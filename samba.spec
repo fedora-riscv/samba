@@ -2,7 +2,7 @@ Summary: The Samba Suite of programs
 Name: samba
 Epoch: 0
 Version: 3.0.25a
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: GPL
 Group: System Environment/Daemons
 URL: http://www.samba.org/
@@ -47,7 +47,7 @@ Patch111: samba-3.0.13-smbclient.patch
 #Patch113: samba-3.0.21-warnings.patch
 Patch200: samba-3.0.25rc1-inotifiy.patch
 Patch201: samba-3.0.25a-pam_smbpass.patch
-
+Patch202: samba-3.0.25a-misc-fix.patch
 
 Requires(pre): samba-common = %{epoch}:%{version}-%{release}
 Requires: pam >= 0:0.64
@@ -170,6 +170,7 @@ cp %{SOURCE11} packaging/Fedora/
 #%patch113 -p1 -b .warnings
 %patch200 -p0 -b .inotify
 %patch201 -p0 -b .pam_smbpass
+%patch202 -p0 -b .misc_fix
 
 # crap
 rm -f examples/VFS/.cvsignore
@@ -631,6 +632,10 @@ exit 0
 #%{_includedir}/libmsrpc.h
 
 %changelog
+* Tue Jun 5 2007 Simo Sorce <ssorce@redhat.com> 3.0.25a-3.fc7
+- fix offline support with XP/Vista from jra@samba.org
+- fix bug in one of the recent security patches
+
 * Tue May 29 2007 Günther Deschner <gdeschner@redhat.com>
 - fix pam_smbpass patch.
 
