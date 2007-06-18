@@ -391,6 +391,8 @@ NEWPATH="/var/lib/samba"
 
 eval ls $OLDPATH/*.tdb >/dev/null 2>&1
 if [ $? = 0 ]; then
+    eval testparm -s 2>/dev/null |grep "lock dir" >/dev/null
+    if [ $? = 1 ]; then #lock dir option not specified, proceed with the move
 
 	#Stop daemons before we move the files around
 
@@ -432,6 +434,10 @@ if [ $? = 0 ]; then
 	mv -f $OLDPATH/*.dat $NEWPATH/ >/dev/null 2>&1
 	mv -f $OLDPATH/perfmon $NEWPATH/ >/dev/null 2>&1
 	mv -f $OLDPATH/printing $NEWPATH/ >/dev/null 2>&1
+
+    else
+	echo "Warning: lock dir explicitly set. Not moving tdb files to new default location"
+    fi
 fi
 
 # We also moved private files from /etc/samba to
@@ -439,26 +445,41 @@ fi
 
 #secrets.tdb
 if [ -f %{_sysconfdir}/samba/secrets.tdb ]; then
-	if [ -f /var/lib/samba/private/secrets.tdb ]; then
-		mv -f /var/lib/samba/private/secrets.tdb /var/lib/samba/private/secrets.tdb.old
+	eval testparm -s 2>/dev/null |grep "private dir" >/dev/null
+	if [ $? = 1 ]; then #private dir option not specified, proceed with the move
+		if [ -f /var/lib/samba/private/secrets.tdb ]; then
+			mv -f /var/lib/samba/private/secrets.tdb /var/lib/samba/private/secrets.tdb.old
+		fi
+		mv -f %{_sysconfdir}/samba/secrets.tdb /var/lib/samba/private/secrets.tdb
+	else
+		echo "Warning: private dir explicitly set. Not moving secrets.tdb to new default location"
 	fi
-	mv -f %{_sysconfdir}/samba/secrets.tdb /var/lib/samba/private/secrets.tdb
 fi
 
 #smbpasswd
 if [ -f %{_sysconfdir}/samba/smbpasswd ]; then
-	if [ -f /var/lib/samba/private/smbpasswd ]; then
-		mv -f /var/lib/samba/private/smbpasswd /var/lib/samba/private/smbpasswd.old
+	eval testparm -s 2>/dev/null |grep "smb passwd file" >/dev/null
+	if [ $? = 1 ]; then #smb passwd file option not specified, proceed with the move
+		if [ -f /var/lib/samba/private/smbpasswd ]; then
+			mv -f /var/lib/samba/private/smbpasswd /var/lib/samba/private/smbpasswd.old
+		fi
+		mv -f %{_sysconfdir}/samba/smbpasswd /var/lib/samba/private/smbpasswd
+	else
+		echo "Warning: smbpasswd file location explicitly set. Not moving smbpasswd to new default location"
 	fi
-	mv -f %{_sysconfdir}/samba/smbpasswd /var/lib/samba/private/smbpasswd
 fi
 
 #passdb.tdb
 if [ -f %{_sysconfdir}/samba/passdb.tdb ]; then
-	if [ -f /var/lib/samba/private/passdb.tdb ]; then
-		mv -f /var/lib/samba/private/passdb.tdb /var/lib/samba/private/passdb.tdb.old
+	eval testparm -s 2>/dev/null |grep "private dir" >/dev/null || testparm -s 2>/dev/null |grep -P "^\s*passdb\s*backend\s*=.*tdbsam:/etc/samba/passdb.tdb.*"
+	if [ $? = 1 ]; then #private dir option not specified, proceed with the move
+		if [ -f /var/lib/samba/private/passdb.tdb ]; then
+			mv -f /var/lib/samba/private/passdb.tdb /var/lib/samba/private/passdb.tdb.old
+		fi
+		mv -f %{_sysconfdir}/samba/passdb.tdb /var/lib/samba/private/passdb.tdb
+	else
+		echo "Warning: passdb.tdb location explicitly set. Not moving passdb.tdb to new default location"
 	fi
-	mv -f %{_sysconfdir}/samba/passdb.tdb /var/lib/samba/private/passdb.tdb
 fi
 
 #remove schannel_store if existing, it is not info we need to keep across restarts
