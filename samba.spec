@@ -1,7 +1,7 @@
 Summary: The Samba Suite of programs
 Name: samba
 Epoch: 0
-Version: 3.0.25c
+Version: 3.0.26a
 Release: 0%{?dist}
 License: GPLv2+ and LGPLv2+
 Group: System Environment/Daemons
@@ -41,7 +41,6 @@ Patch107: samba-3.0.23rc3-passwd.patch
 Patch110: samba-3.0.21pre1-smbspool.patch
 Patch111: samba-3.0.13-smbclient.patch
 Patch200: samba-3.0.25rc1-inotifiy.patch
-Patch210: samba-3.0.25-imdap-basedn.patch
 
 Requires(pre): samba-common = %{epoch}:%{version}-%{release}
 Requires: pam >= 0:0.64
@@ -158,7 +157,6 @@ cp %{SOURCE11} packaging/Fedora/
 %patch110 -p1 -b .smbspool
 %patch111 -p1 -b .smbclient
 %patch200 -p0 -b .inotify
-%patch210 -p1 -b .idmap_basedn
 
 # crap
 rm -f examples/VFS/.cvsignore
@@ -641,6 +639,10 @@ exit 0
 #%{_includedir}/libmsrpc.h
 
 %changelog
+* Tue Sep 11 2007 Simo Sorce <ssorce@redhat.com> 3.0.26a-0.fc8
+- upgrade to the latest upstream realease
+- includes security fixes released today in 3.0.26
+
 * Tue Aug 21 2007 Simo Sorce <ssorce@redhat.com> 3.0.25c-0.fc7
 - update to 3.0.25c
 - add patch to fix samba bugzilla 4772
