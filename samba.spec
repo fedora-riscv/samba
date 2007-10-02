@@ -2,7 +2,7 @@ Summary: The Samba Suite of programs
 Name: samba
 Epoch: 0
 Version: 3.0.26a
-Release: 0%{?dist}
+Release: 1%{?dist}
 License: GPLv2+ and LGPLv2+
 Group: System Environment/Daemons
 URL: http://www.samba.org/
@@ -180,6 +180,7 @@ RPM_OPT_FLAGS="$RPM_OPT_FLAGS -D_FILE_OFFSET_BITS=64"
 EXTRA="-D_LARGEFILE64_SOURCE"
 %endif
 CFLAGS="$RPM_OPT_FLAGS -D_GNU_SOURCE -DLDAP_DEPRECATED" %configure \
+	--with-dnsupdate \
 	--with-acl-support \
 	--with-automount \
 	--with-libsmbclient \
@@ -639,7 +640,10 @@ exit 0
 #%{_includedir}/libmsrpc.h
 
 %changelog
-* Tue Sep 11 2007 Simo Sorce <ssorce@redhat.com> 3.0.26a-0.fc8
+* Tue Oct 2 2007 Simo Sorce <ssorce@redhat.com> 3.0.26a-1.fc7
+- rebuild with AD DNS Update support
+
+* Tue Sep 11 2007 Simo Sorce <ssorce@redhat.com> 3.0.26a-0.fc7
 - upgrade to the latest upstream realease
 - includes security fixes released today in 3.0.26
 
