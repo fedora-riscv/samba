@@ -2,7 +2,7 @@ Summary: The Samba Suite of programs
 Name: samba
 Epoch: 0
 Version: 3.0.26a
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPLv2+ and LGPLv2+
 Group: System Environment/Daemons
 URL: http://www.samba.org/
@@ -159,13 +159,14 @@ cp %{SOURCE11} packaging/Fedora/
 %patch111 -p1 -b .smbclient
 %patch200 -p0 -b .inotify
 
-# crap
-rm -f examples/VFS/.cvsignore
 mv source/VERSION source/VERSION.orig
 sed -e 's/SAMBA_VERSION_VENDOR_SUFFIX=$/&\"%{release}\"/' < source/VERSION.orig > source/VERSION
 cd source
 script/mkversion.sh
 cd ..
+
+#Remove smbldap-tools, they are already packaged separately in Fedora
+rm -fr examples/LDAP/smbldap-tools-0.9.2/
 
 
 %build
@@ -641,6 +642,9 @@ exit 0
 #%{_includedir}/libmsrpc.h
 
 %changelog
+* Wed Oct 3 2007 Simo Sorce <ssorce@redhat.com> 3.0.26a-2.fc8
+- remove smbldap-tools as they are already packaged separately in Fedora
+
 * Tue Oct 2 2007 Simo Sorce <ssorce@redhat.com> 3.0.26a-1.fc8
 - rebuild with AD DNS Update support
 
