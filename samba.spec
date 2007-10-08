@@ -2,7 +2,7 @@ Summary: The Samba Suite of programs
 Name: samba
 Epoch: 0
 Version: 3.0.26a
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: GPLv2+ and LGPLv2+
 Group: System Environment/Daemons
 URL: http://www.samba.org/
@@ -232,6 +232,7 @@ mkdir -p $RPM_BUILD_ROOT/%{_initrddir}
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/{pam.d,logrotate.d,security}
 mkdir -p $RPM_BUILD_ROOT/%{_lib}/security
 mkdir -p $RPM_BUILD_ROOT/var/{log,spool}/samba
+mkdir -p $RPM_BUILD_ROOT/var/log/samba/old
 mkdir -p $RPM_BUILD_ROOT/var/lib/samba
 mkdir -p $RPM_BUILD_ROOT/var/lib/samba/private
 mkdir -p $RPM_BUILD_ROOT/var/lib/samba/winbindd_privileged
@@ -601,6 +602,7 @@ exit 0
 #%dir %{_datadir}/samba/codepages
 %dir %{_sysconfdir}/samba
 %attr(0700,root,root) %dir /var/log/samba
+%attr(0700,root,root) %dir /var/log/samba/old
 %{_initrddir}/winbind
 %{_mandir}/man1/ntlm_auth.1*
 %{_mandir}/man1/profiles.1*
@@ -642,6 +644,9 @@ exit 0
 #%{_includedir}/libmsrpc.h
 
 %changelog
+* Sat Oct 6 2007 Simo Sorce <ssorce@redhat.com> 3.0.26a-3.fc8
+- Fix bug 245506 
+
 * Wed Oct 3 2007 Simo Sorce <ssorce@redhat.com> 3.0.26a-2.fc8
 - remove smbldap-tools as they are already packaged separately in Fedora
 
