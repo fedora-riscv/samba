@@ -50,6 +50,16 @@ Index: source/nsswitch/idmap.c
  	}
  
  	/***************************
+@@ -389,7 +389,8 @@
+ 			continue;
+ 		}
+ 
+-		if (strequal(dom_list[i], lp_workgroup())) {
++		if ((dom_list[i] != default_domain) &&
++		    strequal(dom_list[i], lp_workgroup())) {
+ 			pri_dom_is_in_list = True;
+ 		}
+ 		/* init domain */
 @@ -398,10 +411,10 @@
  						   "default", False);
  
