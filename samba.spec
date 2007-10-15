@@ -2,7 +2,7 @@ Summary: The Samba Suite of programs
 Name: samba
 Epoch: 0
 Version: 3.0.26a
-Release: 4%{?dist}
+Release: 5%{?dist}
 License: GPLv2+ and LGPLv2+
 Group: System Environment/Daemons
 URL: http://www.samba.org/
@@ -644,7 +644,10 @@ exit 0
 #%{_includedir}/libmsrpc.h
 
 %changelog
-* Sat Oct 10 2007 Simo Sorce <ssorce@redhat.com> 3.0.26a-4.fc7
+* Sun Oct 14 2007 Simo Sorce <ssorce@redhat.com> 3.0.26a-5.fc7
+- Fix default domain patch turned out to be incomplete, fixed
+
+* Thu Oct 11 2007 Simo Sorce <ssorce@redhat.com> 3.0.26a-4.fc7
 - Fix idmap_rid module with compatible config syntax
 
 * Sat Oct 6 2007 Simo Sorce <ssorce@redhat.com> 3.0.26a-3.fc7
