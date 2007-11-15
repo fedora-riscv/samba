@@ -1,8 +1,8 @@
 Summary: The Samba Suite of programs
 Name: samba
 Epoch: 0
-Version: 3.0.26a
-Release: 6%{?dist}
+Version: 3.0.27
+Release: 0%{?dist}
 License: GPLv2+ and LGPLv2+
 Group: System Environment/Daemons
 URL: http://www.samba.org/
@@ -646,6 +646,10 @@ exit 0
 #%{_includedir}/libmsrpc.h
 
 %changelog
+* Thu Nov 15 2007 Simo Sorce <ssorce@redhat.com> 3.0.27-0.fc7
+- Fix CVE-2007-4572
+- Fix CVE-2007-5398
+
 * Thu Oct 16 2007 Simo Sorce <ssorce@redhat.com> 3.0.26a-6.fc7
 - Fix bug 253036
 
