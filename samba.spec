@@ -2,7 +2,7 @@ Summary: The Samba Suite of programs
 Name: samba
 Epoch: 0
 Version: 3.0.27
-Release: 0%{?dist}
+Release: 1%{?dist}
 License: GPLv2+ and LGPLv2+
 Group: System Environment/Daemons
 URL: http://www.samba.org/
@@ -43,6 +43,7 @@ Patch111: samba-3.0.13-smbclient.patch
 Patch200: samba-3.0.25rc1-inotifiy.patch
 Patch201: samba3_idmap_default_domain.patch
 Patch202: samba-3.0.26a-winbindd-padding.patch
+Patch203: samba-3.0.27-CVE-2007-4572-regression.patch
 
 Requires(pre): samba-common = %{epoch}:%{version}-%{release}
 Requires: pam >= 0:0.64
@@ -161,6 +162,7 @@ cp %{SOURCE11} packaging/Fedora/
 %patch200 -p0 -b .inotify
 %patch201 -p0 -b .idmap_def_dom
 %patch202 -p1 -b .winbindd_padding
+%patch203 -p1 -b .CVE-2007-4572-regression
 
 mv source/VERSION source/VERSION.orig
 sed -e 's/SAMBA_VERSION_VENDOR_SUFFIX=$/&\"%{release}\"/' < source/VERSION.orig > source/VERSION
@@ -646,6 +648,9 @@ exit 0
 #%{_includedir}/libmsrpc.h
 
 %changelog
+* Mon Nov 19 2007 Simo Sorce <ssorce@redhat.com> 3.0.27-1.fc7
+- Fix regression in CVE-2007-4572
+
 * Thu Nov 15 2007 Simo Sorce <ssorce@redhat.com> 3.0.27-0.fc7
 - Fix CVE-2007-4572
 - Fix CVE-2007-5398
