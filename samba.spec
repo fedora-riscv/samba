@@ -1,7 +1,7 @@
 Summary: The Samba Suite of programs
 Name: samba
 Epoch: 0
-Version: 3.0.27a
+Version: 3.0.28
 Release: 0%{?dist}
 License: GPLv2+ and LGPLv2+
 Group: System Environment/Daemons
@@ -643,6 +643,9 @@ exit 0
 #%{_includedir}/libmsrpc.h
 
 %changelog
+* Mon Dec 10 2007 Simo Sorce <ssorce@redhat.com> 3.0.28-0.fc8
+- Fix CVE-2007-6015
+
 * Wed Nov 21 2007 Simo Sorce <ssorce@redhat.com> 3.0.27a-0.fc8
 - Upstream official fix for regression in CVE-2007-4572
 - More fixes including 2 former patches we had in the package
