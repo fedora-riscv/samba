@@ -1,7 +1,7 @@
 Summary: The Samba Suite of programs
 Name: samba
 Epoch: 0
-Version: 3.0.28
+Version: 3.0.28a
 Release: 0%{?dist}
 License: GPLv2+ and LGPLv2+
 Group: System Environment/Daemons
@@ -133,7 +133,7 @@ develop programs that link against the SMB client library in the Samba suite.
 %prep
 # TAG: change for non-pre
 #%setup -q -n samba-3.0.25rc3
-%setup -q 
+%setup -q
 
 # copy Red Hat specific scripts
 mkdir packaging/Fedora
@@ -176,7 +176,7 @@ RPM_OPT_FLAGS="$RPM_OPT_FLAGS -D_FILE_OFFSET_BITS=64"
 %endif
 %ifarch ia64
 #libtoolize --copy --force     # get it to recognize IA-64
-#autoheader                                               
+#autoheader
 #autoconf
 EXTRA="-D_LARGEFILE64_SOURCE"
 %endif
@@ -642,6 +642,9 @@ exit 0
 #%{_includedir}/libmsrpc.h
 
 %changelog
+* Sun Mar  9 2008 Simo Sorce <ssorce@redhat.com> 3.0.28a-0.fc7
+- New upstream bugfix release
+
 * Mon Dec 10 2007 Simo Sorce <ssorce@redhat.com> 3.0.28-0.fc7
 - Fix CVE-2007-6015
 
