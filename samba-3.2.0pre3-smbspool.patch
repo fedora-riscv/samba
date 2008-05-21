@@ -1,0 +1,32 @@
+>From 03a1b791f1ce41f67bf134024bbc8d116b42ea48 Mon Sep 17 00:00:00 2001
+From: Jeremy Allison <jra@samba.org>
+Date: Wed, 21 May 2008 12:39:08 -0700
+Subject: [PATCH] Fix bug #5479, print spool shares require max_xmit to
+ be adhered to.
+ Jeremy.
+
+---
+ source/libsmb/clireadwrite.c |    7 ++++++-
+ 1 files changed, 6 insertions(+), 1 deletions(-)
+
+diff --git a/source/libsmb/clireadwrite.c b/source/libsmb/clireadwrite.c
+index 12ba4b7..515471e 100644
+--- a/source/libsmb/clireadwrite.c
++++ b/source/libsmb/clireadwrite.c
+@@ -704,7 +704,12 @@ ssize_t cli_write(struct cli_state *cli,
+ 		/* Only do massive writes if we can do them direct
+ 		 * with no signing or encrypting - not on a pipe. */
+ 		writesize = CLI_SAMBA_MAX_POSIX_LARGE_WRITEX_SIZE;
+-	} else if (cli->capabilities & CAP_LARGE_WRITEX) {
++	} else if ((cli->capabilities & CAP_LARGE_WRITEX) &&
++			(strcmp(cli->dev, "LPT1:") != 0)) {
++
++		/* Printer devices are restricted to max_xmit
++		 * writesize in Vista and XPSP3. */
++
+ 		if (cli->is_samba) {
+ 			writesize = CLI_SAMBA_MAX_LARGE_WRITEX_SIZE;
+ 		} else if (!client_is_signing_on(cli)) {
+-- 
+1.5.4.1
+

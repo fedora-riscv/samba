@@ -1,4 +1,4 @@
-%define main_release 11
+%define main_release 12
 %define samba_version 3.2.0pre3
 %define tdb_version 1.1.1
 %define talloc_version 1.2.0
@@ -49,6 +49,7 @@ Patch200: samba-3.0.25rc1-inotifiy.patch
 Patch207: samba-3.2.0pre2-roreloc.diff
 Patch208: samba-3.2.0pre3-smbclient.diff
 Patch209: samba-3.2.0pre3-join.diff
+Patch210: samba-3.2.0pre3-smbspool.patch
 
 Requires(pre): samba-common = %{epoch}:%{version}-%{release}
 Requires: pam >= 0:0.64
@@ -258,6 +259,7 @@ cp %{SOURCE11} packaging/Fedora/
 %patch207 -p1 -b .roreloc
 %patch208 -p1 -b .smbclient
 %patch209 -p1 -b .join
+%patch210 -p1 -b .smbspool
 
 mv source/VERSION source/VERSION.orig
 sed -e 's/SAMBA_VERSION_VENDOR_SUFFIX=$/&\"%{release}\"/' < source/VERSION.orig > source/VERSION
@@ -852,6 +854,10 @@ exit 0
 %{_datadir}/pixmaps/samba/logo-small.png
 
 %changelog
+* Wed May 21 2008 Simo Sorce <ssorce@redhat.com> - 3.2.0-1.pre3.12
+- impossit made iimpossible to print against Vista and XP SP3 as servers
+- resolves: #439154
+
 * Thu May 15 2008 Guenther Deschner <gdeschner@redhat.com> - 3.2.0-1.pre3.11
 - Add "net ads join createcomputer=ou1/ou2/ou3" fix (BZO #5465)
 
