@@ -2,7 +2,7 @@ Summary: The Samba Suite of programs
 Name: samba
 Epoch: 0
 Version: 3.0.29
-Release: 0%{?dist}
+Release: 1%{?dist}
 License: GPLv2+ and LGPLv2+
 Group: System Environment/Daemons
 URL: http://www.samba.org/
@@ -323,6 +323,7 @@ rm -f $RPM_BUILD_ROOT%{_mandir}/man1/testprns.1*
 rm -f $RPM_BUILD_ROOT%{_mandir}/man8/smbmount.8*
 rm -f $RPM_BUILD_ROOT%{_mandir}/man8/smbmnt.8*
 rm -f $RPM_BUILD_ROOT%{_mandir}/man8/smbumount.8*
+rm -f $RPM_BUILD_ROOT%{_mandir}/man1/ldb*.1*
 
 # why are these getting installed in the wrong place?
 rm -f $RPM_BUILD_ROOT%{_sbindir}/{u,}mount.cifs
@@ -630,7 +631,7 @@ exit 0
 
 
 %files doc
-%doc docs/REVISION docs/Samba3-Developers-Guide.pdf docs/Samba3-ByExample.pdf
+%doc docs/Samba3-Developers-Guide.pdf docs/Samba3-ByExample.pdf
 %doc docs/Samba3-HOWTO.pdf docs/THANKS docs/history
 %doc docs/htmldocs
 
@@ -643,6 +644,9 @@ exit 0
 #%{_includedir}/libmsrpc.h
 
 %changelog
+* Wed May 21 2008 Simo Sorce <ssorce@redhat.com> 3.0.29-1.fc8
+- Fix packaging issue
+
 * Wed May 21 2008 Simo Sorce <ssorce@redhat.com> 3.0.29-0.fc8
 - New upstream bugfix release
 
