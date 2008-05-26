@@ -848,11 +848,11 @@ exit 0
 %{_datadir}/pixmaps/samba/logo-small.png
 
 %changelog
-* Fri May 23 2008 Guenther Deschner <gdeschner@redhat.com> - 3.2.0-1.pre3.13
+* Fri May 23 2008 Guenther Deschner <gdeschner@redhat.com> - 3.2.0-1.rc1.13
 - Update to 3.2.0rc1
 
 * Wed May 21 2008 Simo Sorce <ssorce@redhat.com> - 3.2.0-1.pre3.12
-- impossit made iimpossible to print against Vista and XP SP3 as servers
+- make it possible to print against Vista and XP SP3 as servers
 - resolves: #439154
 
 * Thu May 15 2008 Guenther Deschner <gdeschner@redhat.com> - 3.2.0-1.pre3.11
