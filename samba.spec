@@ -2,7 +2,7 @@ Summary: The Samba Suite of programs
 Name: samba
 Epoch: 0
 Version: 3.0.28a
-Release: 0%{?dist}
+Release: 1%{?dist}
 License: GPLv2+ and LGPLv2+
 Group: System Environment/Daemons
 URL: http://www.samba.org/
@@ -41,6 +41,7 @@ Patch107: samba-3.0.23rc3-passwd.patch
 Patch110: samba-3.0.21pre1-smbspool.patch
 Patch111: samba-3.0.13-smbclient.patch
 Patch200: samba-3.0.25rc1-inotifiy.patch
+Patch201: samba-3.0.28a-CVE-2008-1105.patch
 
 Requires(pre): samba-common = %{epoch}:%{version}-%{release}
 Requires: pam >= 0:0.64
@@ -157,6 +158,7 @@ cp %{SOURCE11} packaging/Fedora/
 %patch110 -p1 -b .smbspool
 %patch111 -p1 -b .smbclient
 %patch200 -p0 -b .inotify
+%patch201 -p1 -b .CVE-2008-1105
 
 mv source/VERSION source/VERSION.orig
 sed -e 's/SAMBA_VERSION_VENDOR_SUFFIX=$/&\"%{release}\"/' < source/VERSION.orig > source/VERSION
@@ -642,6 +644,9 @@ exit 0
 #%{_includedir}/libmsrpc.h
 
 %changelog
+* Wed May 28 2008 Simo Sorce <ssorce@redhat.com> 3.0.28a-1.fc7
+- Fix CVE-2008-1105
+
 * Sun Mar  9 2008 Simo Sorce <ssorce@redhat.com> 3.0.28a-0.fc7
 - New upstream bugfix release
 
