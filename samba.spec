@@ -1,7 +1,7 @@
 Summary: The Samba Suite of programs
 Name: samba
 Epoch: 0
-Version: 3.0.32
+Version: 3.0.33
 Release: 0%{?dist}
 License: GPLv2+ and LGPLv2+
 Group: System Environment/Daemons
@@ -644,6 +644,9 @@ exit 0
 #%{_includedir}/libmsrpc.h
 
 %changelog
+* Thu Nov 27 2008 Guenther Deschner <gdeschner@redhat.com> - 3.0.33-0.fc8
+- Update to 3.0.33 (Security fix for CVE-2008-4314)
+
 * Tue Aug 26 2008 Guenther Deschner <gdeschner@redhat.com> 3.0.32-0.fc8
 - New upstream bugfix release
 
