@@ -1,5 +1,5 @@
-%define main_release 23
-%define samba_version 3.2.5
+%define main_release 24
+%define samba_version 3.2.6
 %define tdb_version 1.1.1
 %define talloc_version 1.2.0
 
@@ -8,7 +8,7 @@
 Summary: The Samba Suite of programs
 Name: samba
 Epoch: 0
-Version: 3.2.5
+Version: 3.2.6
 Release: %{samba_release}
 License: GPLv3+ and LGPLv3+
 Group: System Environment/Daemons
@@ -46,7 +46,6 @@ Patch107: samba-3.2.0pre1-grouppwd.patch
 Patch110: samba-3.0.21pre1-smbspool.patch
 Patch111: samba-3.0.13-smbclient.patch
 Patch200: samba-3.0.25rc1-inotifiy.patch
-Patch201: samba-3.2.4-build.patch
 
 Requires(pre): samba-common = %{epoch}:%{version}-%{release}
 Requires: pam >= 0:0.64
@@ -253,7 +252,6 @@ cp %{SOURCE11} packaging/Fedora/
 #%patch110 -p1 -b .smbspool # FIXME: does not apply
 #%patch111 -p1 -b .smbclient # FIXME: does not apply
 #%patch200 -p0 -b .inotify # FIXME: does not compile
-%patch201 -p1 -b .build
 
 mv source/VERSION source/VERSION.orig
 sed -e 's/SAMBA_VERSION_VENDOR_SUFFIX=$/&\"%{samba_release}\"/' < source/VERSION.orig > source/VERSION
@@ -324,10 +322,6 @@ make  LD_LIBRARY_PATH=$RPM_BUILD_DIR/%{name}-%{samba_version}/source/bin \
 
 make  CFLAGS="$RPM_OPT_FLAGS -D_GNU_SOURCE" \
 	debug2html smbfilter bin/cifs.upcall
-
-( cd client ; gcc -o mount.cifs $RPM_OPT_FLAGS -Wall -O -D_GNU_SOURCE -D_LARGEFILE64_SOURCE mount.cifs.c )
-( cd client ; gcc -o umount.cifs $RPM_OPT_FLAGS -Wall -O -D_GNU_SOURCE -D_LARGEFILE64_SOURCE umount.cifs.c )
-
 
 
 %install
@@ -430,8 +424,8 @@ install -m644 %{SOURCE2} $RPM_BUILD_ROOT%{_sysconfdir}/xinetd.d/swat
 
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig
 install -m644 %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/samba
-install -m755 source/client/mount.cifs $RPM_BUILD_ROOT/sbin/mount.cifs
-install -m755 source/client/umount.cifs $RPM_BUILD_ROOT/sbin/umount.cifs
+install -m755 $RPM_BUILD_ROOT/usr/sbin/mount.cifs $RPM_BUILD_ROOT/sbin/mount.cifs
+install -m755 $RPM_BUILD_ROOT/usr/sbin/umount.cifs $RPM_BUILD_ROOT/sbin/umount.cifs
 
 install -m 755 source/lib/netapi/examples/bin/netdomjoin-gui $RPM_BUILD_ROOT/%{_sbindir}/netdomjoin-gui
 mkdir -p $RPM_BUILD_ROOT%{_datadir}/pixmaps/%{name}
@@ -830,6 +824,9 @@ exit 0
 %{_datadir}/pixmaps/samba/logo-small.png
 
 %changelog
+* Wed Dec 10 2008 Guenther Deschner <gdeschner@redhat.com> - 3.2.6-0.24
+- Update to 3.2.6
+
 * Thu Nov 27 2008 Guenther Deschner <gdeschner@redhat.com> - 3.2.5-0.23
 - Update to 3.2.5 (Security fix for CVE-2008-4314)
 
