@@ -1,4 +1,4 @@
-%define main_release 24
+%define main_release 25
 %define samba_version 3.2.8
 %define tdb_version 1.1.1
 %define talloc_version 1.2.0
@@ -826,7 +826,8 @@ exit 0
 %changelog
 * Tue Feb  3 2009 Guenther Deschner <gdeschner@redhat.com> - 3.2.8-0.24
 - Update to 3.2.8
-- resolves: #479743
+- Fix cups connections (resolves: #479743)
+- Remove bogus perl dependencies (resolves: #473051)
 
 * Mon Jan  5 2009 Guenther Deschner <gdeschner@redhat.com> - 3.2.7-0.23
 - Update to 3.2.7 (Security fix for CVE-2009-0022)
