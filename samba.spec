@@ -826,6 +826,7 @@ exit 0
 %changelog
 * Tue Feb  3 2009 Guenther Deschner <gdeschner@redhat.com> - 3.2.8-0.26
 - Update to 3.2.8
+- Remove bogus perl dependencies (resolves: #473051)
 
 * Mon Jan  5 2009 Guenther Deschner <gdeschner@redhat.com> - 3.2.7-0.25
 - Update to 3.2.7 (Security fix for CVE-2009-0022)
