@@ -1,4 +1,4 @@
-%define main_release 25
+%define main_release 26
 %define samba_version 3.2.8
 %define tdb_version 1.1.1
 %define talloc_version 1.2.0
@@ -54,7 +54,7 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 Requires(post): /sbin/chkconfig, /sbin/service
 Requires(preun): /sbin/chkconfig, /sbin/service
 BuildRequires: pam-devel, readline-devel, ncurses-devel, libacl-devel, krb5-devel, openldap-devel, openssl-devel, cups-devel
-BuildRequires: autoconf, gawk, popt-devel, gtk2-devel
+BuildRequires: autoconf, gawk, popt-devel, gtk2-devel, libcap-devel
 
 # Working around perl dependency problem from docs
 %define __perl_requires %{SOURCE999}
@@ -824,6 +824,9 @@ exit 0
 %{_datadir}/pixmaps/samba/logo-small.png
 
 %changelog
+* Thu Mar  5 2009 Guenther Deschner <gdeschner@redhat.com> - 3.2.8-0.26
+- Add libcap-devel to requires list (resolves: #488559)
+
 * Tue Feb  3 2009 Guenther Deschner <gdeschner@redhat.com> - 3.2.8-0.24
 - Update to 3.2.8
 - Fix cups connections (resolves: #479743)
