@@ -1,4 +1,4 @@
-%define main_release 27
+%define main_release 28
 %define samba_version 3.2.8
 %define tdb_version 1.1.1
 %define talloc_version 1.2.0
@@ -46,6 +46,7 @@ Patch107: samba-3.2.0pre1-grouppwd.patch
 Patch110: samba-3.0.21pre1-smbspool.patch
 Patch111: samba-3.0.13-smbclient.patch
 Patch200: samba-3.0.25rc1-inotifiy.patch
+Patch201: samba-3.2.8-nmbd_lmb_delay.patch
 
 Requires(pre): samba-common = %{epoch}:%{version}-%{release}
 Requires: pam >= 0:0.64
@@ -252,6 +253,7 @@ cp %{SOURCE11} packaging/Fedora/
 #%patch110 -p1 -b .smbspool # FIXME: does not apply
 #%patch111 -p1 -b .smbclient # FIXME: does not apply
 #%patch200 -p0 -b .inotify # FIXME: does not compile
+%patch201 -p1 -b .nmbd_lmb_delay
 
 mv source/VERSION source/VERSION.orig
 sed -e 's/SAMBA_VERSION_VENDOR_SUFFIX=$/&\"%{samba_release}\"/' < source/VERSION.orig > source/VERSION
@@ -486,6 +488,8 @@ fi
 
 %post common
 /sbin/ldconfig
+
+# TODO: should we check the timestamps as well here ??
 
 # This script must be run always on installs or upgrades
 # it checks if a previous installation have created files
@@ -824,6 +828,13 @@ exit 0
 %{_datadir}/pixmaps/samba/logo-small.png
 
 %changelog
+* Thu Mar 26 2009 Simo Sorce <ssorce@redhat.com> - 3.2.8-0.28
+- Fix nmbd init script nmbd reload was causing smbd not nmbd to reload the
+  configuration
+- Fix upstream bug 6224, nmbd was waiting 5+ minutes before running elections on
+  startup, causing your own machine not to show up in the network for 5 minutes
+  if it was the only client in that workgroup (fix committed upstream)
+
 * Thu Mar  5 2009 Guenther Deschner <gdeschner@redhat.com> - 3.2.8-0.27
 - Add libcap-devel to requires list (resolves: #488559)
 
