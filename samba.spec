@@ -1,5 +1,5 @@
-%define main_release 26
-%define samba_version 3.2.8
+%define main_release 27
+%define samba_version 3.2.9
 %define tdb_version 1.1.1
 %define talloc_version 1.2.0
 
@@ -8,7 +8,7 @@
 Summary: The Samba Suite of programs
 Name: samba
 Epoch: 0
-Version: 3.2.8
+Version: 3.2.9
 Release: %{samba_release}
 License: GPLv3+ and LGPLv3+
 Group: System Environment/Daemons
@@ -824,6 +824,10 @@ exit 0
 %{_datadir}/pixmaps/samba/logo-small.png
 
 %changelog
+* Tue Mar 31 2009 Guenther Deschner <gdeschner@redhat.com> - 3.2.9-0.27
+- Update to 3.2.9
+- resolves: #489547
+
 * Thu Mar  5 2009 Guenther Deschner <gdeschner@redhat.com> - 3.2.8-0.26
 - Add libcap-devel to requires list (resolves: #488559)
 
