@@ -1,4 +1,4 @@
-%define main_release 32
+%define main_release 33
 %define samba_version 3.2.12
 %define tdb_version 1.1.1
 %define talloc_version 1.2.0
@@ -826,7 +826,7 @@ exit 0
 %{_datadir}/pixmaps/samba/logo-small.png
 
 %changelog
-* Tue Jun 16 2009 Guenther Deschner <gdeschner@redhat.com> - 3.2.12-0.32
+* Tue Jun 16 2009 Guenther Deschner <gdeschner@redhat.com> - 3.2.12-0.33
 - Update to 3.2.12
 
 * Tue Apr 28 2009 Guenther Deschner <gdeschner@redhat.com> - 3.2.11-0.31
