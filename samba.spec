@@ -1,5 +1,5 @@
-%define main_release 29
-%define samba_version 3.2.11
+%define main_release 30
+%define samba_version 3.2.12
 %define tdb_version 1.1.1
 %define talloc_version 1.2.0
 
@@ -8,7 +8,7 @@
 Summary: The Samba Suite of programs
 Name: samba
 Epoch: 0
-Version: 3.2.11
+Version: 3.2.12
 Release: %{samba_release}
 License: GPLv3+ and LGPLv3+
 Group: System Environment/Daemons
@@ -46,7 +46,6 @@ Patch107: samba-3.2.0pre1-grouppwd.patch
 Patch110: samba-3.0.21pre1-smbspool.patch
 Patch111: samba-3.0.13-smbclient.patch
 Patch200: samba-3.0.25rc1-inotifiy.patch
-Patch201: samba-3.2.11-force_user.patch
 
 Requires(pre): samba-common = %{epoch}:%{version}-%{release}
 Requires: pam >= 0:0.64
@@ -253,7 +252,6 @@ cp %{SOURCE11} packaging/Fedora/
 #%patch110 -p1 -b .smbspool # FIXME: does not apply
 #%patch111 -p1 -b .smbclient # FIXME: does not apply
 #%patch200 -p0 -b .inotify # FIXME: does not compile
-%patch201 -p1 -b .force_user
 
 mv source/VERSION source/VERSION.orig
 sed -e 's/SAMBA_VERSION_VENDOR_SUFFIX=$/&\"%{samba_release}\"/' < source/VERSION.orig > source/VERSION
@@ -826,6 +824,9 @@ exit 0
 %{_datadir}/pixmaps/samba/logo-small.png
 
 %changelog
+* Tue Jun 16 2009 Guenther Deschner <gdeschner@redhat.com> - 3.2.12-0.30
+- Update to 3.2.12
+
 * Tue Apr 28 2009 Guenther Deschner <gdeschner@redhat.com> - 3.2.11-0.29
 - Fix "force user"
 - resolves: #497708
