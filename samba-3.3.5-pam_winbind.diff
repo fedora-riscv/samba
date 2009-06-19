@@ -1,0 +1,29 @@
+commit 3815e87f1ffea44c4d76e6c2515ff4894f6896c9
+Author:     Günther Deschner <gd@samba.org>
+AuthorDate: Tue May 5 12:54:21 2009 +0200
+Commit:     Karolin Seeger <kseeger@samba.org>
+CommitDate: Fri Jun 19 08:17:54 2009 +0200
+
+    s3-pam_winbind: Fix Bug 6253: Use correct value for password expiry calculation.
+    
+    Based on patch from Blindauer Emmanuel <samba@mooby.net>.
+    
+    Guenther
+---
+ source/nsswitch/pam_winbind.c |    3 ++-
+ 1 files changed, 2 insertions(+), 1 deletions(-)
+
+diff --git a/source/nsswitch/pam_winbind.c b/source/nsswitch/pam_winbind.c
+index 26ef1d4..1211ffd 100644
+--- a/source/nsswitch/pam_winbind.c
++++ b/source/nsswitch/pam_winbind.c
+@@ -914,7 +914,8 @@ static void _pam_warn_password_expiry(struct pwb_context *ctx,
+ 	/* now check for the global password policy */
+ 	/* good catch from Ralf Haferkamp: an expiry of "never" is translated
+ 	 * to -1 */
+-	if (policy->expire <= 0) {
++	if ((policy->expire == (int64_t)-1) ||
++	    (policy->expire == 0)) {
+ 		return;
+ 	}
+ 

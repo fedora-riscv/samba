@@ -1,4 +1,4 @@
-%define main_release 37
+%define main_release 38
 %define samba_version 3.3.5
 %define tdb_version 1.1.2
 %define talloc_version 1.2.0
@@ -46,6 +46,7 @@ Patch104: samba-3.0.0rc3-nmbd-netbiosname.patch
 # The passwd part has been applied, but not the group part
 Patch107: samba-3.2.0pre1-grouppwd.patch
 Patch200: samba-3.2.5-inotify.patch
+Patch201: samba-3.3.5-pam_winbind.diff
 
 Requires(pre): samba-common = %{epoch}:%{samba_version}-%{release}
 Requires: pam >= 0:0.64
@@ -250,6 +251,7 @@ cp %{SOURCE11} packaging/Fedora/
 #%patch104 -p1 -b .nmbd-netbiosname # FIXME: does not apply
 %patch107 -p1 -b .grouppwd
 %patch200 -p0 -b .inotify
+%patch201 -p1 -b .pam_winbind
 
 mv source/VERSION source/VERSION.orig
 sed -e 's/SAMBA_VERSION_VENDOR_SUFFIX=$/&\"%{samba_release}\"/' < source/VERSION.orig > source/VERSION
@@ -879,6 +881,9 @@ exit 0
 %{_datadir}/pixmaps/samba/logo-small.png
 
 %changelog
+* Fri Jun 19 2009 Guenther Deschner <gdeschner@redhat.com> - 3.3.5-0.38
+- Fix password expiry calculation in pam_winbind
+
 * Tue Jun 16 2009 Guenther Deschner <gdeschner@redhat.com> - 3.3.5-0.37
 - Update to 3.3.5
 
