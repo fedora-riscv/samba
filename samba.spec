@@ -1,6 +1,6 @@
-%define main_release 38
-%define samba_version 3.3.5
-%define tdb_version 1.1.2
+%define main_release 39
+%define samba_version 3.4.0
+%define tdb_version 1.1.3
 %define talloc_version 1.2.0
 %define pre_release %nil
 
@@ -9,6 +9,7 @@
 %define enable_talloc 0
 %define enable_tdb    0
 
+%define samba_source source3
 Summary: Server and Client software to interoperate with Windows machines
 Name: samba
 Epoch: 0
@@ -46,7 +47,7 @@ Patch104: samba-3.0.0rc3-nmbd-netbiosname.patch
 # The passwd part has been applied, but not the group part
 Patch107: samba-3.2.0pre1-grouppwd.patch
 Patch200: samba-3.2.5-inotify.patch
-Patch201: samba-3.3.5-pam_winbind.diff
+Patch201: samba-3.4.0-build.patch
 
 Requires(pre): samba-common = %{epoch}:%{samba_version}-%{release}
 Requires: pam >= 0:0.64
@@ -56,6 +57,12 @@ Requires(post): /sbin/chkconfig, /sbin/service
 Requires(preun): /sbin/chkconfig, /sbin/service
 BuildRequires: pam-devel, readline-devel, ncurses-devel, libacl-devel, krb5-devel, openldap-devel, openssl-devel, cups-devel, ctdb-devel
 BuildRequires: autoconf, gawk, popt-devel, gtk2-devel, libcap-devel
+%if ! %enable_talloc
+BuildRequires: libtalloc-devel
+%endif
+%if ! %enable_tdb
+BuildRequires: libtdb-devel
+%endif
 
 # Working around perl dependency problem from docs
 %define __perl_requires %{SOURCE999}
@@ -251,11 +258,11 @@ cp %{SOURCE11} packaging/Fedora/
 #%patch104 -p1 -b .nmbd-netbiosname # FIXME: does not apply
 %patch107 -p1 -b .grouppwd
 %patch200 -p0 -b .inotify
-%patch201 -p1 -b .pam_winbind
+%patch201 -p1 -b .build
 
-mv source/VERSION source/VERSION.orig
-sed -e 's/SAMBA_VERSION_VENDOR_SUFFIX=$/&\"%{samba_release}\"/' < source/VERSION.orig > source/VERSION
-cd source
+mv %samba_source/VERSION %samba_source/VERSION.orig
+sed -e 's/SAMBA_VERSION_VENDOR_SUFFIX=$/&\"%{samba_release}\"/' < %samba_source/VERSION.orig > %samba_source/VERSION
+cd %samba_source
 script/mkversion.sh
 cd ..
 
@@ -264,7 +271,7 @@ rm -fr examples/LDAP/smbldap-tools-*/
 
 
 %build
-cd source
+cd %samba_source
 sh autogen.sh
 %ifarch i386 sparc
 RPM_OPT_FLAGS="$RPM_OPT_FLAGS -D_FILE_OFFSET_BITS=64"
@@ -306,23 +313,20 @@ CFLAGS="$RPM_OPT_FLAGS -D_GNU_SOURCE -DLDAP_DEPRECATED" %configure \
 	--with-shared-modules=idmap_ad,idmap_rid,idmap_adex,idmap_hash,idmap_tdb2 \
 	--with-cifsupcall \
 	--with-cluster-support
-
 #	--with-aio-support \
 
 
-make  CFLAGS="$RPM_OPT_FLAGS -D_GNU_SOURCE -DLDAP_DEPRECATED" \
-	pch
+make  pch
 
-make  LD_LIBRARY_PATH=$RPM_BUILD_DIR/%{name}-%{samba_version}/source/bin \
-	CFLAGS="$RPM_OPT_FLAGS -D_GNU_SOURCE -DLDAP_DEPRECATED" %{?_smp_mflags} \
-	all nsswitch/libnss_wins.so modules test_pam_modules test_nss_modules test_shlibs
+make  LD_LIBRARY_PATH=$RPM_BUILD_DIR/%{name}-%{samba_version}%{pre_release}/%samba_source/bin \
+	%{?_smp_mflags} \
+	all ../nsswitch/libnss_wins.so modules test_pam_modules test_nss_modules test_shlibs
 
-make  LD_LIBRARY_PATH=$RPM_BUILD_DIR/%{name}-%{samba_version}/source/bin \
-	CFLAGS="$RPM_OPT_FLAGS -D_GNU_SOURCE -DLDAP_DEPRECATED" %{?_smp_mflags} \
+make  LD_LIBRARY_PATH=$RPM_BUILD_DIR/%{name}-%{samba_version}%{pre_release}/%samba_source/bin \
+	%{?_smp_mflags} \
 	-C lib/netapi/examples
 
-make  CFLAGS="$RPM_OPT_FLAGS -D_GNU_SOURCE" \
-	debug2html smbfilter bin/cifs.upcall
+make  debug2html smbfilter bin/cifs.upcall
 
 
 %install
@@ -344,7 +348,7 @@ mkdir -p $RPM_BUILD_ROOT/var/run/winbindd
 mkdir -p $RPM_BUILD_ROOT/%{_libdir}/samba
 mkdir -p $RPM_BUILD_ROOT/%{_libdir}/pkgconfig
 
-cd source
+cd %samba_source
 
 %makeinstall \
 	BINDIR=$RPM_BUILD_ROOT%{_bindir} \
@@ -368,7 +372,7 @@ cd ..
 
 # Install other stuff
 install -m644 packaging/Fedora/smb.conf.default $RPM_BUILD_ROOT%{_sysconfdir}/samba/smb.conf
-install -m755 source/script/mksmbpasswd.sh $RPM_BUILD_ROOT%{_bindir}
+install -m755 %samba_source/script/mksmbpasswd.sh $RPM_BUILD_ROOT%{_bindir}
 install -m644 packaging/Fedora/smbusers $RPM_BUILD_ROOT%{_sysconfdir}/samba/smbusers
 install -m755 packaging/Fedora/smbprint $RPM_BUILD_ROOT%{_bindir}
 install -m755 packaging/Fedora/smb.init $RPM_BUILD_ROOT%{_initrddir}/smb
@@ -384,39 +388,39 @@ install -m644 examples/LDAP/samba.schema $RPM_BUILD_ROOT%{_sysconfdir}/openldap/
 
 # winbind
 mkdir -p $RPM_BUILD_ROOT%{_libdir}
-install -m 755 source/nsswitch/libnss_winbind.so $RPM_BUILD_ROOT/%{_lib}/libnss_winbind.so.2
+install -m 755 nsswitch/libnss_winbind.so $RPM_BUILD_ROOT/%{_lib}/libnss_winbind.so.2
 ln -sf /%{_lib}/libnss_winbind.so.2  $RPM_BUILD_ROOT%{_libdir}/libnss_winbind.so
-install -m 755 source/nsswitch/libnss_wins.so $RPM_BUILD_ROOT/%{_lib}/libnss_wins.so.2
+install -m 755 nsswitch/libnss_wins.so $RPM_BUILD_ROOT/%{_lib}/libnss_wins.so.2
 ln -sf /%{_lib}/libnss_wins.so.2  $RPM_BUILD_ROOT%{_libdir}/libnss_wins.so
 
 # libraries {
 mkdir -p $RPM_BUILD_ROOT%{_libdir} $RPM_BUILD_ROOT%{_includedir}
+build_libdir="$RPM_BUILD_ROOT%{_libdir}"
 
 %if %enable_talloc
 # talloc
-cd source/lib/talloc
+cd lib/talloc
 # just to get the correct .pc file generated
 ./autogen.sh && ./configure --prefix=%{_prefix} --libdir=%{_libdir}
-cd ../../..
-install -m 644 source/lib/talloc/talloc.pc $build_libdir/pkgconfig/
+cd ../..
+install -m 644 lib/talloc/talloc.pc $build_libdir/pkgconfig/
 %endif
 
 %if %enable_tdb
 # tdb
-cd source/lib/tdb
+cd lib/tdb
 # just to get the correct .pc file generated
 ./autogen.sh && ./configure --prefix=%{_prefix} --libdir=%{_libdir}
-cd ../../..
-install -m 644 source/lib/tdb/tdb.pc $build_libdir/pkgconfig/
+cd ../..
+install -m 644 lib/tdb/tdb.pc $build_libdir/pkgconfig/
 %endif
 
 # make install puts libraries in the wrong place
 # (but at least gets the versioning right now)
 
 list="smbclient smbsharemodes netapi talloc tdb wbclient"
-build_libdir="$RPM_BUILD_ROOT%{_libdir}"
 for i in $list; do
-	install -m 644 source/pkgconfig/$i.pc $build_libdir/pkgconfig/ || true
+	install -m 644 %samba_source/pkgconfig/$i.pc $build_libdir/pkgconfig/ || true
 done
 
 
@@ -432,11 +436,11 @@ install -m644 %{SOURCE4} $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/samba
 install -m755 $RPM_BUILD_ROOT/usr/sbin/mount.cifs $RPM_BUILD_ROOT/sbin/mount.cifs
 install -m755 $RPM_BUILD_ROOT/usr/sbin/umount.cifs $RPM_BUILD_ROOT/sbin/umount.cifs
 
-install -m 755 source/lib/netapi/examples/bin/netdomjoin-gui $RPM_BUILD_ROOT/%{_sbindir}/netdomjoin-gui
+install -m 755 %samba_source/lib/netapi/examples/bin/netdomjoin-gui $RPM_BUILD_ROOT/%{_sbindir}/netdomjoin-gui
 mkdir -p $RPM_BUILD_ROOT%{_datadir}/pixmaps/%{name}
-install -m 644 source/lib/netapi/examples/netdomjoin-gui/samba.ico $RPM_BUILD_ROOT/%{_datadir}/pixmaps/%{name}/samba.ico
-install -m 644 source/lib/netapi/examples/netdomjoin-gui/logo.png $RPM_BUILD_ROOT/%{_datadir}/pixmaps/%{name}/logo.png
-install -m 644 source/lib/netapi/examples/netdomjoin-gui/logo-small.png $RPM_BUILD_ROOT/%{_datadir}/pixmaps/%{name}/logo-small.png
+install -m 644 %samba_source/lib/netapi/examples/netdomjoin-gui/samba.ico $RPM_BUILD_ROOT/%{_datadir}/pixmaps/%{name}/samba.ico
+install -m 644 %samba_source/lib/netapi/examples/netdomjoin-gui/logo.png $RPM_BUILD_ROOT/%{_datadir}/pixmaps/%{name}/logo.png
+install -m 644 %samba_source/lib/netapi/examples/netdomjoin-gui/logo-small.png $RPM_BUILD_ROOT/%{_datadir}/pixmaps/%{name}/logo-small.png
 
 rm -f $RPM_BUILD_ROOT/%{_mandir}/man1/editreg.1*
 rm -f $RPM_BUILD_ROOT%{_mandir}/man1/log2pcap.1*
@@ -816,8 +820,8 @@ exit 0
 %{_initrddir}/winbind
 %{_mandir}/man1/ntlm_auth.1*
 %{_mandir}/man1/wbinfo.1*
-%{_mandir}/man7/winbind_krb5_locator.7*
 %{_mandir}/man8/pam_winbind.8*
+%{_mandir}/man7/winbind_krb5_locator.7*
 %{_mandir}/man8/winbindd.8*
 %{_mandir}/man8/idmap_*.8*
 %{_datadir}/locale/*/LC_MESSAGES/pam_winbind.mo
@@ -881,6 +885,10 @@ exit 0
 %{_datadir}/pixmaps/samba/logo-small.png
 
 %changelog
+* Wed Jul 15 2009 Guenther Deschner <gdeschner@redhat.com> - 3.4.0-0.39
+- Update to 3.4.0
+- resolves: #510558
+
 * Fri Jun 19 2009 Guenther Deschner <gdeschner@redhat.com> - 3.3.5-0.38
 - Fix password expiry calculation in pam_winbind
 
