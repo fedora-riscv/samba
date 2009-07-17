@@ -59,10 +59,10 @@ Requires(preun): /sbin/chkconfig, /sbin/service
 BuildRequires: pam-devel, readline-devel, ncurses-devel, libacl-devel, krb5-devel, openldap-devel, openssl-devel, cups-devel, ctdb-devel
 BuildRequires: autoconf, gawk, popt-devel, gtk2-devel, libcap-devel
 %if ! %enable_talloc
-BuildRequires: libtalloc-devel
+BuildRequires: libtalloc-devel >= %{talloc_version}
 %endif
 %if ! %enable_tdb
-BuildRequires: libtdb-devel
+BuildRequires: libtdb-devel >= %{tdb_version}
 %endif
 
 # Working around perl dependency problem from docs
@@ -889,6 +889,7 @@ exit 0
 %changelog
 * Fri Jul 17 2009 Guenther Deschner <gdeschner@redhat.com> - 3.4.0-0.40
 - Fix Bug #6551 (vuid and tid not set in sessionsetupX and tconX)
+- Specify required talloc and tdb version for BuildRequires
 
 * Wed Jul 15 2009 Guenther Deschner <gdeschner@redhat.com> - 3.4.0-0.39
 - Update to 3.4.0
