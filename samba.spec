@@ -1,5 +1,5 @@
-%define main_release 34
-%define samba_version 3.2.12
+%define main_release 35
+%define samba_version 3.2.14
 %define tdb_version 1.1.1
 %define talloc_version 1.2.0
 
@@ -8,7 +8,7 @@
 Summary: The Samba Suite of programs
 Name: samba
 Epoch: 0
-Version: 3.2.12
+Version: 3.2.14
 Release: %{samba_release}
 License: GPLv3+ and LGPLv3+
 Group: System Environment/Daemons
@@ -826,6 +826,9 @@ exit 0
 %{_datadir}/pixmaps/samba/logo-small.png
 
 %changelog
+* Fri Sep  4 2009 Simo Sorce <ssorce@redhat.com> - 3.2.14-0.35
+- Update to 3.2.14
+
 * Tue Jun 16 2009 Guenther Deschner <gdeschner@redhat.com> - 3.2.12-0.34
 - Update to 3.2.12
 - Update pam_winbind.conf file
