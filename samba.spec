@@ -1,5 +1,5 @@
-%define main_release 40
-%define samba_version 3.4.0
+%define main_release 41
+%define samba_version 3.4.1
 %define tdb_version 1.1.3
 %define talloc_version 1.2.0
 %define pre_release %nil
@@ -47,8 +47,6 @@ Patch104: samba-3.0.0rc3-nmbd-netbiosname.patch
 # The passwd part has been applied, but not the group part
 Patch107: samba-3.2.0pre1-grouppwd.patch
 Patch200: samba-3.2.5-inotify.patch
-Patch201: samba-3.4.0-build.patch
-Patch202: samba-3.4.0-bug6551.patch
 
 Requires(pre): samba-common = %{epoch}:%{samba_version}-%{release}
 Requires: pam >= 0:0.64
@@ -259,8 +257,6 @@ cp %{SOURCE11} packaging/Fedora/
 #%patch104 -p1 -b .nmbd-netbiosname # FIXME: does not apply
 %patch107 -p1 -b .grouppwd
 %patch200 -p0 -b .inotify
-%patch201 -p1 -b .build
-%patch202 -p1 -b .bug6551
 
 mv %samba_source/VERSION %samba_source/VERSION.orig
 sed -e 's/SAMBA_VERSION_VENDOR_SUFFIX=$/&\"%{samba_release}\"/' < %samba_source/VERSION.orig > %samba_source/VERSION
@@ -887,6 +883,9 @@ exit 0
 %{_datadir}/pixmaps/samba/logo-small.png
 
 %changelog
+* Wed Sep 09 2009 Guenther Deschner <gdeschner@redhat.com> - 3.4.1.0-41
+- Update to 3.4.1
+
 * Fri Jul 17 2009 Guenther Deschner <gdeschner@redhat.com> - 3.4.0-0.40
 - Fix Bug #6551 (vuid and tid not set in sessionsetupX and tconX)
 - Specify required talloc and tdb version for BuildRequires
