@@ -1,5 +1,5 @@
-%define main_release 35
-%define samba_version 3.2.14
+%define main_release 36
+%define samba_version 3.2.15
 %define tdb_version 1.1.1
 %define talloc_version 1.2.0
 
@@ -8,7 +8,7 @@
 Summary: The Samba Suite of programs
 Name: samba
 Epoch: 0
-Version: 3.2.14
+Version: 3.2.15
 Release: %{samba_release}
 License: GPLv3+ and LGPLv3+
 Group: System Environment/Daemons
@@ -826,6 +826,10 @@ exit 0
 %{_datadir}/pixmaps/samba/logo-small.png
 
 %changelog
+* Thu Oct 01 2009 Guenther Deschner <gdeschner@redhat.com> - 3.2.15-0.36
+- Update to 3.2.15
+- Security Release, fixes CVE-2009-2813, CVE-2009-2948 and CVE-2009-2906
+
 * Fri Sep  4 2009 Simo Sorce <ssorce@redhat.com> - 3.2.14-0.35
 - Update to 3.2.14
 
