@@ -1,5 +1,5 @@
-%define main_release 41
-%define samba_version 3.4.1
+%define main_release 42
+%define samba_version 3.4.2
 %define tdb_version 1.1.3
 %define talloc_version 1.2.0
 %define pre_release %nil
@@ -883,6 +883,10 @@ exit 0
 %{_datadir}/pixmaps/samba/logo-small.png
 
 %changelog
+* Thu Oct 01 2009 Guenther Deschner <gdeschner@redhat.com> - 3.4.2-0.42
+- Update to 3.4.2
+- Security Release, fixes CVE-2009-2813, CVE-2009-2948 and CVE-2009-2906
+
 * Wed Sep 09 2009 Guenther Deschner <gdeschner@redhat.com> - 3.4.1.0-41
 - Update to 3.4.1
 
