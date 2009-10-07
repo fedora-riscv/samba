@@ -1,7 +1,7 @@
-%define main_release 42
+%define main_release 43
 %define samba_version 3.4.2
 %define tdb_version 1.1.3
-%define talloc_version 1.2.0
+%define talloc_version 1.3.0
 %define pre_release %nil
 
 %define samba_release 0%{pre_release}.%{main_release}%{?dist}
@@ -883,6 +883,10 @@ exit 0
 %{_datadir}/pixmaps/samba/logo-small.png
 
 %changelog
+* Wed Oct 07 2009 Guenther Deschner <gdeschner@redhat.com> - 3.4.2-0.43
+- Fix required talloc version
+- resolves: #527806
+
 * Thu Oct 01 2009 Guenther Deschner <gdeschner@redhat.com> - 3.4.2-0.42
 - Update to 3.4.2
 - Security Release, fixes CVE-2009-2813, CVE-2009-2948 and CVE-2009-2906
