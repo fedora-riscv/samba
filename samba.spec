@@ -1,5 +1,5 @@
-%define main_release 44
-%define samba_version 3.4.3
+%define main_release 45
+%define samba_version 3.4.4
 %define tdb_version 1.1.3
 %define talloc_version 1.3.0
 %define pre_release %nil
@@ -883,6 +883,9 @@ exit 0
 %{_datadir}/pixmaps/samba/logo-small.png
 
 %changelog
+* Thu Jan 07 2009 Guenther Deschner <gdeschner@redhat.com> - 3.4.4-0.55
+- Update to 3.4.4
+
 * Thu Oct 29 2009 Guenther Deschner <gdeschner@redhat.com> - 3.4.3-0.44
 - Update to 3.4.3
 
