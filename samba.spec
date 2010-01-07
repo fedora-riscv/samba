@@ -883,7 +883,7 @@ exit 0
 %{_datadir}/pixmaps/samba/logo-small.png
 
 %changelog
-* Thu Jan 07 2009 Guenther Deschner <gdeschner@redhat.com> - 3.4.4-0.45
+* Thu Jan 07 2010 Guenther Deschner <gdeschner@redhat.com> - 3.4.4-0.45
 - Update to 3.4.4
 
 * Thu Oct 29 2009 Guenther Deschner <gdeschner@redhat.com> - 3.4.3-0.44
