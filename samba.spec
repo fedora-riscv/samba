@@ -1,4 +1,4 @@
-%define main_release 51
+%define main_release 52
 %define samba_version 3.4.4
 %define tdb_version 1.1.3
 %define talloc_version 1.3.0
@@ -45,6 +45,7 @@ Patch104: samba-3.0.0rc3-nmbd-netbiosname.patch
 # The passwd part has been applied, but not the group part
 Patch107: samba-3.2.0pre1-grouppwd.patch
 Patch200: samba-3.2.5-inotify.patch
+Patch201: samba-3.4.4-libsmbclient.patch
 
 Requires(pre): samba-common = %{epoch}:%{samba_version}-%{release}
 Requires: pam >= 0:0.64
@@ -202,6 +203,7 @@ cp %{SOURCE11} packaging/Fedora/
 #%patch104 -p1 -b .nmbd-netbiosname # FIXME: does not apply
 %patch107 -p1 -b .grouppwd
 %patch200 -p0 -b .inotify
+%patch201 -p1 -b .libsmbclient
 
 mv %samba_source/VERSION %samba_source/VERSION.orig
 sed -e 's/SAMBA_VERSION_VENDOR_SUFFIX=$/&\"%{samba_release}\"/' < %samba_source/VERSION.orig > %samba_source/VERSION
@@ -654,6 +656,10 @@ exit 0
 %{_datadir}/pixmaps/samba/logo-small.png
 
 %changelog
+* Thu Jan 14 2010 Guenther Deschner <gdeschner@redhat.com> - 3.4.4-52
+- Fix crash bug in libsmbclient (SMBC_parse_path)
+- resolves: #552658
+
 * Thu Jan 07 2010 Guenther Deschner <gdeschner@redhat.com> - 3.4.4-51
 - Update to 3.4.4
 
