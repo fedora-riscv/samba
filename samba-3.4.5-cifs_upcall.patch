@@ -1,0 +1,61 @@
+From efc2e996e3348392f1fd5c0ec7feae4f869fb8f9 Mon Sep 17 00:00:00 2001
+From: Jeff Layton <jlayton@redhat.com>
+Date: Tue, 16 Feb 2010 09:16:42 -0500
+Subject: [PATCH] cifs.upcall: allocate a talloc context for smb_krb5_unparse_name
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+cifs.upcall calls smb_krb5_unparse_name with a NULL talloc context.
+Older versions of this function though will conditionally use
+SMB_REALLOC instead of TALLOC_REALLOC when a NULL context is passed
+in. To make it more consistent, just spawn a talloc context that
+we can pass into this function.
+
+Resolves:
+https://bugzilla.redhat.com/show_bug.cgi?id=565446
+https://bugzilla.samba.org/show_bug.cgi?id=6868
+
+Reported-by: Ludek Finstrle <luf@seznam.cz>
+Signed-off-by: Jeff Layton <jlayton@redhat.com>
+Signed-off-by: Günther Deschner <gd@samba.org>
+(cherry picked from commit a8cc2fa09ed43a167f62711bef363a5ac335dc78)
+---
+ source3/client/cifs.upcall.c |    5 ++++-
+ 1 files changed, 4 insertions(+), 1 deletions(-)
+
+diff --git a/source3/client/cifs.upcall.c b/source3/client/cifs.upcall.c
+index 1617e0e..d573e76 100644
+--- a/source3/client/cifs.upcall.c
++++ b/source3/client/cifs.upcall.c
+@@ -55,6 +55,7 @@ get_tgt_time(const char *ccname) {
+ 	krb5_principal principal;
+ 	time_t credtime = 0;
+ 	char *realm = NULL;
++	TALLOC_CTX *mem_ctx;
+ 
+ 	if (krb5_init_context(&context)) {
+ 		syslog(LOG_DEBUG, "%s: unable to init krb5 context", __func__);
+@@ -86,9 +87,10 @@ get_tgt_time(const char *ccname) {
+ 		goto err_ccstart;
+ 	}
+ 
++	mem_ctx = talloc_init("cifs.upcall");
+ 	while (!credtime && !krb5_cc_next_cred(context, ccache, &cur, &creds)) {
+ 		char *name;
+-		if (smb_krb5_unparse_name(NULL, context, creds.server, &name)) {
++		if (smb_krb5_unparse_name(mem_ctx, context, creds.server, &name)) {
+ 			syslog(LOG_DEBUG, "%s: unable to unparse name", __func__);
+ 			goto err_endseq;
+ 		}
+@@ -101,6 +103,7 @@ get_tgt_time(const char *ccname) {
+ 		TALLOC_FREE(name);
+         }
+ err_endseq:
++	TALLOC_FREE(mem_ctx);
+         krb5_cc_end_seq_get(context, ccache, &cur);
+ err_ccstart:
+ 	krb5_free_principal(context, principal);
+-- 
+1.6.6
+

@@ -1,4 +1,4 @@
-%define main_release 55
+%define main_release 56
 %define samba_version 3.4.5
 %define tdb_version 1.1.3
 %define talloc_version 1.3.0
@@ -47,6 +47,7 @@ Patch107: samba-3.2.0pre1-grouppwd.patch
 Patch200: samba-3.2.5-inotify.patch
 Patch201: samba-3.4.5-pdbedit.patch
 Patch202: samba-3.4.5-CVE-2009-3297-mount_cifs.patch
+Patch203: samba-3.4.5-cifs_upcall.patch
 
 Requires(pre): samba-common = %{epoch}:%{samba_version}-%{release}
 Requires: pam >= 0:0.64
@@ -206,6 +207,7 @@ cp %{SOURCE11} packaging/Fedora/
 %patch200 -p0 -b .inotify
 %patch201 -p1 -b .pdbedit
 %patch202 -p1 -b .CVE-2009-3297-mount_cifs
+%patch203 -p1 -b .cifs_upcall
 
 mv %samba_source/VERSION %samba_source/VERSION.orig
 sed -e 's/SAMBA_VERSION_VENDOR_SUFFIX=$/&\"%{samba_release}\"/' < %samba_source/VERSION.orig > %samba_source/VERSION
@@ -658,6 +660,10 @@ exit 0
 %{_datadir}/pixmaps/samba/logo-small.png
 
 %changelog
+* Wed Feb 17 2010 Guenther Deschner <gdeschner@redhat.com> - 3.4.5-56
+- Fix crash in cifs.upcall
+- resolves: #565446
+
 * Wed Jan 26 2010 Guenther Deschner <gdeschner@redhat.com> - 3.4.5-55
 - Security Release, fixes CVE-2009-3297
 - resolves: #532940
