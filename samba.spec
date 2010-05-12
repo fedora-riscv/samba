@@ -656,6 +656,8 @@ exit 0
 %changelog
 * Wed May 12 2010 Guenther Deschner <gdeschner@redhat.com> - 3.4.8-59
 - Update to 3.4.8
+- Make sure nmb and smb initscripts return LSB compliant return codes
+- resolves: #521095
 
 * Mon Mar 08 2010 Simo Sorce <ssorce@redhat.com> - 3.4.7-58
 - Security update to 3.4.7
