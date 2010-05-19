@@ -1,5 +1,5 @@
-%define main_release 60
-%define samba_version 3.5.2
+%define main_release 61
+%define samba_version 3.5.3
 %define tdb_version 1.2.1
 %define talloc_version 2.0.1
 #%define pre_release rc3
@@ -37,7 +37,7 @@ Source999: filter-requires-samba.sh
 
 # upstream patches.  Applied first so that they'll break our patches rather
 # than the other way around
-Patch01: samba-3.5.2-smbclient-segfault.patch
+Patch01: samba-3.5.2-ipv6.patch
 
 # generic patches
 Patch102: samba-3.2.0pre1-pipedir.patch
@@ -194,7 +194,7 @@ cp %{SOURCE10} packaging/Fedora/
 cp %{SOURCE11} packaging/Fedora/
 
 # Upstream patches
-%patch01 -p1 -b .smbclient_segfault
+%patch01 -p1 -b .ipv6
 # generic patches
 %patch102 -p1 -b .pipedir
 #%patch103 -p1 -b .logfiles
@@ -650,6 +650,11 @@ exit 0
 %{_datadir}/pixmaps/samba/logo-small.png
 
 %changelog
+* Wed May 19 2010 Guenther Deschner <gdeschner@redhat.com> - 3.5.3-61
+- Update to 3.5.3
+- Make sure nmb and smb initscripts return LSB compliant return codes
+- Fix winbind over ipv6
+
 * Sat May 01 2010 Simo Sorce <ssorce@redhat.com> - 3.5.2-60
 - Fix segfault bug #586511
 
