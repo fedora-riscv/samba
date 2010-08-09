@@ -1,0 +1,67 @@
+From a4603b32f7ca11c37f5a48d541ef76b08cda6415 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?G=C3=BCnther=20Deschner?= <gd@samba.org>
+Date: Mon, 9 Aug 2010 14:31:24 +0200
+Subject: [PATCH] s3-winbind: Fix Bug #7568: Make sure cm_connect_lsa_tcp does not reset the secure channel.
+
+This is an important fix as the following could and is happening:
+
+* winbind authenticates a user via schannel secured netlogon samlogonex call,
+current secure channel cred state is stored in winbind state, winbind
+sucessfully decrypts session key from the info3
+
+* winbind sets up a new schannel ncacn_ip_tcp lsa pipe (and thereby resets the
+secure channel on the dc)
+
+* subsequent samlogonex calls use the new secure channel creds on the dc to
+encrypt info3 session key, while winbind tries to use old schannel creds for
+decryption
+
+Guenther
+(cherry picked from commit be396411a4e1f3a174f8a44b6c062d834135e70a)
+(cherry picked from commit afe0e73b7bb640428396c9f40dbbcba5c311fcd9)
+---
+ source3/winbindd/winbindd_cm.c |   20 +++++++++++++-------
+ 1 files changed, 13 insertions(+), 7 deletions(-)
+
+diff --git a/source3/winbindd/winbindd_cm.c b/source3/winbindd/winbindd_cm.c
+index ee9a656..f8e49cc 100644
+--- a/source3/winbindd/winbindd_cm.c
++++ b/source3/winbindd/winbindd_cm.c
+@@ -2231,6 +2231,7 @@ NTSTATUS cm_connect_lsa_tcp(struct winbindd_domain *domain,
+ 			    struct rpc_pipe_client **cli)
+ {
+ 	struct winbindd_cm_conn *conn;
++	struct netlogon_creds_CredentialState *creds;
+ 	NTSTATUS status;
+ 
+ 	DEBUG(10,("cm_connect_lsa_tcp\n"));
+@@ -2251,14 +2252,19 @@ NTSTATUS cm_connect_lsa_tcp(struct winbindd_domain *domain,
+ 
+ 	TALLOC_FREE(conn->lsa_pipe_tcp);
+ 
+-	status = cli_rpc_pipe_open_schannel(conn->cli,
+-					    &ndr_table_lsarpc.syntax_id,
+-					    NCACN_IP_TCP,
+-					    DCERPC_AUTH_LEVEL_PRIVACY,
+-					    domain->name,
+-					    &conn->lsa_pipe_tcp);
++	if (!cm_get_schannel_creds(domain, &creds)) {
++		goto done;
++	}
++
++	status = cli_rpc_pipe_open_schannel_with_key(conn->cli,
++						     &ndr_table_lsarpc.syntax_id,
++						     NCACN_IP_TCP,
++						     DCERPC_AUTH_LEVEL_PRIVACY,
++						     domain->name,
++						     &creds,
++						     &conn->lsa_pipe_tcp);
+ 	if (!NT_STATUS_IS_OK(status)) {
+-		DEBUG(10,("cli_rpc_pipe_open_schannel failed: %s\n",
++		DEBUG(10,("cli_rpc_pipe_open_schannel_with_key failed: %s\n",
+ 			nt_errstr(status)));
+ 		goto done;
+ 	}
+-- 
+1.7.2.1
+
