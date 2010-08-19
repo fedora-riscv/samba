@@ -1,4 +1,4 @@
-%define main_release 64
+%define main_release 65
 %define samba_version 3.5.4
 %define tdb_version 1.2.1
 %define talloc_version 2.0.1
@@ -46,6 +46,7 @@ Patch107: samba-3.2.0pre1-grouppwd.patch
 Patch200: samba-3.2.5-inotify.patch
 Patch201: samba-3.5.4-winbind-schannel.patch
 Patch202: samba-3.5.4-offline_cache.patch
+Patch203: samba-3.5.4-winbind_default_domain.patch
 
 Requires(pre): samba-common = %{epoch}:%{samba_version}-%{release}
 Requires: pam >= 0:0.64
@@ -203,6 +204,7 @@ cp %{SOURCE11} packaging/Fedora/
 %patch200 -p0 -b .inotify
 %patch201 -p1 -b .winbind_schannel
 %patch202 -p1 -b .offline_cache
+%patch203 -p1 -b .winbind_default_domain
 
 mv %samba_source/VERSION %samba_source/VERSION.orig
 sed -e 's/SAMBA_VERSION_VENDOR_SUFFIX=$/&\"%{samba_release}\"/' < %samba_source/VERSION.orig > %samba_source/VERSION
@@ -652,6 +654,10 @@ exit 0
 %{_datadir}/pixmaps/samba/logo-small.png
 
 %changelog
+* Thu Aug 19 2010 Guenther Deschner <gdeschner@redhat.com> - 3.5.4-65
+- Fix winbind default domain
+- related: #618201
+
 * Wed Aug 18 2010 Guenther Deschner <gdeschner@redhat.com> - 3.5.4-64
 - Fix offline authentication
 - resolves: #618201
