@@ -1,4 +1,4 @@
-%define main_release 65
+%define main_release 66
 %define samba_version 3.5.4
 %define tdb_version 1.2.1
 %define talloc_version 2.0.1
@@ -654,6 +654,9 @@ exit 0
 %{_datadir}/pixmaps/samba/logo-small.png
 
 %changelog
+* Tue Aug 24 2010 Guenther Deschner <gdeschner@redhat.com> - 3.5.4-66
+- More fixes for winbind schannel
+
 * Thu Aug 19 2010 Guenther Deschner <gdeschner@redhat.com> - 3.5.4-65
 - Fix winbind default domain
 - related: #618201
