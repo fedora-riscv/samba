@@ -1,5 +1,5 @@
-%define main_release 67
-%define samba_version 3.5.4
+%define main_release 68
+%define samba_version 3.5.5
 %define tdb_version 1.2.1
 %define talloc_version 2.0.1
 #%define pre_release rc3
@@ -673,6 +673,10 @@ exit 0
 %{_datadir}/pixmaps/samba/logo-small.png
 
 %changelog
+* Thu Sep 09 2010 Guenther Deschner <gdeschner@redhat.com> - 3.5.5-68
+- Security Release, fixes CVE-2010-3069
+- resolves: #630869
+
 * Thu Aug 26 2010 Guenther Deschner <gdeschner@redhat.com> - 3.5.4-67
 - Put winbind krb5 locator plugin into a separate rpm
 - resolves: #627181
