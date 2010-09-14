@@ -1,5 +1,5 @@
-%define main_release 59
-%define samba_version 3.4.8
+%define main_release 60
+%define samba_version 3.4.9
 %define tdb_version 1.1.3
 %define talloc_version 1.3.0
 #%define pre_release rc1
@@ -654,6 +654,10 @@ exit 0
 %{_datadir}/pixmaps/samba/logo-small.png
 
 %changelog
+* Thu Sep 09 2010 Guenther Deschner <gdeschner@redhat.com> - 3.4.9-60
+- Security Release, fixes CVE-2010-3069
+- resolves: #630869
+
 * Wed May 12 2010 Guenther Deschner <gdeschner@redhat.com> - 3.4.8-59
 - Update to 3.4.8
 - Make sure nmb and smb initscripts return LSB compliant return codes
