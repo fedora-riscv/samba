@@ -12,7 +12,7 @@ Summary: Server and Client software to interoperate with Windows machines
 Name: samba
 Epoch: 0
 Version: %{samba_version}
-Release: %{samba_release}
+Release: %{samba_release}.1
 License: GPLv3+ and LGPLv3+
 Group: System Environment/Daemons
 URL: http://www.samba.org/
@@ -673,6 +673,9 @@ exit 0
 %{_datadir}/pixmaps/samba/logo-small.png
 
 %changelog
+* Tue Oct 05 2010 jkeating - 0:3.5.5-68.1
+- Rebuilt for gcc bug 634757
+
 * Thu Sep 09 2010 Guenther Deschner <gdeschner@redhat.com> - 3.5.5-68
 - Security Release, fixes CVE-2010-3069
 - resolves: #630869
