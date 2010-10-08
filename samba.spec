@@ -1,5 +1,5 @@
-%define main_release 68
-%define samba_version 3.5.5
+%define main_release 69
+%define samba_version 3.5.6
 %define tdb_version 1.2.1
 %define talloc_version 2.0.1
 #%define pre_release rc3
@@ -12,7 +12,7 @@ Summary: Server and Client software to interoperate with Windows machines
 Name: samba
 Epoch: 0
 Version: %{samba_version}
-Release: %{samba_release}.1
+Release: %{samba_release}
 License: GPLv3+ and LGPLv3+
 Group: System Environment/Daemons
 URL: http://www.samba.org/
@@ -45,9 +45,6 @@ Patch104: samba-3.0.0rc3-nmbd-netbiosname.patch
 # The passwd part has been applied, but not the group part
 Patch107: samba-3.2.0pre1-grouppwd.patch
 Patch200: samba-3.2.5-inotify.patch
-Patch201: samba-3.5.4-winbind-schannel.patch
-Patch202: samba-3.5.4-offline_cache.patch
-Patch203: samba-3.5.4-winbind_default_domain.patch
 
 Requires(pre): samba-common = %{epoch}:%{samba_version}-%{release}
 Requires: pam >= 0:0.64
@@ -213,9 +210,6 @@ cp %{SOURCE11} packaging/Fedora/
 #%patch104 -p1 -b .nmbd-netbiosname # FIXME: does not apply
 %patch107 -p1 -b .grouppwd
 %patch200 -p0 -b .inotify
-%patch201 -p1 -b .winbind_schannel
-%patch202 -p1 -b .offline_cache
-%patch203 -p1 -b .winbind_default_domain
 
 mv %samba_source/VERSION %samba_source/VERSION.orig
 sed -e 's/SAMBA_VERSION_VENDOR_SUFFIX=$/&\"%{samba_release}\"/' < %samba_source/VERSION.orig > %samba_source/VERSION
@@ -673,6 +667,10 @@ exit 0
 %{_datadir}/pixmaps/samba/logo-small.png
 
 %changelog
+* Fri Oct 08 2010 Guenther Deschner <gdeschner@redhat.com> - 3.5.6-69
+- Update to 3.5.6
+- resolves: #617771
+
 * Tue Oct 05 2010 jkeating - 0:3.5.5-68.1
 - Rebuilt for gcc bug 634757
 
