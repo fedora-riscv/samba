@@ -28,7 +28,7 @@ if [ -f /etc/sysconfig/samba ]; then
 fi
 
 # Check that networking is up.
-[ ${NETWORKING} = "no" ] && exit 1
+[ "${NETWORKING}" = "no" ] && exit 1
 
 # Check that smb.conf exists.
 [ -f /etc/samba/smb.conf ] || exit 6
