@@ -1,0 +1,119 @@
+From 9f5c7da3ae47ac57087631e90f85f9a553af9018 Mon Sep 17 00:00:00 2001
+From: Andrew Bartlett <abartlet@samba.org>
+Date: Sat, 11 Sep 2010 16:13:33 +1000
+Subject: [PATCH 1/2] s3-krb5 Fix Kerberos on FreeBSD with Samba4 DCs
+
+The idea of this patch is: Don't support a mix of different kerberos
+features.
+
+Either we should prepare a GSSAPI (8003) checksum and mark the request as
+such, or we should use the old behaviour (a normal kerberos checksum of 0 data).
+
+Sending the GSSAPI checksum data, but without marking it as GSSAPI broke
+Samba4, and seems well outside the expected behaviour, even if Windows accepts it.
+
+Andrew Bartlett
+(cherry picked from commit 3b4db34011f06fb785153fa9070fb1da9d8f5c78)
+
+Signed-off-by: Stefan Metzmacher <metze@samba.org>
+---
+ source3/libsmb/clikrb5.c |    4 +---
+ 1 files changed, 1 insertions(+), 3 deletions(-)
+
+diff --git a/source3/libsmb/clikrb5.c b/source3/libsmb/clikrb5.c
+index b0dec0a..ff93ddb 100644
+--- a/source3/libsmb/clikrb5.c
++++ b/source3/libsmb/clikrb5.c
+@@ -832,7 +832,7 @@ static krb5_error_code ads_krb5_mk_req(krb5_context context,
+ 		goto cleanup_creds;
+ 	}
+ 
+-#if defined(TKT_FLG_OK_AS_DELEGATE ) && defined(HAVE_KRB5_FWD_TGT_CREDS) && defined(HAVE_KRB5_AUTH_CON_SETUSERUSERKEY) && defined(KRB5_AUTH_CONTEXT_USE_SUBKEY)
++#if defined(TKT_FLG_OK_AS_DELEGATE ) && defined(HAVE_KRB5_FWD_TGT_CREDS) && defined(HAVE_KRB5_AUTH_CON_SETUSERUSERKEY) && defined(KRB5_AUTH_CONTEXT_USE_SUBKEY) && defined(HAVE_KRB5_AUTH_CON_SET_REQ_CKSUMTYPE)
+ 	if( credsp->ticket_flags & TKT_FLG_OK_AS_DELEGATE ) {
+ 		/* Fetch a forwarded TGT from the KDC so that we can hand off a 2nd ticket
+ 		 as part of the kerberos exchange. */
+@@ -894,7 +894,6 @@ static krb5_error_code ads_krb5_mk_req(krb5_context context,
+ 			gss_flags |= GSS_C_DELEG_FLAG;
+ 		}
+ 	}
+-#endif
+ 
+ 	/* Frees and reallocates in_data into a GSS checksum blob. */
+ 	retval = create_gss_checksum(&in_data, gss_flags);
+@@ -902,7 +901,6 @@ static krb5_error_code ads_krb5_mk_req(krb5_context context,
+ 		goto cleanup_data;
+ 	}
+ 
+-#if defined(HAVE_KRB5_AUTH_CON_SET_REQ_CKSUMTYPE)
+ 	/* We always want GSS-checksum types. */
+ 	retval = krb5_auth_con_set_req_cksumtype(context, *auth_context, GSSAPI_CHECKSUM );
+ 	if (retval) {
+-- 
+1.7.0.4
+
+
+From 48348c03417a5efeadf493cb6739e83354f345db Mon Sep 17 00:00:00 2001
+From: Stefan Metzmacher <metze@samba.org>
+Date: Thu, 23 Dec 2010 08:17:48 +0100
+Subject: [PATCH 2/2] s3:libsmb: use 16 zero bytes as channel binding checksum in the gssapi checksum (bug #7883)
+
+This fixes SMB session setups with kerberos against some closed
+source SMB servers.
+
+The new behavior matches heimdal and mit.
+
+metze
+
+Autobuild-User: Stefan Metzmacher <metze@samba.org>
+Autobuild-Date: Thu Dec 23 09:38:43 CET 2010 on sn-devel-104
+(cherry picked from commit e9dddc55e324c62973e6a561477b532cf9ed79af)
+(cherry picked from commit 3356192af5d36fbe986c4728162d10fe883ba2fd)
+---
+ source3/libsmb/clikrb5.c |   30 ++++++++++--------------------
+ 1 files changed, 10 insertions(+), 20 deletions(-)
+
+diff --git a/source3/libsmb/clikrb5.c b/source3/libsmb/clikrb5.c
+index ff93ddb..7b5cd09 100644
+--- a/source3/libsmb/clikrb5.c
++++ b/source3/libsmb/clikrb5.c
+@@ -696,26 +696,16 @@ static krb5_error_code create_gss_checksum(krb5_data *in_data, /* [inout] */
+ 	memset(gss_cksum, '\0', base_cksum_size + orig_length);
+ 	SIVAL(gss_cksum, 0, GSSAPI_BNDLENGTH);
+ 
+-	/* Precalculated MD5sum of NULL channel bindings (20 bytes) */
+-	/* Channel bindings are: (all ints encoded as little endian)
+-
+-		[4 bytes] initiator_addrtype (255 for null bindings)
+-		[4 bytes] initiator_address length
+-			[n bytes] .. initiator_address data - not present
+-				     in null bindings.
+-		[4 bytes] acceptor_addrtype (255 for null bindings)
+-		[4 bytes] acceptor_address length
+-			[n bytes] .. acceptor_address data - not present
+-				     in null bindings.
+-		[4 bytes] application_data length
+-			[n bytes] .. application_ data - not present
+-				     in null bindings.
+-		MD5 of this is ""\x14\x8f\x0c\xf7\xb1u\xdey*J\x9a%\xdfV\xc5\x18"
+-	*/
+-
+-	memcpy(&gss_cksum[4],
+-		"\x14\x8f\x0c\xf7\xb1u\xdey*J\x9a%\xdfV\xc5\x18",
+-		GSSAPI_BNDLENGTH);
++	/*
++	 * GSS_C_NO_CHANNEL_BINDINGS means 16 zero bytes.
++	 * This matches the behavior of heimdal and mit.
++	 *
++	 * And it is needed to work against some closed source
++	 * SMB servers.
++	 *
++	 * See bug #7883
++	 */
++	memset(&gss_cksum[4], 0x00, GSSAPI_BNDLENGTH);
+ 
+ 	SIVAL(gss_cksum, 20, gss_flags);
+ 
+-- 
+1.7.0.4
+

@@ -1,4 +1,4 @@
-%define main_release 71
+%define main_release 72
 %define samba_version 3.5.6
 %define tdb_version 1.2.1
 %define talloc_version 2.0.1
@@ -46,6 +46,7 @@ Patch104: samba-3.0.0rc3-nmbd-netbiosname.patch
 Patch107: samba-3.2.0pre1-grouppwd.patch
 Patch200: samba-3.2.5-inotify.patch
 Patch201: samba-3.5.6-libsmbclient.patch
+Patch202: samba-3.5.6-gssapi.patch
 
 Requires(pre): samba-common = %{epoch}:%{samba_version}-%{release}
 Requires: pam >= 0:0.64
@@ -212,6 +213,7 @@ cp %{SOURCE11} packaging/Fedora/
 %patch107 -p1 -b .grouppwd
 %patch200 -p0 -b .inotify
 %patch201 -p1 -b .libsmbclient
+%patch202 -p1 -b .gssapi
 
 mv %samba_source/VERSION %samba_source/VERSION.orig
 sed -e 's/SAMBA_VERSION_VENDOR_SUFFIX=$/&\"%{samba_release}\"/' < %samba_source/VERSION.orig > %samba_source/VERSION
@@ -669,6 +671,10 @@ exit 0
 %{_datadir}/pixmaps/samba/logo-small.png
 
 %changelog
+* Thu Jan 06 2011 Guenther Deschner <gdeschner@redhat.com> - 3.5.6-72
+- Fix GSSAPI checksum for some SMB servers
+- resolves: #667647
+
 * Mon Nov 22 2010 Guenther Deschner <gdeschner@redhat.com> - 3.5.6-71
 - Handle no network case in init scripts
 - resolves: #655766
