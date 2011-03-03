@@ -1,5 +1,5 @@
-%define main_release 72
-%define samba_version 3.5.6
+%define main_release 73
+%define samba_version 3.5.7
 %define tdb_version 1.2.1
 %define talloc_version 2.0.1
 #%define pre_release rc3
@@ -669,6 +669,10 @@ exit 0
 %{_datadir}/pixmaps/samba/logo-small.png
 
 %changelog
+* Thu Mar 03 2011 Guenther Deschner <gdeschner@redhat.com> - 3.5.7-73
+- Security update to 3.5.7 to address CVE-2011-0719
+- resolves: #681852
+
 * Thu Jan 06 2011 Guenther Deschner <gdeschner@redhat.com> - 3.5.6-72
 - Fix GSSAPI checksum for some SMB servers
 - resolves: #667644
