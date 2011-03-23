@@ -1,4 +1,4 @@
-%define main_release 74
+%define main_release 75
 %define samba_version 3.5.8
 %define tdb_version 1.2.1
 %define talloc_version 2.0.1
@@ -31,6 +31,7 @@ Source8: winbind.init
 Source9: smb.conf.default
 Source10: nmb.init
 Source11: pam_winbind.conf
+Source12: smb.conf.5
 
 # Don't depend on Net::LDAP
 Source999: filter-requires-samba.sh
@@ -201,6 +202,7 @@ cp %{SOURCE8} packaging/Fedora/winbind.init
 cp %{SOURCE9} packaging/Fedora/
 cp %{SOURCE10} packaging/Fedora/
 cp %{SOURCE11} packaging/Fedora/
+cp %{SOURCE12} docs/manpages/smb.conf.5
 
 # Upstream patches
 #(none)
@@ -667,6 +669,10 @@ exit 0
 %{_datadir}/pixmaps/samba/logo-small.png
 
 %changelog
+* Tue Mar 22 2011 Guenther Deschner <gdeschner@redhat.com> - 3.5.8-75
+- Fix broken smb.conf.5 manpage
+- resolves: #689605
+
 * Tue Mar 08 2011 Guenther Deschner <gdeschner@redhat.com> - 3.5.8-74
 - Update to 3.5.8
 - resolves: #596830
