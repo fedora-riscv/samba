@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 # chkconfig: - 91 35
-# description: Starts and stops the Samba smbd and nmbd daemons \
+# description: Starts and stops the Samba nmbd daemon \
 #	       used to provide SMB network services.
 #
 # pidfile: /var/run/samba/nmbd.pid
