@@ -453,8 +453,10 @@ exit 0
 #%postun
 
 
-%pre winbind
-/usr/sbin/groupadd -g 88 wbpriv >/dev/null 2>&1 || :
+%pre common
+if ! getent group wbpriv >/dev/null 2>&1 ; then
+  /usr/sbin/groupadd -g 88 wbpriv >/dev/null 2>&1 || :
+fi
 
 %post winbind
 /sbin/chkconfig --add winbind
@@ -672,6 +674,8 @@ exit 0
 - resolves: #551631
 - Fix root check in smb init script
 - resolves: #577533
+- Check for wbpriv group existence in samba-common
+- resolves: #643362
 
 * Tue Mar 22 2011 Guenther Deschner <gdeschner@redhat.com> - 3.5.8-75
 - Fix broken smb.conf.5 manpage
