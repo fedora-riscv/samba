@@ -672,6 +672,8 @@ exit 0
 * Fri Apr 01 2011 Guenther Deschner <gdeschner@redhat.com> - 3.5.8-76
 - Fix nmb init script description
 - resolves: #551631
+- Fix root check in smb init script
+- resolves: #577533
 
 * Tue Mar 22 2011 Guenther Deschner <gdeschner@redhat.com> - 3.5.8-75
 - Fix broken smb.conf.5 manpage
