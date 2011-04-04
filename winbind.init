@@ -72,8 +72,10 @@ if [ "$1" = status ]; then
        exit $?
 fi
 
-# Check that we can write to it... so non-root users stop here
-[ -w /etc/samba/smb.conf ] || exit 4
+uid=`id | cut -d\( -f1 | cut -d= -f2`
+
+# Check that we stop here for non-root users
+[ $uid -ne 0 ] && exit 4
 
 case "$1" in
   start)

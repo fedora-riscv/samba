@@ -1,4 +1,4 @@
-%define main_release 65
+%define main_release 66
 %define samba_version 3.6.0
 %define tdb_version 1.2.1
 %define talloc_version 2.0.1
@@ -651,6 +651,10 @@ exit 0
 %{_datadir}/pixmaps/samba/logo-small.png
 
 %changelog
+* Mon Apr 04 2011 Guenther Deschner <gdeschner@redhat.com> - 3.6.0pre1-66
+- Fix root checks in init scripts
+- resolves: #692594
+
 * Fri Mar 11 2011 Guenther Deschner <gdeschner@redhat.com> - 3.6.0pre1-65
 - Enable quota support
 
