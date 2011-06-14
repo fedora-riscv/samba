@@ -1,5 +1,5 @@
-%define main_release 76
-%define samba_version 3.5.8
+%define main_release 77
+%define samba_version 3.5.9
 %define tdb_version 1.2.1
 %define talloc_version 2.0.1
 #%define pre_release rc3
@@ -31,7 +31,6 @@ Source8: winbind.init
 Source9: smb.conf.default
 Source10: nmb.init
 Source11: pam_winbind.conf
-Source12: smb.conf.5
 
 # Don't depend on Net::LDAP
 Source999: filter-requires-samba.sh
@@ -202,7 +201,6 @@ cp %{SOURCE8} packaging/Fedora/winbind.init
 cp %{SOURCE9} packaging/Fedora/
 cp %{SOURCE10} packaging/Fedora/
 cp %{SOURCE11} packaging/Fedora/
-cp %{SOURCE12} docs/manpages/smb.conf.5
 
 # Upstream patches
 #(none)
@@ -671,6 +669,9 @@ exit 0
 %{_datadir}/pixmaps/samba/logo-small.png
 
 %changelog
+* Tue Jun 14 2011 Guenther Deschner <gdeschner@redhat.com> - 3.5.9-77
+- Update to 3.5.9
+
 * Fri Apr 01 2011 Guenther Deschner <gdeschner@redhat.com> - 3.5.8-76
 - Fix nmb init script description
 - resolves: #551631
