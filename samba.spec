@@ -1,5 +1,5 @@
-%define main_release 69
-%define samba_version 3.5.9
+%define main_release 70
+%define samba_version 3.5.10
 %define tdb_version 1.2.1
 %define talloc_version 2.0.1
 #%define pre_release pre1
@@ -668,6 +668,10 @@ exit 0
 %{_datadir}/pixmaps/samba/logo-small.png
 
 %changelog
+* Tue Aug 02 2011 Guenther Deschner <gdeschner@redhat.com> - 3.5.10-70
+- Security update to 3.5.10, fixes CVE-2011-2522 and CVE-2011-2694
+- resolves: #725890
+
 * Tue Jun 14 2011 Guenther Deschner <gdeschner@redhat.com> - 3.5.9-69
 - Update to 3.5.9
 
