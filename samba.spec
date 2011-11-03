@@ -1,5 +1,5 @@
-%define main_release 71
-%define samba_version 3.5.11
+%define main_release 72
+%define samba_version 3.5.12
 %define tdb_version 1.2.1
 %define talloc_version 2.0.1
 #%define pre_release pre1
@@ -668,6 +668,9 @@ exit 0
 %{_datadir}/pixmaps/samba/logo-small.png
 
 %changelog
+* Thu Nov 03 2011 Andreas Schneider <asn@redhat.com> - 3.5.11-72
+- Update to 3.5.12
+
 * Thu Aug 04 2011 Guenther Deschner <gdeschner@redhat.com> - 3.5.11-71
 - Update to 3.5.11
 - resolves: #713648
