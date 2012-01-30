@@ -669,6 +669,7 @@ fi
 %changelog
 * Mon Jan 30 2012 Andreas Schneider <asn@redhat.com> - 1:3.6.3-78
 - Update to 3.6.3
+- Fixes CVE-2012-0817
 
 * Mon Dec 05 2011 Andreas Schneider <asn@redhat.com> - 1:3.6.1-77
 - Fix winbind cache upgrade.
