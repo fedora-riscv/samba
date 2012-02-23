@@ -1,4 +1,4 @@
-%define main_release 78
+%define main_release 80
 %define samba_version 3.6.3
 %define tdb_version 1.2.9
 %define talloc_version 2.0.5
@@ -667,6 +667,9 @@ fi
 %{_datadir}/pixmaps/samba/logo-small.png
 
 %changelog
+* Thu Feb 23 2012 Andreas Schneider <asn@redhat.com> - 1:3.6.3-80
+- Add commented out 'max protocol' to the default config.
+
 * Mon Jan 30 2012 Andreas Schneider <asn@redhat.com> - 1:3.6.3-78
 - Update to 3.6.3
 - Fixes CVE-2012-0817
