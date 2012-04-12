@@ -1,5 +1,5 @@
-%define main_release 72
-%define samba_version 3.5.12
+%define main_release 73
+%define samba_version 3.5.14
 %define tdb_version 1.2.1
 %define talloc_version 2.0.1
 #%define pre_release pre1
@@ -668,6 +668,9 @@ exit 0
 %{_datadir}/pixmaps/samba/logo-small.png
 
 %changelog
+* Thu Apr 12 2012 Jon Ciesla <limburgher@gmail.com> - 3.5.14-73
+- Update to 3.5.14, CVE-2012-1182.
+
 * Thu Nov 03 2011 Andreas Schneider <asn@redhat.com> - 3.5.11-72
 - Update to 3.5.12
 
