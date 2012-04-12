@@ -1,5 +1,5 @@
-%define main_release 80
-%define samba_version 3.6.3
+%define main_release 82
+%define samba_version 3.6.4
 %define tdb_version 1.2.9
 %define talloc_version 2.0.5
 #%define pre_release rc3
@@ -185,6 +185,25 @@ Requires: libsmbclient = %{epoch}:%{samba_version}-%{release}
 %description -n libsmbclient-devel
 The libsmbclient-devel package contains the header files and libraries needed to
 develop programs that link against the SMB client library in the Samba suite.
+
+%package -n libwbclient
+Summary: The Winbind client library
+Group: Applications/System
+
+%description -n libwbclient
+The libwbclient contains the Winbind client library from the Samba suite.
+
+%package -n libwbclient-devel
+Summary: Developer tools for the Winbind client library
+Group: Development
+Requires: libwbclient = %{epoch}:%{samba_version}-%{release}
+
+Obsoletes: samba-winbind-devel
+Provides: samba-winbind-devel = %{epoch}:%{samba_version}-%{release}
+
+%description -n libwbclient-devel
+The libwbclient-devel package contains the header files and libraries needed to
+develop programs that link against the Winbind client library in the Samba suite.
 
 %prep
 # TAG: change for non-pre
@@ -634,12 +653,6 @@ fi
 %{_libdir}/libnss_wins.so
 /%{_lib}/libnss_wins.so.2
 /%{_lib}/security/pam_winbind.so
-%attr(755,root,root) %{_libdir}/libwbclient.so.*
-
-%files winbind-devel
-%{_includedir}/wbclient.h
-%{_libdir}/libwbclient.so
-%{_libdir}/pkgconfig/wbclient.pc
 
 %files doc
 %doc docs/Samba3-Developers-Guide.pdf docs/Samba3-ByExample.pdf
@@ -659,6 +672,14 @@ fi
 %{_libdir}/pkgconfig/smbsharemodes.pc
 %{_mandir}/man7/libsmbclient.7*
 
+%files -n libwbclient
+%attr(755,root,root) %{_libdir}/libwbclient.so.*
+
+%files -n libwbclient-devel
+%{_includedir}/wbclient.h
+%{_libdir}/libwbclient.so
+%{_libdir}/pkgconfig/wbclient.pc
+
 %files domainjoin-gui
 %{_sbindir}/netdomjoin-gui
 %dir %{_datadir}/pixmaps/samba
@@ -667,12 +688,26 @@ fi
 %{_datadir}/pixmaps/samba/logo-small.png
 
 %changelog
+* Thu Apr 12 2012 Jon Ciesla <limburgher@gmail.com> - 1:3.6.4-82
+- Update to 3.6.4
+- Fixes CVE-2012-1182
+
+* Mon Mar 19 2012 Andreas Schneider <asn@redhat.com> - 1:3.6.3-81
+- Fix provides for of libwclient-devel for samba-winbind-devel.
+
 * Thu Feb 23 2012 Andreas Schneider <asn@redhat.com> - 1:3.6.3-80
 - Add commented out 'max protocol' to the default config.
+
+* Mon Feb 13 2012 Andreas Schneider <asn@redhat.com> - 1:3.6.3-79
+- Create a libwbclient package.
+- Replace winbind-devel with libwbclient-devel package.
 
 * Mon Jan 30 2012 Andreas Schneider <asn@redhat.com> - 1:3.6.3-78
 - Update to 3.6.3
 - Fixes CVE-2012-0817
+
+* Sat Jan 14 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1:3.6.1-77.1
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_17_Mass_Rebuild
 
 * Mon Dec 05 2011 Andreas Schneider <asn@redhat.com> - 1:3.6.1-77
 - Fix winbind cache upgrade.
