@@ -1,5 +1,5 @@
-%define main_release 73
-%define samba_version 3.5.14
+%define main_release 74
+%define samba_version 3.5.15
 %define tdb_version 1.2.1
 %define talloc_version 2.0.1
 #%define pre_release pre1
@@ -668,6 +668,10 @@ exit 0
 %{_datadir}/pixmaps/samba/logo-small.png
 
 %changelog
+* Mon Apr 30 2012 Guenther Deschner <gdeschner@redhat.com> - 3.5.15-74
+- Security Release, fixes CVE-2012-2111
+- resolves: #XXXXX
+
 * Thu Apr 12 2012 Jon Ciesla <limburgher@gmail.com> - 3.5.14-73
 - Update to 3.5.14, CVE-2012-1182.
 
