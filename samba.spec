@@ -670,7 +670,7 @@ exit 0
 %changelog
 * Mon Apr 30 2012 Guenther Deschner <gdeschner@redhat.com> - 3.5.15-74
 - Security Release, fixes CVE-2012-2111
-- resolves: #XXXXX
+- resolves: #817551
 
 * Thu Apr 12 2012 Jon Ciesla <limburgher@gmail.com> - 3.5.14-73
 - Update to 3.5.14, CVE-2012-1182.
