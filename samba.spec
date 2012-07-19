@@ -1,4 +1,4 @@
-%define main_release 88
+%define main_release 89
 %define samba_version 3.6.6
 %define tdb_version 1.2.9
 %define talloc_version 2.0.5
@@ -47,6 +47,7 @@ Patch104: samba-3.0.0rc3-nmbd-netbiosname.patch
 Patch107: samba-3.2.0pre1-grouppwd.patch
 Patch200: samba-3.2.5-inotify.patch
 Patch201: samba-3.6.4-krb5_locate_kdc.patch
+Patch202: samba-3.6.6-ndr.patch
 
 Requires(pre): samba-common = %{epoch}:%{samba_version}-%{release}
 Requires: pam >= 0:0.64
@@ -232,6 +233,7 @@ cp %{SOURCE11} packaging/Fedora/
 %patch107 -p1 -b .grouppwd
 %patch200 -p0 -b .inotify
 %patch201 -p1 -b .krb5_locate_kdc
+%patch202 -p1 -b .ndr
 
 mv %samba_source/VERSION %samba_source/VERSION.orig
 sed -e 's/SAMBA_VERSION_VENDOR_SUFFIX=$/&\"%{samba_release}\"/' < %samba_source/VERSION.orig > %samba_source/VERSION
@@ -697,6 +699,10 @@ fi
 %{_datadir}/pixmaps/samba/logo-small.png
 
 %changelog
+* Thu Jul 19 2012 Guenther Deschner <gdeschner@redhat.com> - 2:3.6.6-89
+- Fix printing tdb upgrade for 3.6.6
+- resolves: #841609
+
 * Tue Jun 26 2012 Guenther Deschner <gdeschner@redhat.com> - 2:3.6.6-88
 - Update to 3.6.6
 
