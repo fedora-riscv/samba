@@ -1,5 +1,5 @@
-%define main_release 92
-%define samba_version 3.6.8
+%define main_release 93
+%define samba_version 3.6.9
 %define tdb_version 1.2.9
 %define talloc_version 2.0.5
 #%define pre_release rc3
@@ -17,7 +17,7 @@ License: GPLv3+ and LGPLv3+
 Group: System Environment/Daemons
 URL: http://www.samba.org/
 
-Source: http://www.samba.org/samba/%{name}-%{samba_version}%{pre_release}.tar.gz
+Source: http://www.samba.org/samba/%{name}-%{samba_version}%{pre_release}.tar.bz2
 
 # Red Hat specific replacement-files
 Source1: samba.log
@@ -697,6 +697,9 @@ fi
 %{_datadir}/pixmaps/samba/logo-small.png
 
 %changelog
+* Fri Nov 09 2012 Guenther Deschner <gdeschner@redhat.com> - 2:3.6.9-93
+- Update to 3.6.9
+
 * Fri Oct 26 2012 - Andreas Schneider <asn@redhat.com> -2:3.6.8-92
 - Fix pam_winbind segfault in pam_sm_authenticate().
 - resolves: #870493
