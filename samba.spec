@@ -1,5 +1,5 @@
-%define main_release 94
-%define samba_version 3.6.10
+%define main_release 1
+%define samba_version 3.6.12
 %define tdb_version 1.2.9
 %define talloc_version 2.0.5
 #%define pre_release rc3
@@ -695,6 +695,13 @@ fi
 %{_datadir}/pixmaps/samba/logo-small.png
 
 %changelog
+* Thu Jan 31 2013 - Andreas Schneider <asn@redhat.com> - 2:3.6.12-1
+- Update to 3.6.12
+- Fixes CVE-2013-0213 and CVE-2013-0214.
+- resolves: #905700
+- resolves: #906002
+- resolves: #905704
+
 * Mon Dec 10 2012 Guenther Deschner <gdeschner@redhat.com> - 2:3.6.10-94
 - Update to 3.6.10
 
