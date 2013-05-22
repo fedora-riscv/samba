@@ -31,7 +31,7 @@
 %global with_mitkrb5 0
 %global with_dc 1
 
-%global with_swat 0
+%global with_swat 1
 
 %if %{with testsuite}
 # The testsuite only works with a full build right now.
@@ -1370,7 +1370,6 @@ rm -rf %{buildroot}
 %changelog
 * Tue May 21 2013 - Andreas Schneider <asn@redhat.com> - 2:4.0.6-1
 - Update to Samba 4.0.6.
-- Remove SWAT.
 
 * Tue Apr 10 2013 - Andreas Schneider <asn@redhat.com> - 2:4.0.5-1
 - Update to Samba 4.0.5.
