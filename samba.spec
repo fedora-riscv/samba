@@ -1,7 +1,7 @@
 # Set --with testsuite or %bcond_without to run the Samba torture testsuite.
 %bcond_with testsuite
 
-%define main_release 2
+%define main_release 3
 
 %define samba_version 4.0.7
 %define talloc_version 2.0.7
@@ -80,6 +80,7 @@ Source201: README.downgrade
 
 Patch0: samba-4.0.6_add_passdb_upn_enum.patch
 Patch1: samba-4.0.8-fix_winbind_ccache_cleanup.patch
+Patch2: samba-4.1.0rc1-add_support_for_cc_type_dir.patch
 
 BuildRoot:      %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 
@@ -460,6 +461,7 @@ the local kerberos library to use the same KDC as samba and winbind use
 %setup -q -n samba-%{version}%{pre_release}
 %patch0 -p1
 %patch1 -p1
+%patch2 -p1
 
 %build
 %global _talloc_lib ,talloc,pytalloc,pytalloc-util
@@ -1509,6 +1511,10 @@ rm -rf %{buildroot}
 %{_mandir}/man7/winbind_krb5_locator.7*
 
 %changelog
+* Wed Jul 24 2013 - Andreas Schneider <asn@redhat.com> - 2:4.0.7-3
+- resolves: #985107 - Add support for new default location for Kerberos
+                      credential caches.
+
 * Mon Jul 15 2013 - Andreas Schneider <asn@redhat.com> - 2:4.0.7-2
 - resolves: #972692 - Build with PIE and full RELRO.
 - resolves: #884169 - Add explicit dependencies suggested by rpmdiff.
