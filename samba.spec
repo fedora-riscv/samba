@@ -1,9 +1,9 @@
 # Set --with testsuite or %bcond_without to run the Samba torture testsuite.
 %bcond_with testsuite
 
-%define main_release 4
+%define main_release 1
 
-%define samba_version 4.0.7
+%define samba_version 4.0.8
 %define talloc_version 2.0.7
 %define ntdb_version 0.9
 %define tdb_version 1.2.12
@@ -1513,7 +1513,11 @@ rm -rf %{buildroot}
 %{_mandir}/man7/winbind_krb5_locator.7*
 
 %changelog
-* Mon Aug 05 2013 - Andreas Schneider <asn@redhat.com> 2:4.0.7-4
+* Mon Aug 05 2013 - Andreas Schneider <asn@redhat.com> 2:4.0.8-1
+- Update to Samba 4.0.8
+- resolves: #993043 - CVE-2013-4124 [fedora-all]
+- resolves: #984401 - CVE-2013-4124 DoS via integer overflow when reading
+                      an EA list
 - related: #985107 - Fix wbinfo error message of unknown command
                      for --krb5ccname.
 
