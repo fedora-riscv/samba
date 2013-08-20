@@ -1,0 +1,52 @@
+From 308c6b273f2077b9495636cfc260fe38c496d2e5 Mon Sep 17 00:00:00 2001
+From: Andreas Schneider <asn@samba.org>
+Date: Fri, 26 Jul 2013 15:36:02 +0200
+Subject: [PATCH] nsswitch: Add OPT_KRB5CCNAME to avoid an error message.
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+BUG: https://bugzilla.samba.org/show_bug.cgi?id=10048
+
+Reviewed-by: Günther Deschner <gd@samba.org>
+
+Autobuild-User(master): Andreas Schneider <asn@cryptomilk.org>
+Autobuild-Date(master): Fri Jul 26 17:40:26 CEST 2013 on sn-devel-104
+---
+ nsswitch/wbinfo.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/nsswitch/wbinfo.c b/nsswitch/wbinfo.c
+index cfb430b..17977ed 100644
+--- a/nsswitch/wbinfo.c
++++ b/nsswitch/wbinfo.c
+@@ -2064,7 +2064,8 @@ enum {
+ 	OPT_LOGOFF,
+ 	OPT_LOGOFF_USER,
+ 	OPT_LOGOFF_UID,
+-	OPT_LANMAN
++	OPT_LANMAN,
++	OPT_KRB5CCNAME
+ };
+ 
+ int main(int argc, char **argv, char **envp)
+@@ -2165,7 +2166,7 @@ int main(int argc, char **argv, char **envp)
+ 		{ "krb5auth", 'K', POPT_ARG_STRING, &string_arg, 'K', "authenticate user using Kerberos", "user%password" },
+ 			/* destroys wbinfo --help output */
+ 			/* "user%password,DOM\\user%password,user@EXAMPLE.COM,EXAMPLE.COM\\user%password" }, */
+-		{ "krb5ccname", 0, POPT_ARG_STRING, &opt_krb5ccname, '0', "authenticate user using Kerberos and specific credential cache type", "krb5ccname" },
++		{ "krb5ccname", 0, POPT_ARG_STRING, &opt_krb5ccname, OPT_KRB5CCNAME, "authenticate user using Kerberos and specific credential cache type", "krb5ccname" },
+ #endif
+ 		{ "separator", 0, POPT_ARG_NONE, 0, OPT_SEPARATOR, "Get the active winbind separator", NULL },
+ 		{ "verbose", 0, POPT_ARG_NONE, 0, OPT_VERBOSE, "Print additional information per command", NULL },
+@@ -2621,6 +2622,7 @@ int main(int argc, char **argv, char **envp)
+ 		case OPT_LANMAN:
+ 		case OPT_LOGOFF_USER:
+ 		case OPT_LOGOFF_UID:
++		case OPT_KRB5CCNAME:
+ 			break;
+ 		default:
+ 			d_fprintf(stderr, "Invalid option\n");
+-- 
+1.8.3.1
+
