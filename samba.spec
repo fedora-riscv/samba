@@ -1,7 +1,7 @@
 # Set --with testsuite or %bcond_without to run the Samba torture testsuite.
 %bcond_with testsuite
 
-%define main_release 2
+%define main_release 3
 
 %define samba_version 4.0.9
 %define talloc_version 2.0.7
@@ -400,6 +400,7 @@ Summary: Samba winbind
 Group: Applications/System
 Requires: %{name}-common = %{samba_depver}
 Requires: %{name}-libs = %{samba_depver}
+Requires: %{name}-winbind-modules = %{samba_depver}
 
 Provides: samba4-winbind = %{samba_depver}
 Obsoletes: samba4-winbind < %{samba_depver}
@@ -1523,6 +1524,10 @@ rm -rf %{buildroot}
 %{_mandir}/man8/pam_winbind.8*
 
 %changelog
+* Wed Oct 16 2013 - Andreas Schneider <asn@redhat.com> 2:4.0.9-3
+- resolves: #1018856 - Fix installation of pam_winbind after upgrade.
+- related: #1010722 - Split out a samba-winbind-modules package.
+
 * Fri Oct 04 2013 - Andreas Schneider <asn@redhat.com> - 2:4.0.9-2
 - resolves: #1010722 - Split out a samba-winbind-modules package.
 
