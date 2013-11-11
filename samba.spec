@@ -1,9 +1,9 @@
 # Set --with testsuite or %bcond_without to run the Samba torture testsuite.
 %bcond_with testsuite
 
-%define main_release 3
+%define main_release 1
 
-%define samba_version 4.0.9
+%define samba_version 4.0.11
 %define talloc_version 2.0.7
 %define ntdb_version 0.9
 %define tdb_version 1.2.12
@@ -1525,6 +1525,9 @@ rm -rf %{buildroot}
 %{_mandir}/man8/pam_winbind.8*
 
 %changelog
+* Mon Nov 11 2013 - Andreas Schneider <asn@redhat.com> 2:4.0.11-1
+- resolves: #1024544 - Fix CVE-2013-4475.
+
 * Wed Oct 16 2013 - Andreas Schneider <asn@redhat.com> 2:4.0.9-3
 - resolves: #1018856 - Fix installation of pam_winbind after upgrade.
 - related: #1010722 - Split out a samba-winbind-modules package.
