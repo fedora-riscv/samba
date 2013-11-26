@@ -1,7 +1,7 @@
 # Set --with testsuite or %bcond_without to run the Samba torture testsuite.
 %bcond_with testsuite
 
-%define main_release 1
+%define main_release 2
 
 %define samba_version 4.0.11
 %define talloc_version 2.0.7
@@ -79,6 +79,7 @@ Source200: README.dc
 Source201: README.downgrade
 
 Patch3: samba-4.1.0rc1-fix_wbinfo_krb5ccname.patch
+Patch4: samba-4.1.2-winbind_cache_keysize.patch
 
 BuildRoot:      %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 
@@ -471,6 +472,7 @@ module necessary to communicate to the Winbind Daemon
 %prep
 %setup -q -n samba-%{version}%{pre_release}
 %patch3 -p1
+%patch4 -p1 -b .samba-4.1.2-winbind_cache_keysize.patch
 
 %build
 %global _talloc_lib ,talloc,pytalloc,pytalloc-util
@@ -1524,6 +1526,9 @@ rm -rf %{buildroot}
 %{_mandir}/man8/pam_winbind.8*
 
 %changelog
+* Tue Nov 26 2013 - Guenther Deschner <gdeschner@redhat.com> 2:4.0.11-2
+- resolves: #1030964 - Fix winbind cache keysize limitations.
+
 * Mon Nov 11 2013 - Andreas Schneider <asn@redhat.com> 2:4.0.11-1
 - resolves: #1024544 - Fix CVE-2013-4475.
 

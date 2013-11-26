@@ -1,0 +1,41 @@
+From 944e9fbc20f125b52e047484dca1792d75561ed9 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?G=C3=BCnther=20Deschner?= <gd@samba.org>
+Date: Wed, 13 Nov 2013 15:10:33 +0100
+Subject: [PATCH] s3-winbindd: Fix #10264, cache_traverse_validate_fn failure
+ for NDR cache entries.
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+We need to increase the keysize limit for NDR queries. A wbint_LookupSids query
+for just 20 sids already hits the older limit.
+
+Guenther
+
+https://bugzilla.samba.org/show_bug.cgi?id=10264
+Signed-off-by: Günther Deschner <gd@samba.org>
+Reviewed-by: Michael Adam <obnox@samba.org>
+
+Autobuild-User(master): Michael Adam <obnox@samba.org>
+Autobuild-Date(master): Wed Nov 13 19:33:46 CET 2013 on sn-devel-104
+---
+ source3/winbindd/winbindd_cache.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/source3/winbindd/winbindd_cache.c b/source3/winbindd/winbindd_cache.c
+index 91c19fa..267cefc 100644
+--- a/source3/winbindd/winbindd_cache.c
++++ b/source3/winbindd/winbindd_cache.c
+@@ -4065,7 +4065,8 @@ static int cache_traverse_validate_fn(TDB_CONTEXT *the_tdb, TDB_DATA kbuf, TDB_D
+ 	struct tdb_validation_status *v_state = (struct tdb_validation_status *)state;
+ 
+ 	/* Paranoia check. */
+-	if (strncmp("UA/", (const char *)kbuf.dptr, 3) == 0) {
++	if (strncmp("UA/", (const char *)kbuf.dptr, 3) == 0 ||
++	    strncmp("NDR/", (const char *)kbuf.dptr, 4) == 0) {
+ 		max_key_len = 1024 * 1024;
+ 	}
+ 	if (kbuf.dsize > max_key_len) {
+-- 
+1.8.3.1
+
