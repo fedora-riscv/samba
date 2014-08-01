@@ -3,7 +3,7 @@
 
 %define main_release 1
 
-%define samba_version 4.0.19
+%define samba_version 4.0.21
 %define talloc_version 2.0.7
 %define ntdb_version 0.9
 %define tdb_version 1.2.12
@@ -1524,6 +1524,10 @@ rm -rf %{buildroot}
 %{_mandir}/man8/pam_winbind.8*
 
 %changelog
+* Fri Aug 01 2014 - Guenther Deschner <gdeschner@redhat.com> - 4.0.21-1
+- Update to Samba 4.0.21.
+- resolves: #1126015 - Fix CVE-2014-3560.
+
 * Mon Jun 23 2014 - Guenther Deschner <gdeschner@redhat.com> - 4.0.19-1
 - Update to Samba 4.0.19.
 - resolves: #1112251 - Fix CVE-2014-0244 and CVE-2014-3493.
