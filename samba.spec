@@ -1,9 +1,9 @@
 # Set --with testsuite or %bcond_without to run the Samba torture testsuite.
 %bcond_with testsuite
 
-%define main_release 1
+%define main_release 4
 
-%define samba_version 4.1.11
+%define samba_version 4.1.9
 %define talloc_version 2.0.8
 %define ntdb_version 0.9
 %define tdb_version 1.2.12
@@ -73,7 +73,7 @@ License:        GPLv3+ and LGPLv3+
 Group:          System Environment/Daemons
 URL:            http://www.samba.org/
 
-Source0:        http://ftp.samba.org/pub/samba/stable/samba-%{version}%{pre_release}.tar.xz
+Source0:        samba-%{version}%{pre_release}.tar.xz
 
 # Red Hat specific replacement-files
 Source1: samba.log
@@ -84,6 +84,8 @@ Source6: samba.pamd
 
 Source200: README.dc
 Source201: README.downgrade
+
+Patch0: samba-CVE-2014-3560.patch
 
 BuildRoot:      %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 
@@ -502,6 +504,8 @@ module necessary to communicate to the Winbind Daemon
 
 %prep
 %setup -q -n samba-%{version}%{pre_release}
+
+%patch0 -p1 -b .samba-CVE-2014-3560.patch
 
 %build
 %global _talloc_lib ,talloc,pytalloc,pytalloc-util
@@ -1572,8 +1576,7 @@ rm -rf %{buildroot}
 %{_mandir}/man8/pam_winbind.8*
 
 %changelog
-* Fri Aug 1 2014 - Jared Smith <jsmith@fedoraproject.org> - 4.1.11-1
-- Update to upstream Samba 4.1.11 release
+* Fri Aug 1 2014 - Jared Smith <jsmith@fedoraproject.org> - 4.1.9-4
 - resolves: #1126015 - Fix CVE-2014-3560
 
 * Mon Jun 23 2014 - Guenther Deschner <gdeschner@redhat.com> - 4.1.9-3
