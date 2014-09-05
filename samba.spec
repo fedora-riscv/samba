@@ -431,6 +431,7 @@ Requires: %{name}-libs = %{samba_depver}
 Summary: Testing devel files for Samba servers and clients
 Group: Applications/System
 Requires: %{name}-libs = %{samba_depver}
+Requires: %{name}-test-libs = %{samba_depver}
 
 %description test-devel
 samba-test-devel provides testing devel files for both the server and client
