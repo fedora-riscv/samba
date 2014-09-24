@@ -1585,6 +1585,7 @@ rm -rf %{buildroot}
 %changelog
 * Wed Sep 24 2014 - Andreas Schneider <asn@redhat.com> - 4.1.12-1
 - Update to Samba 4.1.12.
+- resolves: #1145313 - Fix smbclient auth against a DFS share.
 
 * Fri Aug 1 2014 - Jared Smith <jsmith@fedoraproject.org> - 4.1.9-4
 - resolves: #1126015 - Fix CVE-2014-3560
