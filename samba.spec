@@ -43,6 +43,11 @@
 %endif
 %endif
 
+%global libwbc_alternatives_suffix %nil
+%if 0%{?__isa_bits} == 64
+%global libwbc_alternatives_suffix -64
+%endif
+
 %global with_mitkrb5 1
 %global with_dc 0
 
@@ -103,9 +108,6 @@ Requires(postun): systemd
 
 Requires(pre): %{name}-common = %{samba_depver}
 Requires: %{name}-libs = %{samba_depver}
-%if %with_libwbclient
-Requires: libwbclient = %{samba_depver}
-%endif
 
 Provides: samba4 = %{samba_depver}
 Obsoletes: samba4 < %{samba_depver}
@@ -220,9 +222,6 @@ of SMB/CIFS shares and printing to SMB/CIFS printers.
 Summary: Files used by both Samba servers and clients
 Group: Applications/System
 Requires: %{name}-libs = %{samba_depver}
-%if %with_libwbclient
-Requires: libwbclient = %{samba_depver}
-%endif
 Requires(post): systemd
 
 Provides: samba4-common = %{samba_depver}
@@ -301,9 +300,6 @@ Samba VFS module for GlusterFS integration.
 Summary: Samba libraries
 Group: Applications/System
 Requires: krb5-libs >= 1.10
-%if %with_libwbclient
-Requires: libwbclient = %{samba_depver}
-%endif
 
 Provides: samba4-libs = %{samba_depver}
 Obsoletes: samba4-libs < %{samba_depver}
@@ -404,9 +400,6 @@ Requires: %{name}-libs = %{samba_depver}
 %if %with_libsmbclient
 Requires: libsmbclient = %{samba_depver}
 %endif
-%if %with_libwbclient
-Requires: libwbclient = %{samba_depver}
-%endif
 
 Provides: samba4-test = %{samba_depver}
 Obsoletes: samba4-test < %{samba_depver}
@@ -458,9 +451,6 @@ Group: Applications/System
 Requires: %{name}-common = %{samba_depver}
 Requires: %{name}-libs = %{samba_depver}
 Requires: %{name}-winbind = %{samba_depver}
-%if %with_libwbclient
-Requires: libwbclient = %{samba_depver}
-%endif
 
 Provides: samba4-winbind-clients = %{samba_depver}
 Obsoletes: samba4-winbind-clients < %{samba_depver}
@@ -473,10 +463,7 @@ tool.
 %package winbind-krb5-locator
 Summary: Samba winbind krb5 locator
 Group: Applications/System
-%if %with_libwbclient
-Requires: libwbclient = %{samba_depver}
-Requires: %{name}-winbind = %{samba_depver}
-%else
+%if ! %with_libwbclient
 Requires: %{name}-libs = %{samba_depver}
 %endif
 
@@ -501,9 +488,6 @@ the local kerberos library to use the same KDC as samba and winbind use
 Summary: Samba winbind modules
 Group: Applications/System
 Requires: %{name}-libs = %{samba_depver}
-%if %with_libwbclient
-Requires: libwbclient = %{samba_depver}
-%endif
 Requires: pam
 
 %description winbind-modules
@@ -619,6 +603,11 @@ install -d -m 0755 %{buildroot}/var/run/winbindd
 install -d -m 0755 %{buildroot}/%{_libdir}/samba
 install -d -m 0755 %{buildroot}/%{_libdir}/pkgconfig
 
+# Move libwbclient.so* into private directory, it cannot be just libdir/samba
+# because samba uses rpath with this directory.
+install -d -m 0755 %{buildroot}/%{_libdir}/samba/wbclient
+mv %{buildroot}/%{_libdir}/libwbclient.so* %{buildroot}/%{_libdir}/samba/wbclient
+
 # Install other stuff
 install -d -m 0755 %{buildroot}%{_sysconfdir}/logrotate.d
 install -m 0644 %{SOURCE1} %{buildroot}%{_sysconfdir}/logrotate.d/samba
@@ -716,9 +705,33 @@ fi
 %endif # with_libsmbclient
 
 %if %with_libwbclient
-%post -n libwbclient -p /sbin/ldconfig
+%posttrans -n libwbclient
+# It has to be posttrans here to make sure all files of a previous version
+# without alternatives support are removed
+%{_sbindir}/update-alternatives --install %{_libdir}/libwbclient.so.0.11 \
+                                libwbclient.so.0.11%{libwbc_alternatives_suffix} %{_libdir}/samba/wbclient/libwbclient.so.0.11 10
+/sbin/ldconfig
 
-%postun -n libwbclient -p /sbin/ldconfig
+%preun -n libwbclient
+%{_sbindir}/update-alternatives --remove libwbclient.so.0.11%{libwbc_alternatives_suffix} %{_libdir}/samba/wbclient/libwbclient.so.0.11
+/sbin/ldconfig
+
+%posttrans -n libwbclient-devel
+%{_sbindir}/update-alternatives --install %{_libdir}/libwbclient.so \
+                                libwbclient.so%{libwbc_alternatives_suffix} %{_libdir}/samba/wbclient/libwbclient.so 10
+
+%preun -n libwbclient-devel
+# alternatives checks if the file which should be removed is a link or not, but
+# not if it points to the /etc/alternatives directory or to some other place.
+# When downgrading to a version where alternatives is not used and
+# libwbclient.so is a link and not a file it will be removed. The following
+# check removes the alternatives files manually if that is the case.
+if [ "`readlink %{_libdir}/libwbclient.so`" == "libwbclient.so.0.11" ]; then
+    /bin/rm -f /etc/alternatives/libwbclient.so%{libwbc_alternatives_suffix} /var/lib/alternatives/libwbclient.so%{libwbc_alternatives_suffix} 2> /dev/null
+else
+    %{_sbindir}/update-alternatives --remove libwbclient.so%{libwbc_alternatives_suffix} %{_libdir}/samba/wbclient/libwbclient.so
+fi
+
 %endif # with_libwbclient
 
 %post test -p /sbin/ldconfig
@@ -1447,14 +1460,14 @@ rm -rf %{buildroot}
 %if %with_libwbclient
 %files -n libwbclient
 %defattr(-,root,root)
-%{_libdir}/libwbclient.so.*
+%{_libdir}/samba/wbclient/libwbclient.so.*
 %{_libdir}/samba/libwinbind-client.so
 
 ### LIBWBCLIENT-DEVEL
 %files -n libwbclient-devel
 %defattr(-,root,root)
 %{_includedir}/samba-4.0/wbclient.h
-%{_libdir}/libwbclient.so
+%{_libdir}/samba/wbclient/libwbclient.so
 %{_libdir}/pkgconfig/wbclient.pc
 %endif # with_libwbclient
 
@@ -1585,6 +1598,7 @@ rm -rf %{buildroot}
 %changelog
 * Wed Nov 26 2014 - Andreas Schneider <asn@redhat.com> - 4.1.13-1
 - Update to Samba 4.1.12.
+- Use alternatives for libwbclient.
 
 * Tue Oct 07 2014 - Andreas Schneider <asn@redhat.com> - 4.1.12-5
 - resolves: #1033595 - Fix segfault in winbind.
