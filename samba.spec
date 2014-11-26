@@ -6,9 +6,9 @@
 # ctdb is enabled by default, you can disable it with: --without clustering
 %bcond_without clustering
 
-%define main_release 5
+%define main_release 1
 
-%define samba_version 4.1.12
+%define samba_version 4.1.13
 %define talloc_version 2.0.8
 %define ntdb_version 0.9
 %define tdb_version 1.2.12
@@ -93,8 +93,6 @@ Source6: samba.pamd
 
 Source200: README.dc
 Source201: README.downgrade
-
-Patch0:    samba-4.1.13-fix_winbind_segfault.patch
 
 BuildRoot:      %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 
@@ -514,8 +512,6 @@ module necessary to communicate to the Winbind Daemon
 
 %prep
 %setup -q -n samba-%{version}%{pre_release}
-
-%patch0 -p1 -b .samba-4.1.13-fix_winbind_segfault.patch
 
 %build
 %global _talloc_lib ,talloc,pytalloc,pytalloc-util
@@ -1587,6 +1583,9 @@ rm -rf %{buildroot}
 %{_mandir}/man8/pam_winbind.8*
 
 %changelog
+* Wed Nov 26 2014 - Andreas Schneider <asn@redhat.com> - 4.1.13-1
+- Update to Samba 4.1.12.
+
 * Tue Oct 07 2014 - Andreas Schneider <asn@redhat.com> - 4.1.12-5
 - resolves: #1033595 - Fix segfault in winbind.
 
