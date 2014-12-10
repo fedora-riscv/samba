@@ -8,7 +8,7 @@
 
 %define main_release 1
 
-%define samba_version 4.1.13
+%define samba_version 4.1.14
 %define talloc_version 2.0.8
 %define ntdb_version 0.9
 %define tdb_version 1.2.12
@@ -549,7 +549,6 @@ LDFLAGS="-Wl,-z,relro,-z,now" \
         --with-pammodulesdir=%{_libdir}/security \
         --with-lockdir=/var/lib/samba \
         --with-cachedir=/var/lib/samba \
-        --with-perl-lib-install-dir=%{perl_vendorlib} \
         --disable-gnutls \
         --disable-rpath-install \
         --with-shared-modules=%{_samba4_modules} \
@@ -1596,6 +1595,9 @@ rm -rf %{buildroot}
 %{_mandir}/man8/pam_winbind.8*
 
 %changelog
+* Wed Dec 10 2014 - Andreas Schneider <asn@redhat.com> - 4.1.14-1
+- Update to Samba 4.1.14.
+
 * Wed Nov 26 2014 - Andreas Schneider <asn@redhat.com> - 4.1.13-1
 - Update to Samba 4.1.12.
 - Use alternatives for libwbclient.
