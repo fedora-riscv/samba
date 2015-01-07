@@ -6,7 +6,7 @@
 # ctdb is enabled by default, you can disable it with: --without clustering
 %bcond_without clustering
 
-%define main_release 1
+%define main_release 2
 
 %define samba_version 4.1.14
 %define talloc_version 2.0.8
@@ -108,6 +108,9 @@ Requires(postun): systemd
 
 Requires(pre): %{name}-common = %{samba_depver}
 Requires: %{name}-libs = %{samba_depver}
+%if %with_libwbclient
+Requires: libwbclient = %{samba_depver}
+%endif
 
 Provides: samba4 = %{samba_depver}
 Obsoletes: samba4 < %{samba_depver}
@@ -222,6 +225,9 @@ of SMB/CIFS shares and printing to SMB/CIFS printers.
 Summary: Files used by both Samba servers and clients
 Group: Applications/System
 Requires: %{name}-libs = %{samba_depver}
+%if %with_libwbclient
+Requires: libwbclient = %{samba_depver}
+%endif
 Requires(post): systemd
 
 Provides: samba4-common = %{samba_depver}
@@ -300,6 +306,9 @@ Samba VFS module for GlusterFS integration.
 Summary: Samba libraries
 Group: Applications/System
 Requires: krb5-libs >= 1.10
+%if %with_libwbclient
+Requires: libwbclient = %{samba_depver}
+%endif
 
 Provides: samba4-libs = %{samba_depver}
 Obsoletes: samba4-libs < %{samba_depver}
@@ -400,6 +409,9 @@ Requires: %{name}-libs = %{samba_depver}
 %if %with_libsmbclient
 Requires: libsmbclient = %{samba_depver}
 %endif
+%if %with_libwbclient
+Requires: libwbclient = %{samba_depver}
+%endif
 
 Provides: samba4-test = %{samba_depver}
 Obsoletes: samba4-test < %{samba_depver}
@@ -451,6 +463,9 @@ Group: Applications/System
 Requires: %{name}-common = %{samba_depver}
 Requires: %{name}-libs = %{samba_depver}
 Requires: %{name}-winbind = %{samba_depver}
+%if %with_libwbclient
+Requires: libwbclient = %{samba_depver}
+%endif
 
 Provides: samba4-winbind-clients = %{samba_depver}
 Obsoletes: samba4-winbind-clients < %{samba_depver}
@@ -463,7 +478,10 @@ tool.
 %package winbind-krb5-locator
 Summary: Samba winbind krb5 locator
 Group: Applications/System
-%if ! %with_libwbclient
+%if %with_libwbclient
+Requires: libwbclient = %{samba_depver}
+Requires: %{name}-winbind = %{samba_depver}
+%else
 Requires: %{name}-libs = %{samba_depver}
 %endif
 
@@ -488,6 +506,9 @@ the local kerberos library to use the same KDC as samba and winbind use
 Summary: Samba winbind modules
 Group: Applications/System
 Requires: %{name}-libs = %{samba_depver}
+%if %with_libwbclient
+Requires: libwbclient = %{samba_depver}
+%endif
 Requires: pam
 
 %description winbind-modules
@@ -1595,6 +1616,9 @@ rm -rf %{buildroot}
 %{_mandir}/man8/pam_winbind.8*
 
 %changelog
+* Wed Jan 07 2015 - Andreas Schneider <asn@redhat.com> - 4.1.14-2
+- Add missing requires to libwbclient.
+
 * Wed Dec 10 2014 - Andreas Schneider <asn@redhat.com> - 4.1.14-1
 - Update to Samba 4.1.14.
 
