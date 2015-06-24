@@ -6,7 +6,7 @@
 # ctdb is enabled by default, you can disable it with: --without clustering
 %bcond_without clustering
 
-%define main_release 0
+%define main_release 1
 
 %define samba_version 4.2.2
 %define talloc_version 2.1.2
@@ -23,6 +23,10 @@
 %define samba_release %{main_release}%{?dist}
 %endif
 
+# This is a network daemon, do a hardened build
+# Enables PIE and full RELRO protection
+%global _hardened_build 1
+
 %global with_libsmbclient 1
 %global with_libwbclient 1
 
@@ -36,6 +40,9 @@
 %global with_profiling 1
 
 %global with_vfs_cephfs 1
+%if 0%{?rhel}
+%global with_vfs_cephfs 0
+%endif
 
 %global with_vfs_glusterfs 1
 %if 0%{?rhel}
@@ -141,6 +148,7 @@ BuildRequires: gawk
 BuildRequires: krb5-devel >= 1.10
 BuildRequires: libacl-devel
 BuildRequires: libaio-devel
+BuildRequires: libarchive-devel
 BuildRequires: libattr-devel
 BuildRequires: libcap-devel
 BuildRequires: libuuid-devel
@@ -1057,6 +1065,14 @@ rm -rf %{buildroot}
 %{_mandir}/man8/vfs_worm.8*
 %{_mandir}/man8/vfs_xattr_tdb.8*
 
+%if ! %{with_vfs_glusterfs}
+%exclude %{_mandir}/man8/vfs_glusterfs.8*
+%endif
+
+%if ! %{with_vfs_cephfs}
+%exclude %{_mandir}/man8/vfs_ceph.8*
+%endif
+
 ### CLIENT
 %files client
 %defattr(-,root,root)
@@ -1932,6 +1948,10 @@ rm -rf %{buildroot}
 %endif # with_clustering_support
 
 %changelog
+* Fri Jun 19 2015 Andreas Schneider <asn@redhat.com> - 4.2.2-1
+- resolves: #1227911 - Enable tar support for smbclient
+- Enable hardened build
+
 * Thu May 28 2015 Guenther Deschner <gdeschner@redhat.com> - 4.2.2-0
 - Update to Samba 4.2.2
 
