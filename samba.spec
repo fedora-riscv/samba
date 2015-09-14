@@ -8,7 +8,7 @@
 
 %define main_release 1
 
-%define samba_version 4.1.17
+%define samba_version 4.1.20
 %define talloc_version 2.0.8
 %define ntdb_version 0.9
 %define tdb_version 1.2.12
@@ -98,8 +98,6 @@ Source6: samba.pamd
 
 Source200: README.dc
 Source201: README.downgrade
-
-Patch0: samba-4.1.15-fix_auth_with_long_hostnames.patch
 
 BuildRoot:      %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 
@@ -519,8 +517,6 @@ module necessary to communicate to the Winbind Daemon
 
 %prep
 %setup -q -n samba-%{version}%{pre_release}
-
-%patch0 -p1 -b .samba-4.1.15-fix_auth_with_long_hostnames.patch
 
 %build
 %global _talloc_lib ,talloc,pytalloc,pytalloc-util
@@ -1299,6 +1295,7 @@ rm -rf %{buildroot}
 %if %{with_vfs_glusterfs}
 %files vfs-glusterfs
 %{_libdir}/samba/vfs/glusterfs.so
+%{_mandir}/man8/vfs_glusterfs.8.gz
 %endif
 
 ### LIBS
@@ -1620,6 +1617,10 @@ rm -rf %{buildroot}
 %{_mandir}/man8/pam_winbind.8*
 
 %changelog
+* Mon Sep 14 2015 Andreas Schneider <asn@redhat.com> - 4.1.20-1
+- Update to Samba 4.1.20
+- resolves: #1261080 - Fix memleak in libsmbclient
+
 * Mon Feb 23 2015 Andreas Schneider <asn@redhat.com> - 4.1.17-1
 - Update to Samba 4.1.17
 - Fix CVE-2015-0240 - RCE in netlogon
