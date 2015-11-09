@@ -8,7 +8,7 @@
 
 %define main_release 0
 
-%define samba_version 4.2.3
+%define samba_version 4.2.5
 %define talloc_version 2.1.2
 %define ntdb_version 1.0
 %define tdb_version 1.3.6
@@ -98,8 +98,6 @@ Group:          System Environment/Daemons
 URL:            http://www.samba.org/
 
 Source0:        samba-%{version}%{pre_release}.tar.xz
-
-Patch3:         samba-4.2-auth-credentials-if-credentials-have-principal-set-t.patch
 
 # Red Hat specific replacement-files
 Source1: samba.log
@@ -645,8 +643,6 @@ and use CTDB instead.
 
 %prep
 %setup -q -n samba-%{version}%{pre_release}
-
-%patch3 -p1 -b .samba-4.2-auth-credentials-if-credentials-have-principal-set-t.patch
 
 %build
 %global _talloc_lib ,talloc,pytalloc,pytalloc-util
@@ -1945,6 +1941,9 @@ rm -rf %{buildroot}
 %endif # with_clustering_support
 
 %changelog
+* Mon Nov 09 2015 Guenther Deschner <gdeschner@redhat.com> - 4.2.5-0
+- Update to Samba 4.2.5
+
 * Tue Jul 14 2015 Guenther Deschner <gdeschner@redhat.com> - 4.2.3-0
 - resolves: #1088911 - Update to Samba 4.2.3
 
