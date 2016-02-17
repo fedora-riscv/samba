@@ -8,7 +8,7 @@
 
 %define main_release 0
 
-%define samba_version 4.2.7
+%define samba_version 4.2.8
 %define talloc_version 2.1.2
 %define ntdb_version 1.0
 %define tdb_version 1.3.6
@@ -108,8 +108,6 @@ Source6: samba.pamd
 
 Source200: README.dc
 Source201: README.downgrade
-
-Patch0: samba-4.3.3-async_connect_send_test.patch
 
 BuildRoot:      %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 
@@ -645,8 +643,6 @@ and use CTDB instead.
 
 %prep
 %setup -q -n samba-%{version}%{pre_release}
-
-%patch0 -p1 -b .samba-4.3.3-async_connect_send_test.patch
 
 %build
 %global _talloc_lib ,talloc,pytalloc,pytalloc-util
@@ -1945,6 +1941,9 @@ rm -rf %{buildroot}
 %endif # with_clustering_support
 
 %changelog
+* Wed Feb 17 2016 Guenther Deschner <gdeschner@redhat.com> - 4.2.8-0
+- Update to Samba 4.2.8
+
 * Wed Dec 16 2015 Guenther Deschner <gdeschner@redhat.com> - 4.2.7-0
 - Update to Samba 4.2.7
 - resolves: #1292069
