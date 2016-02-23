@@ -6,9 +6,9 @@
 # ctdb is enabled by default, you can disable it with: --without clustering
 %bcond_without clustering
 
-%define main_release 1
+%define main_release 0
 
-%define samba_version 4.3.4
+%define samba_version 4.3.5
 %define talloc_version 2.1.3
 %define tdb_version 1.3.7
 %define tevent_version 0.9.25
@@ -106,8 +106,6 @@ Source6: samba.pamd
 
 Source200: README.dc
 Source201: README.downgrade
-
-Patch1: samba-4.3-s3-parm-clean-up-defaults-when-removing-global-param.patch
 
 BuildRoot:      %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 
@@ -374,6 +372,20 @@ Provides: samba-glusterfs
 %description vfs-glusterfs
 Samba VFS module for GlusterFS integration.
 %endif
+
+### KRB5-PRINTING
+%package krb5-printing
+Summary: Samba CUPS backend for printing with Kerberos
+Group: Applications/System
+Requires(pre): %{name}-client
+
+Requires(post): %{_sbindir}/update-alternatives
+Requires(postun): %{_sbindir}/update-alternatives
+
+%description krb5-printing
+If you need Kerberos for print jobs to a printer connection to cups via the SMB
+backend, then you need to install that package. It will allow cups to access
+the Kerberos credentials cache of the user issuing the print job.
 
 ### LIBS
 %package libs
@@ -672,7 +684,6 @@ and use CTDB instead.
 
 %prep
 %setup -q -n samba-%{version}%{pre_release}
-%patch1 -p1
 
 %build
 %global _talloc_lib ,talloc,pytalloc,pytalloc-util
@@ -789,6 +800,11 @@ then
     exit -1
 fi
 
+# Move smbspool_krb5_wrapper
+install -d -m 0755 %{buildroot}%{_libexecdir}/samba
+mv %{buildroot}%{_bindir}/smbspool_krb5_wrapper %{buildroot}%{_libexecdir}/samba
+touch %{buildroot}%{_libexecdir}/samba/cups_backend_smb
+
 # Install other stuff
 install -d -m 0755 %{buildroot}%{_sysconfdir}/logrotate.d
 install -m 0644 %{SOURCE1} %{buildroot}%{_sysconfdir}/logrotate.d/samba
@@ -879,13 +895,39 @@ if [ -d /var/cache/samba ]; then
     ln -sf /var/cache/samba /var/lib/samba/
 fi
 
-%postun common -p /sbin/ldconfig
+%post client
+%{_sbindir}/update-alternatives --install %{_libexecdir}/samba/cups_backend_smb \
+    cups_backend_smb \
+    %{_bindir}/smbspool 10
+
+%postun client
+if [ $1 -eq 0 ] ; then
+    %{_sbindir}/update-alternatives --remove cups_backend_smb %{_libexecdir}/samba/smbspool
+fi
+
+%post client-libs -p /sbin/ldconfig
+
+%postun client-libs -p /sbin/ldconfig
+
+%post common-libs -p /sbin/ldconfig
+
+%postun common-libs -p /sbin/ldconfig
 
 %if %with_dc
 %post dc-libs -p /sbin/ldconfig
 
 %postun dc-libs -p /sbin/ldconfig
-%endif # with_dc
+%endif
+
+%post krb5-printing
+%{_sbindir}/update-alternatives --install %{_libexecdir}/samba/cups_backend_smb \
+	cups_backend_smb \
+	%{_libexecdir}/samba/smbspool_krb5_wrapper 50
+
+%postun krb5-printing
+if [ $1 -eq 0 ] ; then
+	%{_sbindir}/update-alternatives --remove cups_backend_smb %{_libexecdir}/samba/smbspool_krb5_wrapper
+fi
 
 %post libs -p /sbin/ldconfig
 
@@ -1123,6 +1165,8 @@ rm -rf %{buildroot}
 %{_bindir}/smbta-util
 %{_bindir}/smbtar
 %{_bindir}/smbtree
+%dir %{_libexecdir}/samba
+%ghost %{_libexecdir}/samba/cups_backend_smb
 %{_mandir}/man1/dbwrap_tool.1*
 %{_mandir}/man1/nmblookup.1*
 %{_mandir}/man1/oLschema2ldif.1*
@@ -1662,6 +1706,12 @@ rm -rf %{buildroot}
 %{_mandir}/man8/vfs_glusterfs.8*
 %endif
 
+### KRB5-PRINTING
+%files krb5-printing
+%defattr(-,root,root)
+%attr(0700,root,root) %{_libexecdir}/samba/smbspool_krb5_wrapper
+%{_mandir}/man8/smbspool_krb5_wrapper.8*
+
 ### LIBS
 %files libs
 %defattr(-,root,root)
@@ -1981,6 +2031,9 @@ rm -rf %{buildroot}
 %endif # with_clustering_support
 
 %changelog
+* Tue Feb 23 2016 Guenther Deschner <gdeschner@redhat.com> - 4.3.5-0
+- resolves: #1261230 - Update to Samba 4.3.5
+
 * Fri Jan 22 2016 Alexander Bokovoy <abokovoy@redhat.com> - 4.3.4-1
 - resolves: #1300038 - PANIC: Bad talloc magic value - wrong talloc version used/mixed
 
