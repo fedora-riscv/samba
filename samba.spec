@@ -8,7 +8,7 @@
 
 %define main_release 0
 
-%define samba_version 4.3.5
+%define samba_version 4.3.6
 %define talloc_version 2.1.3
 %define tdb_version 1.3.7
 %define tevent_version 0.9.25
@@ -2031,6 +2031,10 @@ rm -rf %{buildroot}
 %endif # with_clustering_support
 
 %changelog
+* Tue Mar 08 2016 Guenther Deschner <gdeschner@redhat.com> - 4.3.6-0
+- Update to Samba 4.3.6
+- resolves: #1315942 - CVE-2015-7560 Incorrect ACL get/set allowed on symlink path
+
 * Tue Feb 23 2016 Guenther Deschner <gdeschner@redhat.com> - 4.3.5-0
 - resolves: #1261230 - Update to Samba 4.3.5
 
