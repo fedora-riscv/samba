@@ -8,7 +8,7 @@
 
 %define main_release 0
 
-%define samba_version 4.3.6
+%define samba_version 4.3.8
 %define talloc_version 2.1.3
 %define tdb_version 1.3.7
 %define tevent_version 0.9.25
@@ -106,6 +106,8 @@ Source6: samba.pamd
 
 Source200: README.dc
 Source201: README.downgrade
+
+Patch0:		samba-4.2.10-s3-winbind-make-sure-domain-member-can-talk-to-trust.patch
 
 BuildRoot:      %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 
@@ -684,6 +686,8 @@ and use CTDB instead.
 
 %prep
 %setup -q -n samba-%{version}%{pre_release}
+
+%patch0 -p 1 -b .samba-4.2.10-s3-winbind-make-sure-domain-member-can-talk-to-trust.patch
 
 %build
 %global _talloc_lib ,talloc,pytalloc,pytalloc-util
@@ -2031,6 +2035,17 @@ rm -rf %{buildroot}
 %endif # with_clustering_support
 
 %changelog
+* Tue Apr 12 2016 Guenther Deschner <gdeschner@redhat.com> - 4.3.8-0
+- Update to Samba 4.3.8, fix badlock security bug
+- resolves: #1326453 - CVE-2015-5370
+- resolves: #1326453 - CVE-2016-2110
+- resolves: #1326453 - CVE-2016-2111
+- resolves: #1326453 - CVE-2016-2112
+- resolves: #1326453 - CVE-2016-2113
+- resolves: #1326453 - CVE-2016-2114
+- resolves: #1326453 - CVE-2016-2115
+- resolves: #1326453 - CVE-2016-2118
+
 * Tue Mar 08 2016 Guenther Deschner <gdeschner@redhat.com> - 4.3.6-0
 - Update to Samba 4.3.6
 - resolves: #1315942 - CVE-2015-7560 Incorrect ACL get/set allowed on symlink path
