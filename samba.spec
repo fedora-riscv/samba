@@ -11,7 +11,7 @@
 %define samba_version 4.3.9
 %define talloc_version 2.1.3
 %define tdb_version 1.3.7
-%define tevent_version 0.9.25
+%define tevent_version 0.9.28
 %define ldb_version 1.1.24
 # This should be rc1 or nil
 %define pre_release %nil
@@ -190,7 +190,7 @@ BuildRequires: pytalloc-devel >= %{libtalloc_version}
 %endif
 
 %if ! %with_internal_tevent
-%global libtevent_version 0.9.25
+%global libtevent_version 0.9.28
 
 BuildRequires: libtevent-devel >= %{libtevent_version}
 BuildRequires: python-tevent >= %{libtevent_version}
