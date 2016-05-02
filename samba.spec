@@ -8,11 +8,11 @@
 
 %define main_release 0
 
-%define samba_version 4.2.11
-%define talloc_version 2.1.2
+%define samba_version 4.2.12
+%define talloc_version 2.1.3
 %define ntdb_version 1.0
-%define tdb_version 1.3.6
-%define tevent_version 0.9.25
+%define tdb_version 1.3.7
+%define tevent_version 0.9.28
 %define ldb_version 1.1.24
 # This should be rc1 or nil
 %define pre_release %nil
@@ -182,14 +182,14 @@ BuildRequires: gnutls-devel
 BuildRequires: perl(Parse::Yapp)
 
 %if ! %with_internal_talloc
-%global libtalloc_version 2.1.2
+%global libtalloc_version 2.1.3
 
 BuildRequires: libtalloc-devel >= %{libtalloc_version}
 BuildRequires: pytalloc-devel >= %{libtalloc_version}
 %endif
 
 %if ! %with_internal_tevent
-%global libtevent_version 0.9.25
+%global libtevent_version 0.9.28
 
 BuildRequires: libtevent-devel >= %{libtevent_version}
 BuildRequires: python-tevent >= %{libtevent_version}
@@ -203,7 +203,7 @@ BuildRequires: pyldb-devel >= %{libldb_version}
 %endif
 
 %if ! %with_internal_tdb
-%global libtdb_version 1.3.6
+%global libtdb_version 1.3.7
 
 BuildRequires: libtdb-devel >= %{libtdb_version}
 BuildRequires: python-tdb >= %{libtdb_version}
@@ -1947,6 +1947,9 @@ rm -rf %{buildroot}
 %endif # with_clustering_support
 
 %changelog
+* Mon May 02 2016 Guenther Deschner <gdeschner@redhat.com> - 4.2.12-0
+- Update to Samba 4.2.12
+
 * Tue Apr 12 2016 Guenther Deschner <gdeschner@redhat.com> - 4.2.11-0
 - Update to Samba 4.2.11, fix badlock security bug
 - resolves: #1326453 - CVE-2015-5370
