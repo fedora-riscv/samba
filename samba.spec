@@ -111,6 +111,7 @@ Source201: README.downgrade
 
 Patch0:		samba-4.2.10-s3-winbind-make-sure-domain-member-can-talk-to-trust.patch
 Patch1:		samba-4.2.10-s3-parm-clean-up-defaults-when-removing-global-param.patch
+Patch2:		samba-4.2.12-smbspool_krb5_install_path.patch
 
 BuildRoot:      %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 
@@ -361,6 +362,20 @@ Provides: samba-glusterfs
 %description vfs-glusterfs
 Samba VFS module for GlusterFS integration.
 %endif
+
+### KRB5-PRINTING
+%package krb5-printing
+Summary: Samba CUPS backend for printing with Kerberos
+Group: Applications/System
+Requires(pre): %{name}-client
+
+Requires(post): %{_sbindir}/update-alternatives
+Requires(postun): %{_sbindir}/update-alternatives
+
+%description krb5-printing
+If you need Kerberos for print jobs to a printer connection to cups via the SMB
+backend, then you need to install that package. It will allow cups to access
+the Kerberos credentials cache of the user issuing the print job.
 
 ### LIBS
 %package libs
@@ -649,6 +664,7 @@ and use CTDB instead.
 
 %patch0 -p 1 -b .samba-4.2.10-s3-winbind-make-sure-domain-member-can-talk-to-trust.patch
 %patch1 -p 1 -b .samba-4.2.10-s3-parm-clean-up-defaults-when-removing-global-param.patch
+%patch2 -p 1 -b .samba-4.2.12-smbspool_krb5_install_path.patch
 
 %build
 %global _talloc_lib ,talloc,pytalloc,pytalloc-util
@@ -856,11 +872,31 @@ fi
 
 %postun common -p /sbin/ldconfig
 
+%post client
+%{_sbindir}/update-alternatives --install %{_libexecdir}/samba/cups_backend_smb \
+	cups_backend_smb \
+	%{_bindir}/smbspool 10
+
+%postun client
+if [ $1 -eq 0 ] ; then
+	%{_sbindir}/update-alternatives --remove cups_backend_smb %{_libexecdir}/samba/smbspool
+fi
+
 %if %with_dc
 %post dc-libs -p /sbin/ldconfig
 
 %postun dc-libs -p /sbin/ldconfig
 %endif # with_dc
+
+%post krb5-printing
+%{_sbindir}/update-alternatives --install %{_libexecdir}/samba/cups_backend_smb \
+	cups_backend_smb \
+	%{_libexecdir}/samba/smbspool_krb5_wrapper 50
+
+%postun krb5-printing
+if [ $1 -eq 0 ] ; then
+	%{_sbindir}/update-alternatives --remove cups_backend_smb %{_libexecdir}/samba/smbspool_krb5_wrapper
+fi
 
 %post libs -p /sbin/ldconfig
 
@@ -1649,6 +1685,12 @@ rm -rf %{buildroot}
 %{_libdir}/samba/vfs/glusterfs.so
 %{_mandir}/man8/vfs_glusterfs.8*
 %endif
+
+### KRB5-PRINTING
+%files krb5-printing
+%defattr(-,root,root)
+%attr(0700,root,root) %{_libexecdir}/samba/smbspool_krb5_wrapper
+%{_mandir}/man8/smbspool_krb5_wrapper.8*
 
 ### LIBS
 %files libs

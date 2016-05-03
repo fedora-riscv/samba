@@ -1,0 +1,29 @@
+From b504918372df0a55585c92da445f4e1fba4af04a Mon Sep 17 00:00:00 2001
+From: Andreas Schneider <asn@samba.org>
+Date: Fri, 12 Feb 2016 08:46:10 +0100
+Subject: [PATCH] s3-waf: Install smbspool_krb5_wrapper in LIBEXECDIR
+
+Signed-off-by: Andreas Schneider <asn@samba.org>
+Reviewed-by: Martin Schwenke <martin@meltin.net>
+
+Autobuild-User(master): Martin Schwenke <martins@samba.org>
+Autobuild-Date(master): Sat Feb 13 00:41:33 CET 2016 on sn-devel-144
+---
+ source3/wscript_build | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/source3/wscript_build b/source3/wscript_build
+index 0c7dfc2..6f47c35 100755
+--- a/source3/wscript_build
++++ b/source3/wscript_build
+@@ -1191,6 +1191,7 @@ bld.SAMBA3_BINARY('smbspool_krb5_wrapper',
+                  DYNCONFIG
+                  cups
+                  ''',
++                 install_path='${LIBEXECDIR}/samba',
+                  enabled=bld.CONFIG_SET('HAVE_CUPS'))
+ 
+ bld.SAMBA3_BINARY('testparm',
+-- 
+2.5.5
+
