@@ -6,7 +6,7 @@
 # ctdb is enabled by default, you can disable it with: --without clustering
 %bcond_without clustering
 
-%define main_release 0
+%define main_release 1
 
 %define samba_version 4.2.12
 %define talloc_version 2.1.3
@@ -1131,6 +1131,8 @@ rm -rf %{buildroot}
 %{_bindir}/smbta-util
 %{_bindir}/smbtar
 %{_bindir}/smbtree
+%dir %{_libexecdir}/samba
+%ghost %{_libexecdir}/samba/cups_backend_smb
 %{_mandir}/man1/dbwrap_tool.1*
 %{_mandir}/man1/nmblookup.1*
 %{_mandir}/man1/oLschema2ldif.1*
@@ -1989,6 +1991,9 @@ rm -rf %{buildroot}
 %endif # with_clustering_support
 
 %changelog
+* Thu Jun 16 2016 Andreas Schneider <asn@redhat.com> - 4.2.12-1
+- resolves: #1346229 - Package /usr/libexec/samba directory
+
 * Mon May 02 2016 Guenther Deschner <gdeschner@redhat.com> - 4.2.12-0
 - Update to Samba 4.2.12
 
