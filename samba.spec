@@ -6,7 +6,7 @@
 # ctdb is enabled by default, you can disable it with: --without clustering
 %bcond_without clustering
 
-%define main_release 0
+%define main_release 1
 
 %define samba_version 4.3.10
 %define talloc_version 2.1.3
@@ -108,6 +108,7 @@ Source200: README.dc
 Source201: README.downgrade
 
 Patch0:		samba-4.2.10-s3-winbind-make-sure-domain-member-can-talk-to-trust.patch
+Patch1:		samba-4.3.11-ntvfs_build.patch
 
 BuildRoot:      %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 
@@ -688,6 +689,7 @@ and use CTDB instead.
 %setup -q -n samba-%{version}%{pre_release}
 
 %patch0 -p 1 -b .samba-4.2.10-s3-winbind-make-sure-domain-member-can-talk-to-trust.patch
+%patch1 -p 1 -b .samba-4.3.11-ntvfs_build.patch
 
 %build
 %global _talloc_lib ,talloc,pytalloc,pytalloc-util
@@ -1292,6 +1294,7 @@ rm -rf %{buildroot}
 %{_libdir}/samba/libnet-keytab-samba4.so
 %{_libdir}/samba/libnetif-samba4.so
 %{_libdir}/samba/libnpa-tstream-samba4.so
+%{_libdir}/samba/libposix-eadb-samba4.so
 %{_libdir}/samba/libprinting-migrate-samba4.so
 %{_libdir}/samba/libreplace-samba4.so
 %{_libdir}/samba/libsamba-cluster-support-samba4.so
@@ -1513,7 +1516,6 @@ rm -rf %{buildroot}
 %{_libdir}/samba/libdnsserver-common-samba4.so
 %{_libdir}/samba/libdsdb-module-samba4.so
 %{_libdir}/samba/libntvfs-samba4.so
-%{_libdir}/samba/libposix-eadb-samba4.so
 %{_libdir}/samba/bind9/dlz_bind9_9.so
 %else
 %doc packaging/README.dc-libs
@@ -2035,6 +2037,9 @@ rm -rf %{buildroot}
 %endif # with_clustering_support
 
 %changelog
+* Wed Jun 22 2016 Guenther Deschner <gdeschner@redhat.com> - 4.3.10-1
+- resolves: #1348899 - Import of samba.ntacls fails
+
 * Thu Jun 16 2016 Guenther Deschner <gdeschner@redhat.com> - 4.3.10-0
 - Update to Samba 4.3.10
 
