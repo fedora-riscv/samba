@@ -8,7 +8,7 @@
 
 %define main_release 1
 
-%define samba_version 4.3.10
+%define samba_version 4.3.11
 %define talloc_version 2.1.3
 %define tdb_version 1.3.7
 %define tevent_version 0.9.28
@@ -2037,6 +2037,10 @@ rm -rf %{buildroot}
 %endif # with_clustering_support
 
 %changelog
+* Thu Jul 07 2016 Guenther Deschner <gdeschner@redhat.com> - 4.3.11-1
+- Update to Samba 4.3.11
+- resolves: #1353504 - CVE-2016-2119
+
 * Wed Jun 22 2016 Guenther Deschner <gdeschner@redhat.com> - 4.3.10-1
 - resolves: #1348899 - Import of samba.ntacls fails
 
