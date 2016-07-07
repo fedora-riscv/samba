@@ -1,7 +1,7 @@
-From 8e3cb71800f9834cb7495439fa8807ba25c00e40 Mon Sep 17 00:00:00 2001
+From 55b3c4d03fc307ace3b72461484ca9b53d6482b4 Mon Sep 17 00:00:00 2001
 From: Andrew Bartlett <abartlet@samba.org>
 Date: Wed, 11 May 2016 05:33:17 +1200
-Subject: [PATCH] build: Build less of Samba when building
+Subject: [PATCH 1/2] build: Build less of Samba when building
  --without-ntvfs-fileserver
 
 We would build, but not use, many components of the NTVFS file server
@@ -17,13 +17,13 @@ Reviewed-by: Garming Sam <garming@catalyst.net.nz>
  source4/ntvfs/posix/posix_eadb.c          |  81 ++++++++++----------
  source4/ntvfs/posix/wscript_build         |  61 +++++++--------
  source4/ntvfs/wscript_build               | 120 +++++++++++++++---------------
- source4/rpc_server/common/server_info.c   |   1 +
+ source4/rpc_server/common/server_info.c   |   2 +-
  source4/rpc_server/wkssvc/dcesrv_wkssvc.c |   1 -
  source4/rpc_server/wscript_build          |  18 +++--
  source4/smb_server/service_smb.c          |   4 +-
  source4/smb_server/wscript_build          |   2 +-
  source4/smbd/server.c                     |   4 -
- 9 files changed, 150 insertions(+), 142 deletions(-)
+ 9 files changed, 150 insertions(+), 143 deletions(-)
 
 diff --git a/source4/ntvfs/posix/posix_eadb.c b/source4/ntvfs/posix/posix_eadb.c
 index 31c565c..e08597c 100644
@@ -366,13 +366,14 @@ index 6e3ee6d..44cb78d 100644
  
  
 diff --git a/source4/rpc_server/common/server_info.c b/source4/rpc_server/common/server_info.c
-index afbbb23..e23b108 100644
+index afbbb23..39c75cc 100644
 --- a/source4/rpc_server/common/server_info.c
 +++ b/source4/rpc_server/common/server_info.c
-@@ -27,6 +27,7 @@
+@@ -26,7 +26,7 @@
+ #include "auth/auth.h"
  #include "param/param.h"
  #include "rpc_server/common/common.h"
- #include "rpc_server/common/share.h"
+-#include "rpc_server/common/share.h"
 +#include "libds/common/roles.h"
  
  /* 
@@ -508,6 +509,324 @@ index b0f67c9..bf3a58f 100644
  	process_model_init(cmdline_lp_ctx); 
  
  	shared_init = load_samba_modules(NULL, "service");
+-- 
+2.5.5
+
+
+From 2a242bf03a29fc523b0b68bc34de94d739031667 Mon Sep 17 00:00:00 2001
+From: Andrew Bartlett <abartlet@samba.org>
+Date: Sat, 10 Oct 2015 09:30:17 +1300
+Subject: [PATCH 2/2] build: Enable NTVFS file server to be omitted
+
+We now only build it by default with --enable-sefltest, or otherwise
+if requested.
+
+The NTVFS file server still has features not present in the smbd file
+server, such as a CIFS/SMB proxy, and a radically different design,
+but it is also not undergoing any ongoing development so this keeps it
+in a safe state for care and maintaince, with less of a security risk
+if such an issue were to come up.
+
+BUG: https://bugzilla.samba.org/show_bug.cgi?id=11991
+
+Signed-off-by: Andrew Bartlett <abartlet@samba.org>
+Reviewed-by: Jeremy Allison <jra@samba.org>
+(cherry picked from commit 71dcc76b70d8e249624f9bf057fc4fd3a44125e1)
+---
+ python/pyglue.c                       | 11 +++++++++++
+ python/samba/__init__.py              |  1 +
+ python/samba/netcmd/domain.py         | 37 ++++++++++++++++++++++++++++-------
+ source4/smb_server/smb/wscript_build  |  2 +-
+ source4/smb_server/smb2/wscript_build |  2 +-
+ source4/smb_server/wscript_build      |  4 ++--
+ source4/torture/rpc/rpc.c             |  2 +-
+ source4/torture/wscript_build         | 14 +++++++------
+ wscript                               | 22 +++++++++++++++++++++
+ 9 files changed, 77 insertions(+), 18 deletions(-)
+
+diff --git a/python/pyglue.c b/python/pyglue.c
+index 3fc6e38..81244a2 100644
+--- a/python/pyglue.c
++++ b/python/pyglue.c
+@@ -121,6 +121,15 @@ static PyObject *py_get_debug_level(PyObject *self)
+ 	return PyInt_FromLong(DEBUGLEVEL);
+ }
+ 
++static PyObject *py_is_ntvfs_fileserver_built(PyObject *self)
++{
++#ifdef WITH_NTVFS_FILESERVER
++	Py_RETURN_TRUE;
++#else
++	Py_RETURN_FALSE;
++#endif
++}
++
+ /*
+   return the list of interface IPs we have configured
+   takes an loadparm context, returns a list of IPs in string form
+@@ -267,6 +276,8 @@ static PyMethodDef py_misc_methods[] = {
+ 		"(for testing) compare two strings using Samba's strcasecmp_m()"},
+ 	{ "strstr_m", (PyCFunction)py_strstr_m, METH_VARARGS,
+ 		"(for testing) find one string in another with Samba's strstr_m()"},
++	{ "is_ntvfs_fileserver_built", (PyCFunction)py_is_ntvfs_fileserver_built, METH_NOARGS,
++		"is the NTVFS file server built in this installation?" },
+ 	{ NULL }
+ };
+ 
+diff --git a/python/samba/__init__.py b/python/samba/__init__.py
+index aaf335c..7cfbc4c 100644
+--- a/python/samba/__init__.py
++++ b/python/samba/__init__.py
+@@ -398,3 +398,4 @@ unix2nttime = _glue.unix2nttime
+ generate_random_password = _glue.generate_random_password
+ strcasecmp_m = _glue.strcasecmp_m
+ strstr_m = _glue.strstr_m
++is_ntvfs_fileserver_built = _glue.is_ntvfs_fileserver_built
+diff --git a/python/samba/netcmd/domain.py b/python/samba/netcmd/domain.py
+index 119e8b2..780d615 100644
+--- a/python/samba/netcmd/domain.py
++++ b/python/samba/netcmd/domain.py
+@@ -224,7 +224,7 @@ class cmd_domain_provision(Command):
+          Option("--ol-mmr-urls", type="string", metavar="LDAPSERVER",
+                 help="List of LDAP-URLS [ ldap://<FQHN>:<PORT>/  (where <PORT> has to be different than 389!) ] separated with comma (\",\") for use with OpenLDAP-MMR (Multi-Master-Replication), e.g.: \"ldap://s4dc1:9000,ldap://s4dc2:9000\""),
+          Option("--use-xattrs", type="choice", choices=["yes", "no", "auto"], help="Define if we should use the native fs capabilities or a tdb file for storing attributes likes ntacl, auto tries to make an inteligent guess based on the user rights and system capabilities", default="auto"),
+-         Option("--use-ntvfs", action="store_true", help="Use NTVFS for the fileserver (default = no)"),
++
+          Option("--use-rfc2307", action="store_true", help="Use AD to store posix attributes (default = no)"),
+         ]
+ 
+@@ -239,9 +239,16 @@ class cmd_domain_provision(Command):
+         Option("--ldap-backend-nosync", help="Configure LDAP backend not to call fsync() (for performance in test environments)", action="store_true"),
+         ]
+ 
++    ntvfs_options = [
++         Option("--use-ntvfs", action="store_true", help="Use NTVFS for the fileserver (default = no)"),
++    ]
++
+     if os.getenv('TEST_LDAP', "no") == "yes":
+         takes_options.extend(openldap_options)
+ 
++    if samba.is_ntvfs_fileserver_built():
++         takes_options.extend(ntvfs_options)
++
+     takes_args = []
+ 
+     def run(self, sambaopts=None, versionopts=None,
+@@ -490,8 +497,6 @@ class cmd_domain_dcpromo(Command):
+                action="store_true"),
+         Option("--machinepass", type=str, metavar="PASSWORD",
+                help="choose machine password (otherwise random)"),
+-        Option("--use-ntvfs", help="Use NTVFS for the fileserver (default = no)",
+-               action="store_true"),
+         Option("--dns-backend", type="choice", metavar="NAMESERVER-BACKEND",
+                choices=["SAMBA_INTERNAL", "BIND9_DLZ", "NONE"],
+                help="The DNS server backend. SAMBA_INTERNAL is the builtin name server (default), "
+@@ -502,6 +507,14 @@ class cmd_domain_dcpromo(Command):
+         Option("--verbose", help="Be verbose", action="store_true")
+         ]
+ 
++    ntvfs_options = [
++         Option("--use-ntvfs", action="store_true", help="Use NTVFS for the fileserver (default = no)"),
++    ]
++
++    if samba.is_ntvfs_fileserver_built():
++         takes_options.extend(ntvfs_options)
++
++
+     takes_args = ["domain", "role?"]
+ 
+     def run(self, domain, role=None, sambaopts=None, credopts=None,
+@@ -569,8 +582,6 @@ class cmd_domain_join(Command):
+                help="choose machine password (otherwise random)"),
+         Option("--adminpass", type="string", metavar="PASSWORD",
+                help="choose adminstrator password when joining as a subdomain (otherwise random)"),
+-        Option("--use-ntvfs", help="Use NTVFS for the fileserver (default = no)",
+-               action="store_true"),
+         Option("--dns-backend", type="choice", metavar="NAMESERVER-BACKEND",
+                choices=["SAMBA_INTERNAL", "BIND9_DLZ", "NONE"],
+                help="The DNS server backend. SAMBA_INTERNAL is the builtin name server (default), "
+@@ -581,6 +592,13 @@ class cmd_domain_join(Command):
+         Option("--verbose", help="Be verbose", action="store_true")
+        ]
+ 
++    ntvfs_options = [
++        Option("--use-ntvfs", help="Use NTVFS for the fileserver (default = no)",
++               action="store_true")
++    ]
++    if samba.is_ntvfs_fileserver_built():
++        takes_options.extend(ntvfs_options)
++
+     takes_args = ["domain", "role?"]
+ 
+     def run(self, domain, role=None, sambaopts=None, credopts=None,
+@@ -1358,8 +1376,6 @@ class cmd_domain_classicupgrade(Command):
+         Option("--verbose", help="Be verbose", action="store_true"),
+         Option("--use-xattrs", type="choice", choices=["yes","no","auto"], metavar="[yes|no|auto]",
+                    help="Define if we should use the native fs capabilities or a tdb file for storing attributes likes ntacl, auto tries to make an inteligent guess based on the user rights and system capabilities", default="auto"),
+-        Option("--use-ntvfs", help="Use NTVFS for the fileserver (default = no)",
+-               action="store_true"),
+         Option("--dns-backend", type="choice", metavar="NAMESERVER-BACKEND",
+                choices=["SAMBA_INTERNAL", "BIND9_FLATFILE", "BIND9_DLZ", "NONE"],
+                help="The DNS server backend. SAMBA_INTERNAL is the builtin name server (default), "
+@@ -1369,6 +1385,13 @@ class cmd_domain_classicupgrade(Command):
+                default="SAMBA_INTERNAL")
+     ]
+ 
++    ntvfs_options = [
++        Option("--use-ntvfs", help="Use NTVFS for the fileserver (default = no)",
++               action="store_true")
++    ]
++    if samba.is_ntvfs_fileserver_built():
++        takes_options.extend(ntvfs_options)
++
+     takes_args = ["smbconf"]
+ 
+     def run(self, smbconf=None, targetdir=None, dbdir=None, testparm=None,
+diff --git a/source4/smb_server/smb/wscript_build b/source4/smb_server/smb/wscript_build
+index a17de06..3e3df21 100644
+--- a/source4/smb_server/smb/wscript_build
++++ b/source4/smb_server/smb/wscript_build
+@@ -5,6 +5,6 @@ bld.SAMBA_SUBSYSTEM('SMB_PROTOCOL',
+ 	autoproto='smb_proto.h',
+ 	deps='dfs_server_ad',
+ 	public_deps='ntvfs LIBPACKET samba-credentials samba_server_gensec',
+-	enabled=bld.AD_DC_BUILD_IS_ENABLED()
++	enabled=bld.CONFIG_SET('WITH_NTVFS_FILESERVER')
+ 	)
+ 
+diff --git a/source4/smb_server/smb2/wscript_build b/source4/smb_server/smb2/wscript_build
+index 18a2b29..7866ee9 100644
+--- a/source4/smb_server/smb2/wscript_build
++++ b/source4/smb_server/smb2/wscript_build
+@@ -4,6 +4,6 @@ bld.SAMBA_SUBSYSTEM('SMB2_PROTOCOL',
+ 	source='receive.c negprot.c sesssetup.c tcon.c fileio.c fileinfo.c find.c keepalive.c',
+ 	autoproto='smb2_proto.h',
+ 	public_deps='ntvfs LIBPACKET LIBCLI_SMB2 samba_server_gensec NDR_DFSBLOBS',
+-	enabled=bld.AD_DC_BUILD_IS_ENABLED()
++	enabled=bld.CONFIG_SET('WITH_NTVFS_FILESERVER')
+ 	)
+ 
+diff --git a/source4/smb_server/wscript_build b/source4/smb_server/wscript_build
+index e0e1888..5860340 100644
+--- a/source4/smb_server/wscript_build
++++ b/source4/smb_server/wscript_build
+@@ -7,14 +7,14 @@ bld.SAMBA_MODULE('service_smb',
+ 	init_function='server_service_smb_init',
+ 	deps='SMB_SERVER netif shares samba-hostconfig POPT_SAMBA',
+ 	internal_module=False,
+-	enabled=bld.AD_DC_BUILD_IS_ENABLED()
++	enabled=bld.CONFIG_SET('WITH_NTVFS_FILESERVER')
+ 	)
+ 
+ bld.SAMBA_SUBSYSTEM('SMB_SERVER',
+ 	source='handle.c tcon.c session.c blob.c management.c smb_server.c',
+ 	autoproto='smb_server_proto.h',
+ 	public_deps='share LIBPACKET SMB_PROTOCOL SMB2_PROTOCOL',
+-	enabled=bld.AD_DC_BUILD_IS_ENABLED()
++	enabled=bld.CONFIG_SET('WITH_NTVFS_FILESERVER')
+ 	)
+ 
+ bld.RECURSE('smb')
+diff --git a/source4/torture/rpc/rpc.c b/source4/torture/rpc/rpc.c
+index e70fac52..aa16242 100644
+--- a/source4/torture/rpc/rpc.c
++++ b/source4/torture/rpc/rpc.c
+@@ -489,7 +489,7 @@ NTSTATUS torture_rpc_init(void)
+ 	torture_suite_add_suite(suite, torture_rpc_object_uuid(suite));
+ 	torture_suite_add_suite(suite, torture_rpc_winreg(suite));
+ 	torture_suite_add_suite(suite, torture_rpc_spoolss(suite));
+-#ifdef AD_DC_BUILD_IS_ENABLED
++#ifdef WITH_NTVFS_FILESERVER
+ 	torture_suite_add_suite(suite, torture_rpc_spoolss_notify(suite));
+ #endif
+ 	torture_suite_add_suite(suite, torture_rpc_spoolss_win(suite));
+diff --git a/source4/torture/wscript_build b/source4/torture/wscript_build
+index 9231bba..1b443b7 100755
+--- a/source4/torture/wscript_build
++++ b/source4/torture/wscript_build
+@@ -32,11 +32,13 @@ bld.RECURSE('winbind')
+ bld.RECURSE('libnetapi')
+ bld.RECURSE('libsmbclient')
+ 
+-heimdal_specific = dict(source='', deps='')
++ntvfs_specific = dict(source='', deps='')
+ 
+-if bld.CONFIG_SET('AD_DC_BUILD_IS_ENABLED'):
+-	heimdal_specific['source'] += ' rpc/spoolss_notify.c'
+-	heimdal_specific['deps'] += ' SMB_SERVER dcerpc_server ntvfs'
++# Yes, the spoolss_notify test uses the NTVFS file server to run the SMB server expected
++# to handle the RPC callback!
++if bld.CONFIG_SET('WITH_NTVFS_FILESERVER'):
++	ntvfs_specific['source'] += ' rpc/spoolss_notify.c'
++	ntvfs_specific['deps'] += ' SMB_SERVER dcerpc_server ntvfs'
+ 
+ bld.SAMBA_SUBSYSTEM('TORTURE_NDR',
+ 	source='ndr/ndr.c ndr/winreg.c ndr/atsvc.c ndr/lsa.c ndr/epmap.c ndr/dfs.c ndr/netlogon.c ndr/drsuapi.c ndr/spoolss.c ndr/ntprinting.c ndr/samr.c ndr/dfsblob.c ndr/drsblobs.c ndr/nbt.c ndr/ntlmssp.c ndr/string.c ndr/backupkey.c ndr/witness.c',
+@@ -100,7 +102,7 @@ bld.SAMBA_MODULE('torture_rpc',
+                         rpc/clusapi.c
+                         rpc/witness.c
+                         rpc/backupkey.c
+-                        ''' + heimdal_specific['source'],
++                        ''' + ntvfs_specific['source'],
+                  autoproto='rpc/proto.h',
+                  subsystem='smbtorture',
+                  init_function='torture_rpc_init',
+@@ -146,7 +148,7 @@ bld.SAMBA_MODULE('torture_rpc',
+                       RPC_NDR_CLUSAPI
+                       RPC_NDR_WITNESS
+                       RPC_NDR_BACKUPKEY
+-                      ''' + heimdal_specific['deps'],
++                      ''' + ntvfs_specific['deps'],
+                  internal_module=True)
+ 
+ bld.RECURSE('drs')
+diff --git a/wscript b/wscript
+index 9431e11..981f044 100644
+--- a/wscript
++++ b/wscript
+@@ -53,6 +53,14 @@ def set_options(opt):
+                    help='disable AD DC functionality (enables Samba 4 client and Samba 3 code base).',
+                    action='store_true', dest='without_ad_dc', default=False)
+ 
++    opt.add_option('--with-ntvfs-fileserver',
++                   help='enable the depricated NTVFS file server from the original Samba4 branch (default if --enable-selftest specicifed).  Conflicts with --with-system-mitkrb5 and --without-ad-dc',
++                   action='store_true', dest='with_ntvfs_fileserver')
++
++    opt.add_option('--without-ntvfs-fileserver',
++                   help='disable the depricated NTVFS file server from the original Samba4 branch',
++                   action='store_false', dest='with_ntvfs_fileserver')
++
+     opt.add_option('--with-pie',
+                   help=("Build Position Independent Executables " +
+                         "(default if supported by compiler)"),
+@@ -132,6 +140,7 @@ def configure(conf):
+         conf.PROCESS_SEPARATE_RULE('system_mitkrb5')
+     if not (Options.options.without_ad_dc or Options.options.with_system_mitkrb5):
+         conf.DEFINE('AD_DC_BUILD_IS_ENABLED', 1)
++
+     # Only process heimdal_build for non-MIT KRB5 builds
+     # When MIT KRB5 checks are done as above, conf.env.KRB5_VENDOR will be set
+     # to the lowcased output of 'krb5-config --vendor'.
+@@ -154,6 +163,19 @@ def configure(conf):
+         conf.RECURSE('lib/resolv_wrapper')
+         conf.RECURSE('lib/socket_wrapper')
+         conf.RECURSE('lib/uid_wrapper')
++        if Options.options.with_ntvfs_fileserver != False:
++            if not (Options.options.without_ad_dc or Options.options.with_system_mitkrb5):
++                conf.DEFINE('WITH_NTVFS_FILESERVER', 1)
++        if Options.options.with_ntvfs_fileserver == False:
++            if not (Options.options.without_ad_dc or Options.options.with_system_mitkrb5):
++                raise Utils.WafError('--without-ntvfs-fileserver conflicts with --enable-selftest while building the AD DC')
++
++    if Options.options.with_ntvfs_fileserver == True:
++        if Options.options.without_ad_dc:
++            raise Utils.WafError('--with-ntvfs-fileserver conflicts with --without-ad-dc')
++        if Options.options.with_system_mitkrb5:
++            raise Utils.WafError('--with-ntvfs-fileserver conflicts with --with-system-mitkrb5')
++        conf.DEFINE('WITH_NTVFS_FILESERVER', 1)
+     conf.RECURSE('source3')
+     conf.RECURSE('lib/texpect')
+     if conf.env.with_ctdb:
 -- 
 2.5.5
 
