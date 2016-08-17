@@ -1216,8 +1216,6 @@ rm -rf %{buildroot}
 %{_mandir}/man8/tdbtool.8*
 %endif
 
-%dir %{_libdir}/samba/ldb
-
 %if %with_internal_ldb
 %{_bindir}/ldbadd
 %{_bindir}/ldbdel
@@ -1400,6 +1398,8 @@ rm -rf %{buildroot}
 %defattr(-,root,root)
 # common libraries
 %{_libdir}/samba/libpopt-samba3-samba4.so
+
+%dir %{_libdir}/samba/ldb
 
 %dir %{_libdir}/samba/pdb
 %{_libdir}/samba/pdb/ldapsam.so
