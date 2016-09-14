@@ -6,7 +6,7 @@
 # ctdb is enabled by default, you can disable it with: --without clustering
 %bcond_without clustering
 
-%define main_release 1
+%define main_release 2
 
 %define samba_version 4.3.11
 %define talloc_version 2.1.3
@@ -908,7 +908,7 @@ fi
 
 %postun client
 if [ $1 -eq 0 ] ; then
-    %{_sbindir}/update-alternatives --remove cups_backend_smb %{_libexecdir}/samba/smbspool
+    %{_sbindir}/update-alternatives --remove cups_backend_smb %{_bindir}/smbspool
 fi
 
 %post client-libs -p /sbin/ldconfig
@@ -2037,6 +2037,9 @@ rm -rf %{buildroot}
 %endif # with_clustering_support
 
 %changelog
+* Wed Sep 14 2016 Guenther Deschner <gdeschner@redhat.com> - 4.3.11-2
+- Fix smbspool alternatives handling during samba-client uninstall
+
 * Thu Jul 07 2016 Guenther Deschner <gdeschner@redhat.com> - 4.3.11-1
 - Update to Samba 4.3.11
 - resolves: #1353504 - CVE-2016-2119
