@@ -6,9 +6,9 @@
 # ctdb is enabled by default, you can disable it with: --without clustering
 %bcond_without clustering
 
-%define main_release 2
+%define main_release 1
 
-%define samba_version 4.4.5
+%define samba_version 4.4.6
 %define talloc_version 2.1.6
 %define tdb_version 1.3.8
 %define tevent_version 0.9.28
@@ -108,7 +108,6 @@ Source200: README.dc
 Source201: README.downgrade
 
 Patch0:    samba-4.4.5-fix_resolving_trusted_domain_users.patch
-Patch1: samba-4.4.5-ntvfs_build.patch
 
 BuildRoot:      %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 
@@ -692,7 +691,6 @@ and use CTDB instead.
 %setup -q -n samba-%{version}%{pre_release}
 
 %patch0 -p 1 -b .samba-4.4.5-fix_resolving_trusted_domain_users.patch
-%patch1 -p 1 -b .samba-4.4.5-ntvfs_build.patch
 
 %build
 %global _talloc_lib ,talloc,pytalloc,pytalloc-util
@@ -1257,7 +1255,6 @@ rm -rf %{buildroot}
 %{_libdir}/libsamdb.so.*
 %{_libdir}/libsmbconf.so.*
 %{_libdir}/libsmbldap.so.*
-%{_libdir}/libtevent-unix-util.so.*
 %{_libdir}/libtevent-util.so.*
 %{_libdir}/libdcerpc.so.*
 
@@ -1626,7 +1623,6 @@ rm -rf %{buildroot}
 %{_libdir}/libsamba-util.so
 %{_libdir}/libsamdb.so
 %{_libdir}/libsmbconf.so
-%{_libdir}/libtevent-unix-util.so
 %{_libdir}/libtevent-util.so
 %{_libdir}/pkgconfig/dcerpc.pc
 %{_libdir}/pkgconfig/dcerpc_samr.pc
@@ -1946,36 +1942,36 @@ rm -rf %{buildroot}
 
 %files -n ctdb-tests
 %defattr(-,root,root)
-%dir %{_libdir}/ctdb-tests
-%{_libdir}/ctdb-tests/comm_client_test
-%{_libdir}/ctdb-tests/comm_server_test
-%{_libdir}/ctdb-tests/comm_test
-%{_libdir}/ctdb-tests/ctdb_bench
-%{_libdir}/ctdb-tests/ctdb_fetch
-%{_libdir}/ctdb-tests/ctdb_fetch_one
-%{_libdir}/ctdb-tests/ctdb_fetch_readonly_loop
-%{_libdir}/ctdb-tests/ctdb_fetch_readonly_once
-%{_libdir}/ctdb-tests/ctdb_functest
-%{_libdir}/ctdb-tests/ctdb_lock_tdb
-%{_libdir}/ctdb-tests/ctdb_persistent
-%{_libdir}/ctdb-tests/ctdb_porting_tests
-%{_libdir}/ctdb-tests/ctdb_randrec
-%{_libdir}/ctdb-tests/ctdb_store
-%{_libdir}/ctdb-tests/ctdb_stubtest
-%{_libdir}/ctdb-tests/ctdb_takeover_tests
-%{_libdir}/ctdb-tests/ctdb_trackingdb_test
-%{_libdir}/ctdb-tests/ctdb_transaction
-%{_libdir}/ctdb-tests/ctdb_traverse
-%{_libdir}/ctdb-tests/ctdb_update_record
-%{_libdir}/ctdb-tests/ctdb_update_record_persistent
-%{_libdir}/ctdb-tests/db_hash_test
-%{_libdir}/ctdb-tests/pkt_read_test
-%{_libdir}/ctdb-tests/pkt_write_test
-%{_libdir}/ctdb-tests/protocol_client_test
-%{_libdir}/ctdb-tests/protocol_types_test
-%{_libdir}/ctdb-tests/rb_test
-%{_libdir}/ctdb-tests/reqid_test
-%{_libdir}/ctdb-tests/srvid_test
+%dir %{_libexecdir}/ctdb/tests
+%{_libexecdir}/ctdb/tests/comm_client_test
+%{_libexecdir}/ctdb/tests/comm_server_test
+%{_libexecdir}/ctdb/tests/comm_test
+%{_libexecdir}/ctdb/tests/ctdb_bench
+%{_libexecdir}/ctdb/tests/ctdb_fetch
+%{_libexecdir}/ctdb/tests/ctdb_fetch_one
+%{_libexecdir}/ctdb/tests/ctdb_fetch_readonly_loop
+%{_libexecdir}/ctdb/tests/ctdb_fetch_readonly_once
+%{_libexecdir}/ctdb/tests/ctdb_functest
+%{_libexecdir}/ctdb/tests/ctdb_lock_tdb
+%{_libexecdir}/ctdb/tests/ctdb_persistent
+%{_libexecdir}/ctdb/tests/ctdb_porting_tests
+%{_libexecdir}/ctdb/tests/ctdb_randrec
+%{_libexecdir}/ctdb/tests/ctdb_store
+%{_libexecdir}/ctdb/tests/ctdb_stubtest
+%{_libexecdir}/ctdb/tests/ctdb_takeover_tests
+%{_libexecdir}/ctdb/tests/ctdb_trackingdb_test
+%{_libexecdir}/ctdb/tests/ctdb_transaction
+%{_libexecdir}/ctdb/tests/ctdb_traverse
+%{_libexecdir}/ctdb/tests/ctdb_update_record
+%{_libexecdir}/ctdb/tests/ctdb_update_record_persistent
+%{_libexecdir}/ctdb/tests/db_hash_test
+%{_libexecdir}/ctdb/tests/pkt_read_test
+%{_libexecdir}/ctdb/tests/pkt_write_test
+%{_libexecdir}/ctdb/tests/protocol_client_test
+%{_libexecdir}/ctdb/tests/protocol_types_test
+%{_libexecdir}/ctdb/tests/rb_test
+%{_libexecdir}/ctdb/tests/reqid_test
+%{_libexecdir}/ctdb/tests/srvid_test
 %{_bindir}/ctdb_run_tests
 %{_bindir}/ctdb_run_cluster_tests
 %dir %{_datadir}/ctdb-tests
@@ -1999,6 +1995,9 @@ rm -rf %{buildroot}
 %endif # with_clustering_support
 
 %changelog
+* Thu Sep 22 2016 Guenther Deschner <gdeschner@redhat.com> - 4.4.6-1
+- Update to Samba 4.4.6
+
 * Wed Sep 14 2016 Guenther Deschner <gdeschner@redhat.com> - 4.4.5-2
 - Fix smbspool alternatives handling during samba-client uninstall
 
