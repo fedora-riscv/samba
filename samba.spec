@@ -6,9 +6,9 @@
 # ctdb is enabled by default, you can disable it with: --without clustering
 %bcond_without clustering
 
-%define main_release 2
+%define main_release 0
 
-%define samba_version 4.3.11
+%define samba_version 4.3.12
 %define talloc_version 2.1.3
 %define tdb_version 1.3.7
 %define tevent_version 0.9.28
@@ -108,7 +108,6 @@ Source200: README.dc
 Source201: README.downgrade
 
 Patch0:		samba-4.2.10-s3-winbind-make-sure-domain-member-can-talk-to-trust.patch
-Patch1:		samba-4.3.11-ntvfs_build.patch
 
 BuildRoot:      %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 
@@ -689,7 +688,6 @@ and use CTDB instead.
 %setup -q -n samba-%{version}%{pre_release}
 
 %patch0 -p 1 -b .samba-4.2.10-s3-winbind-make-sure-domain-member-can-talk-to-trust.patch
-%patch1 -p 1 -b .samba-4.3.11-ntvfs_build.patch
 
 %build
 %global _talloc_lib ,talloc,pytalloc,pytalloc-util
@@ -2037,6 +2035,9 @@ rm -rf %{buildroot}
 %endif # with_clustering_support
 
 %changelog
+* Thu Nov 03 2016 Guenther Deschner <gdeschner@redhat.com> - 4.3.12-0
+- Update to Samba 4.3.12
+
 * Wed Sep 14 2016 Guenther Deschner <gdeschner@redhat.com> - 4.3.11-2
 - Fix smbspool alternatives handling during samba-client uninstall
 
