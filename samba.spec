@@ -6,7 +6,7 @@
 # ctdb is enabled by default, you can disable it with: --without clustering
 %bcond_without clustering
 
-%define main_release 1
+%define main_release 2
 
 %define samba_version 4.4.7
 %define talloc_version 2.1.6
@@ -108,6 +108,7 @@ Source200: README.dc
 Source201: README.downgrade
 
 Patch0:    samba-4.4.5-fix_resolving_trusted_domain_users.patch
+Patch1:    samba-4.4.7-vfs_gluster_realpath.patch
 
 BuildRoot:      %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 
@@ -691,6 +692,7 @@ and use CTDB instead.
 %setup -q -n samba-%{version}%{pre_release}
 
 %patch0 -p 1 -b .samba-4.4.5-fix_resolving_trusted_domain_users.patch
+%patch1 -p 1 -b .samba-4.4.7-vfs_gluster_realpath.patch
 
 %build
 %global _talloc_lib ,talloc,pytalloc,pytalloc-util
@@ -1996,6 +1998,9 @@ rm -rf %{buildroot}
 %endif # with_clustering_support
 
 %changelog
+* Fri Nov 04 2016 Anoop C S <anoopcs@redhat.com> - 4.4.7-2
+- Fix glfs_realpath allocation in vfs_glusterfs
+
 * Wed Oct 26 2016 Guenther Deschner <gdeschner@redhat.com> - 4.4.7-1
 - Update to Samba 4.4.7
 
