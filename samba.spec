@@ -6,7 +6,7 @@
 # ctdb is enabled by default, you can disable it with: --without clustering
 %bcond_without clustering
 
-%define main_release 2
+%define main_release 3
 
 %define samba_version 4.4.7
 %define talloc_version 2.1.6
@@ -1998,6 +1998,9 @@ rm -rf %{buildroot}
 %endif # with_clustering_support
 
 %changelog
+* Mon Dec 05 2016 Rex Dieter <rdieter@fedoraproject.org> - -
+- rebuild (libldb)
+
 * Fri Nov 04 2016 Anoop C S <anoopcs@redhat.com> - 4.4.7-2
 - Fix glfs_realpath allocation in vfs_glusterfs
 
