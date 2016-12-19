@@ -109,6 +109,7 @@ Source201: README.downgrade
 
 Patch0:    samba-4.4.5-fix_resolving_trusted_domain_users.patch
 Patch1:    samba-4.4.7-vfs_gluster_realpath.patch
+Patch2:    samba-4.4.9-krb5_cksumtype_checks.patch
 
 BuildRoot:      %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 
@@ -693,6 +694,7 @@ and use CTDB instead.
 
 %patch0 -p 1 -b .samba-4.4.5-fix_resolving_trusted_domain_users.patch
 %patch1 -p 1 -b .samba-4.4.7-vfs_gluster_realpath.patch
+%patch2 -p 1 -b .samba-4.4.9-krb5_cksumtype_checks.patch
 
 %build
 %global _talloc_lib ,talloc,pytalloc,pytalloc-util
