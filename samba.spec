@@ -8,7 +8,7 @@
 
 %define main_release 0
 
-%define samba_version 4.4.8
+%define samba_version 4.4.9
 %define talloc_version 2.1.6
 %define tdb_version 1.3.8
 %define tevent_version 0.9.28
@@ -108,8 +108,6 @@ Source200: README.dc
 Source201: README.downgrade
 
 Patch0:    samba-4.4.5-fix_resolving_trusted_domain_users.patch
-Patch1:    samba-4.4.7-vfs_gluster_realpath.patch
-Patch2:    samba-4.4.9-krb5_cksumtype_checks.patch
 
 BuildRoot:      %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 
@@ -693,8 +691,6 @@ and use CTDB instead.
 %setup -q -n samba-%{version}%{pre_release}
 
 %patch0 -p 1 -b .samba-4.4.5-fix_resolving_trusted_domain_users.patch
-%patch1 -p 1 -b .samba-4.4.7-vfs_gluster_realpath.patch
-%patch2 -p 1 -b .samba-4.4.9-krb5_cksumtype_checks.patch
 
 %build
 %global _talloc_lib ,talloc,pytalloc,pytalloc-util
@@ -1979,27 +1975,30 @@ rm -rf %{buildroot}
 %{_libexecdir}/ctdb/tests/srvid_test
 %{_bindir}/ctdb_run_tests
 %{_bindir}/ctdb_run_cluster_tests
-%dir %{_datadir}/ctdb-tests
-%dir %{_datadir}/ctdb-tests/eventscripts
-%{_datadir}/ctdb-tests/eventscripts/etc-ctdb/events.d
-%{_datadir}/ctdb-tests/eventscripts/etc-ctdb/functions
-%{_datadir}/ctdb-tests/eventscripts/etc-ctdb/nfs-checks.d
-%{_datadir}/ctdb-tests/eventscripts/etc-ctdb/nfs-linux-kernel-callout
-%{_datadir}/ctdb-tests/eventscripts/etc-ctdb/statd-callout
-%dir %{_datadir}/ctdb-tests/onnode
-%{_datadir}/ctdb-tests/onnode/functions
-%dir %{_datadir}/ctdb-tests/scripts
-%{_datadir}/ctdb-tests/scripts/common.sh
-%{_datadir}/ctdb-tests/scripts/integration.bash
-%{_datadir}/ctdb-tests/scripts/test_wrap
-%{_datadir}/ctdb-tests/scripts/unit.sh
-%dir %{_datadir}/ctdb-tests/simple
-%{_datadir}/ctdb-tests/simple/functions
-%{_datadir}/ctdb-tests/simple/nodes
+%dir %{_datadir}/ctdb/tests
+%dir %{_datadir}/ctdb/tests/eventscripts
+%{_datadir}/ctdb/tests/eventscripts/etc-ctdb/events.d
+%{_datadir}/ctdb/tests/eventscripts/etc-ctdb/functions
+%{_datadir}/ctdb/tests/eventscripts/etc-ctdb/nfs-checks.d
+%{_datadir}/ctdb/tests/eventscripts/etc-ctdb/nfs-linux-kernel-callout
+%{_datadir}/ctdb/tests/eventscripts/etc-ctdb/statd-callout
+%dir %{_datadir}/ctdb/tests/onnode
+%{_datadir}/ctdb/tests/onnode/functions
+%dir %{_datadir}/ctdb/tests/scripts
+%{_datadir}/ctdb/tests/scripts/common.sh
+%{_datadir}/ctdb/tests/scripts/integration.bash
+%{_datadir}/ctdb/tests/scripts/test_wrap
+%{_datadir}/ctdb/tests/scripts/unit.sh
+%dir %{_datadir}/ctdb/tests/simple
+%{_datadir}/ctdb/tests/simple/functions
+%{_datadir}/ctdb/tests/simple/nodes
 %doc ctdb/tests/README
 %endif # with_clustering_support
 
 %changelog
+* Wed Jan 04 2017 Guenther Deschner <gdeschner@redhat.com> - 4.4.9-0
+- Update to Samba 4.4.9
+
 * Mon Dec 19 2016 Guenther Deschner <gdeschner@redhat.com> - 4.4.8-0
 - Update to Samba 4.4.8
 - resolves: #1405984 - CVE-2016-2123,CVE-2016-2125 and CVE-2016-2126
