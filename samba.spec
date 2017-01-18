@@ -8,7 +8,7 @@
 
 %define main_release 0
 
-%define samba_version 4.5.3
+%define samba_version 4.5.4
 %define talloc_version 2.1.8
 %define tdb_version 1.3.10
 %define tevent_version 0.9.29
@@ -1941,6 +1941,7 @@ rm -rf %{buildroot}
 %{_libexecdir}/ctdb/tests/porting_tests
 %{_libexecdir}/ctdb/tests/protocol_client_test
 %{_libexecdir}/ctdb/tests/protocol_types_test
+%{_libexecdir}/ctdb/tests/protocol_util_test
 %{_libexecdir}/ctdb/tests/rb_test
 %{_libexecdir}/ctdb/tests/reqid_test
 %{_libexecdir}/ctdb/tests/srvid_test
@@ -1970,6 +1971,9 @@ rm -rf %{buildroot}
 %endif # with_clustering_support
 
 %changelog
+* Wed Jan 18 2017 Guenther Deschner <gdeschner@redhat.com> - 4.5.4-0
+- Update to Samba 4.5.4
+
 * Mon Dec 19 2016 Guenther Deschner <gdeschner@redhat.com> - 4.5.3-0
 - Update to Samba 4.5.3
 - resolves: #1405984 - CVE-2016-2123,CVE-2016-2125 and CVE-2016-2126
