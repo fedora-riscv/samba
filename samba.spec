@@ -8,7 +8,7 @@
 
 %define main_release 0
 
-%define samba_version 4.5.4
+%define samba_version 4.5.5
 %define talloc_version 2.1.8
 %define tdb_version 1.3.10
 %define tevent_version 0.9.29
@@ -1945,6 +1945,7 @@ rm -rf %{buildroot}
 %{_libexecdir}/ctdb/tests/rb_test
 %{_libexecdir}/ctdb/tests/reqid_test
 %{_libexecdir}/ctdb/tests/srvid_test
+%{_libexecdir}/ctdb/tests/test_mutex_raw
 %{_libexecdir}/ctdb/tests/transaction_loop
 %{_libexecdir}/ctdb/tests/update_record
 %{_libexecdir}/ctdb/tests/update_record_persistent
@@ -1971,6 +1972,9 @@ rm -rf %{buildroot}
 %endif # with_clustering_support
 
 %changelog
+* Mon Jan 30 2017 Guenther Deschner <gdeschner@redhat.com> - 4.5.5-0
+- Update to Samba 4.5.5
+
 * Wed Jan 18 2017 Guenther Deschner <gdeschner@redhat.com> - 4.5.4-0
 - Update to Samba 4.5.4
 
