@@ -8,7 +8,7 @@
 
 %define main_release 0
 
-%define samba_version 4.4.9
+%define samba_version 4.4.10
 %define talloc_version 2.1.6
 %define tdb_version 1.3.8
 %define tevent_version 0.9.28
@@ -106,8 +106,6 @@ Source6: samba.pamd
 
 Source200: README.dc
 Source201: README.downgrade
-
-Patch0:    samba-4.4.5-fix_resolving_trusted_domain_users.patch
 
 BuildRoot:      %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 
@@ -689,8 +687,6 @@ and use CTDB instead.
 
 %prep
 %setup -q -n samba-%{version}%{pre_release}
-
-%patch0 -p 1 -b .samba-4.4.5-fix_resolving_trusted_domain_users.patch
 
 %build
 %global _talloc_lib ,talloc,pytalloc,pytalloc-util
@@ -1996,6 +1992,9 @@ rm -rf %{buildroot}
 %endif # with_clustering_support
 
 %changelog
+* Wed Mar 01 2017 Guenther Deschner <gdeschner@redhat.com> - 4.4.10-0
+- Update to Samba 4.4.10
+
 * Wed Jan 04 2017 Guenther Deschner <gdeschner@redhat.com> - 4.4.9-0
 - Update to Samba 4.4.9
 
