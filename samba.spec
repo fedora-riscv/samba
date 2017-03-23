@@ -8,7 +8,7 @@
 
 %define main_release 0
 
-%define samba_version 4.5.6
+%define samba_version 4.5.7
 %define talloc_version 2.1.8
 %define tdb_version 1.3.10
 %define tevent_version 0.9.29
@@ -2550,6 +2550,10 @@ rm -rf %{buildroot}
 %endif # with_clustering_support
 
 %changelog
+* Thu Mar 23 2017 Guenther Deschner <gdeschner@redhat.com> - 4.5.7-0
+- Update to Samba 4.5.7
+- resolves: #1435156 - Security fix for CVE-2017-2619
+
 * Thu Mar 09 2017 Guenther Deschner <gdeschner@redhat.com> - 4.5.6-0
 - Update to Samba 4.5.6
 
