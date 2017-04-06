@@ -6,7 +6,7 @@
 # ctdb is enabled by default, you can disable it with: --without clustering
 %bcond_without clustering
 
-%define main_release 0
+%define main_release 1
 
 %define samba_version 4.4.13
 %define talloc_version 2.1.6
@@ -106,6 +106,8 @@ Source6: samba.pamd
 
 Source200: README.dc
 Source201: README.downgrade
+
+Patch0: samba-4.4.x-fix_nss_wins_crash.patch
 
 BuildRoot:      %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 
@@ -687,6 +689,8 @@ and use CTDB instead.
 
 %prep
 %setup -q -n samba-%{version}%{pre_release}
+
+%patch0 -p1 -b .samba-4.4.x-fix_nss_wins_crash.patch
 
 %build
 %global _talloc_lib ,talloc,pytalloc,pytalloc-util
@@ -1992,6 +1996,9 @@ rm -rf %{buildroot}
 %endif # with_clustering_support
 
 %changelog
+* Thu Apr 06 2017 Andreas Schneider <asn@redhat.com> - 4.4.13-1
+- resolves: #1364666 - Fix nss_wins crash
+
 * Fri Mar 31 2017 Guenther Deschner <gdeschner@redhat.com> - 4.4.13-0
 - Update to Samba 4.4.13
 - related: #1435156 - Security fix for CVE-2017-2619

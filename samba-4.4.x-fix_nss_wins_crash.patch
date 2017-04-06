@@ -1,0 +1,35 @@
+From 119825e3df9b65ea24f28a7faf39b54861d62f0c Mon Sep 17 00:00:00 2001
+From: Andreas Schneider <asn@samba.org>
+Date: Mon, 19 Sep 2016 16:21:31 +0200
+Subject: [PATCH] waf: Explicitly link libreplace against libnss_wins.so
+
+If we do not specify replace as a depencency here, it will not link to
+libreplace using an rpath.
+
+BUG: https://bugzilla.samba.org/show_bug.cgi?id=12277
+
+Signed-off-by: Andreas Schneider <asn@samba.org>
+Reviewed-by: Jeremy Allison <jra@samba.org>
+Reviewed-by: Jim McDonough <jmcd@samba.org>
+
+(cherry picked from commit d8a5565ae647352d11d622bd4e73ff4568678a7c)
+---
+ nsswitch/wscript_build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/nsswitch/wscript_build b/nsswitch/wscript_build
+index f286896..ab8f8ea 100644
+--- a/nsswitch/wscript_build
++++ b/nsswitch/wscript_build
+@@ -42,7 +42,7 @@ if (Utils.unversioned_sys_platform() == 'linux' or (host_os.rfind('gnu') > -1)):
+     bld.SAMBA3_LIBRARY('nss_wins',
+                        keep_underscore=True,
+                        source='wins.c',
+-                       deps='''wbclient''',
++                       deps='wbclient replace',
+                        public_headers=[],
+                        public_headers_install=False,
+                        pc_files=[],
+-- 
+2.10.0
+
