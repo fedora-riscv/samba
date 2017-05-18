@@ -6,9 +6,9 @@
 # ctdb is enabled by default, you can disable it with: --without clustering
 %bcond_without clustering
 
-%define main_release 1
+%define main_release 0
 
-%define samba_version 4.5.8
+%define samba_version 4.5.9
 %define talloc_version 2.1.8
 %define tdb_version 1.3.10
 %define tevent_version 0.9.29
@@ -105,8 +105,6 @@ Source6: samba.pamd
 
 Source200: README.dc
 Source201: README.downgrade
-
-Patch0: samba-4.5.9-fix_nss_wins_crash.patch
 
 Requires(pre): /usr/sbin/groupadd
 Requires(post): systemd
@@ -2552,6 +2550,9 @@ rm -rf %{buildroot}
 %endif # with_clustering_support
 
 %changelog
+* Thu May 18 2017 Guenther Deschner <gdeschner@redhat.com> - 4.5.9-0
+- Update to Samba 4.5.9
+
 * Thu Apr 06 2017 Andreas Schneider <asn@redhat.com> - 4.5.8-1
 - resolves: #1364666 - Fix nss_wins crash
 
