@@ -8,7 +8,7 @@
 
 %define main_release 0
 
-%define samba_version 4.5.10
+%define samba_version 4.5.11
 %define talloc_version 2.1.8
 %define tdb_version 1.3.10
 %define tevent_version 0.9.29
@@ -2032,6 +2032,10 @@ rm -rf %{buildroot}
 %{_datadir}/ctdb/tests/eventscripts/05.system.monitor.016.sh
 %{_datadir}/ctdb/tests/eventscripts/05.system.monitor.017.sh
 %{_datadir}/ctdb/tests/eventscripts/05.system.monitor.018.sh
+%{_datadir}/ctdb/tests/eventscripts/06.nfs.releaseip.001.sh
+%{_datadir}/ctdb/tests/eventscripts/06.nfs.releaseip.002.sh
+%{_datadir}/ctdb/tests/eventscripts/06.nfs.takeip.001.sh
+%{_datadir}/ctdb/tests/eventscripts/06.nfs.takeip.002.sh
 %{_datadir}/ctdb/tests/eventscripts/10.interface.init.001.sh
 %{_datadir}/ctdb/tests/eventscripts/10.interface.init.002.sh
 %{_datadir}/ctdb/tests/eventscripts/10.interface.init.021.sh
@@ -2146,6 +2150,7 @@ rm -rf %{buildroot}
 %{_datadir}/ctdb/tests/eventscripts/60.nfs.monitor.106.sh
 %{_datadir}/ctdb/tests/eventscripts/60.nfs.monitor.107.sh
 %{_datadir}/ctdb/tests/eventscripts/60.nfs.monitor.108.sh
+%{_datadir}/ctdb/tests/eventscripts/60.nfs.monitor.109.sh
 %{_datadir}/ctdb/tests/eventscripts/60.nfs.monitor.111.sh
 %{_datadir}/ctdb/tests/eventscripts/60.nfs.monitor.112.sh
 %{_datadir}/ctdb/tests/eventscripts/60.nfs.monitor.113.sh
@@ -2169,6 +2174,14 @@ rm -rf %{buildroot}
 %{_datadir}/ctdb/tests/eventscripts/60.nfs.multi.004.sh
 %{_datadir}/ctdb/tests/eventscripts/60.nfs.multi.005.sh
 %{_datadir}/ctdb/tests/eventscripts/60.nfs.multi.006.sh
+%{_datadir}/ctdb/tests/eventscripts/60.nfs.releaseip.001.sh
+%{_datadir}/ctdb/tests/eventscripts/60.nfs.releaseip.002.sh
+%{_datadir}/ctdb/tests/eventscripts/60.nfs.shutdown.001.sh
+%{_datadir}/ctdb/tests/eventscripts/60.nfs.shutdown.002.sh
+%{_datadir}/ctdb/tests/eventscripts/60.nfs.startup.001.sh
+%{_datadir}/ctdb/tests/eventscripts/60.nfs.startup.002.sh
+%{_datadir}/ctdb/tests/eventscripts/60.nfs.takeip.001.sh
+%{_datadir}/ctdb/tests/eventscripts/60.nfs.takeip.002.sh
 %{_datadir}/ctdb/tests/eventscripts/91.lvs.001.sh
 %{_datadir}/ctdb/tests/eventscripts/91.lvs.ipreallocated.011.sh
 %{_datadir}/ctdb/tests/eventscripts/91.lvs.ipreallocated.012.sh
@@ -2492,6 +2505,10 @@ rm -rf %{buildroot}
 %{_datadir}/ctdb/tests/tool/ctdb.natgw.008.sh
 %{_datadir}/ctdb/tests/tool/ctdb.nodestatus.001.sh
 %{_datadir}/ctdb/tests/tool/ctdb.nodestatus.002.sh
+%{_datadir}/ctdb/tests/tool/ctdb.nodestatus.003.sh
+%{_datadir}/ctdb/tests/tool/ctdb.nodestatus.004.sh
+%{_datadir}/ctdb/tests/tool/ctdb.nodestatus.005.sh
+%{_datadir}/ctdb/tests/tool/ctdb.nodestatus.006.sh
 %{_datadir}/ctdb/tests/tool/ctdb.ping.001.sh
 %{_datadir}/ctdb/tests/tool/ctdb.pnn.001.sh
 %{_datadir}/ctdb/tests/tool/ctdb.process-exists.001.sh
@@ -2550,6 +2567,9 @@ rm -rf %{buildroot}
 %endif # with_clustering_support
 
 %changelog
+* Thu Jul 06 2017 Guenther Deschner <gdeschner@redhat.com> - 4.5.11-0
+- Update to Samba 4.5.11
+
 * Wed May 24 2017 Guenther Deschner <gdeschner@redhat.com> - 4.5.10-0
 - Update to Samba 4.5.10
 - resolves: #1455050 - Security fix for CVE-2017-7494
