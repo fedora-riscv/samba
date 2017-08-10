@@ -2115,6 +2115,10 @@ rm -rf %{buildroot}
 %{_datadir}/ctdb/tests/eventscripts/05.system.monitor.016.sh
 %{_datadir}/ctdb/tests/eventscripts/05.system.monitor.017.sh
 %{_datadir}/ctdb/tests/eventscripts/05.system.monitor.018.sh
+%{_datadir}/ctdb/tests/eventscripts/06.nfs.releaseip.001.sh
+%{_datadir}/ctdb/tests/eventscripts/06.nfs.releaseip.002.sh
+%{_datadir}/ctdb/tests/eventscripts/06.nfs.takeip.001.sh
+%{_datadir}/ctdb/tests/eventscripts/06.nfs.takeip.002.sh
 %{_datadir}/ctdb/tests/eventscripts/10.interface.init.001.sh
 %{_datadir}/ctdb/tests/eventscripts/10.interface.init.002.sh
 %{_datadir}/ctdb/tests/eventscripts/10.interface.init.021.sh
@@ -2231,6 +2235,7 @@ rm -rf %{buildroot}
 %{_datadir}/ctdb/tests/eventscripts/60.nfs.monitor.106.sh
 %{_datadir}/ctdb/tests/eventscripts/60.nfs.monitor.107.sh
 %{_datadir}/ctdb/tests/eventscripts/60.nfs.monitor.108.sh
+%{_datadir}/ctdb/tests/eventscripts/60.nfs.monitor.109.sh
 %{_datadir}/ctdb/tests/eventscripts/60.nfs.monitor.111.sh
 %{_datadir}/ctdb/tests/eventscripts/60.nfs.monitor.112.sh
 %{_datadir}/ctdb/tests/eventscripts/60.nfs.monitor.113.sh
@@ -2250,6 +2255,14 @@ rm -rf %{buildroot}
 %{_datadir}/ctdb/tests/eventscripts/60.nfs.monitor.162.sh
 %{_datadir}/ctdb/tests/eventscripts/60.nfs.multi.001.sh
 %{_datadir}/ctdb/tests/eventscripts/60.nfs.multi.002.sh
+%{_datadir}/ctdb/tests/eventscripts/60.nfs.releaseip.001.sh
+%{_datadir}/ctdb/tests/eventscripts/60.nfs.releaseip.002.sh
+%{_datadir}/ctdb/tests/eventscripts/60.nfs.shutdown.001.sh
+%{_datadir}/ctdb/tests/eventscripts/60.nfs.shutdown.002.sh
+%{_datadir}/ctdb/tests/eventscripts/60.nfs.startup.001.sh
+%{_datadir}/ctdb/tests/eventscripts/60.nfs.startup.002.sh
+%{_datadir}/ctdb/tests/eventscripts/60.nfs.takeip.001.sh
+%{_datadir}/ctdb/tests/eventscripts/60.nfs.takeip.002.sh
 %{_datadir}/ctdb/tests/eventscripts/91.lvs.001.sh
 %{_datadir}/ctdb/tests/eventscripts/91.lvs.ipreallocated.011.sh
 %{_datadir}/ctdb/tests/eventscripts/91.lvs.ipreallocated.012.sh
