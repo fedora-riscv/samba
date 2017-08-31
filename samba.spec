@@ -8,7 +8,7 @@
 
 %define main_release 0
 
-%define samba_version 4.5.11
+%define samba_version 4.5.13
 %define talloc_version 2.1.8
 %define tdb_version 1.3.10
 %define tevent_version 0.9.29
@@ -2567,6 +2567,9 @@ rm -rf %{buildroot}
 %endif # with_clustering_support
 
 %changelog
+* Thu Aug 31 2017 Guenther Deschner <gdeschner@redhat.com> - 4.5.13-0
+- Update to Samba 4.5.13
+
 * Thu Jul 06 2017 Guenther Deschner <gdeschner@redhat.com> - 4.5.11-0
 - Update to Samba 4.5.11
 
