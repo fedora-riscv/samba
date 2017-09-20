@@ -8,7 +8,7 @@
 
 %define main_release 0
 
-%define samba_version 4.5.13
+%define samba_version 4.5.14
 %define talloc_version 2.1.8
 %define tdb_version 1.3.10
 %define tevent_version 0.9.29
@@ -2567,6 +2567,10 @@ rm -rf %{buildroot}
 %endif # with_clustering_support
 
 %changelog
+* Wed Sep 20 2017 Guenther Deschner <gdeschner@redhat.com> - 4.5.14-0
+- Update to Samba 4.5.14
+- resolves: #1493441 - Security fix for CVE-2017-12150 CVE-2017-12151 CVE-2017-12163
+
 * Thu Aug 31 2017 Guenther Deschner <gdeschner@redhat.com> - 4.5.13-0
 - Update to Samba 4.5.13
 
