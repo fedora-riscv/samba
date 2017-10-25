@@ -3280,6 +3280,7 @@ rm -rf %{buildroot}
 %changelog
 * Wed Oct 25 2017 Andreas Schneider <asn@redhat.com> - 4.7.0-15
 - Fix several dependency issues
+- related: #1499140 - Fix several dependency issues
 
 * Fri Oct 13 2017 Andreas Schneider <asn@redhat.com> - 4.7.0-14
 - resolves: #1499140 - Move libdfs-server-ad to the correct subpackage
