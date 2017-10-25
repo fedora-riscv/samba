@@ -8,7 +8,7 @@
 
 %define main_release 0
 
-%define samba_version 4.6.8
+%define samba_version 4.6.9
 %define talloc_version 2.1.9
 %define tdb_version 1.3.12
 %define tevent_version 0.9.31
@@ -1980,6 +1980,7 @@ rm -rf %{buildroot}
 %{_libexecdir}/ctdb/tests/ctdb_packet_parse
 %{_libexecdir}/ctdb/tests/ctdb_takeover_tests
 %{_libexecdir}/ctdb/tests/db_hash_test
+%{_libexecdir}/ctdb/tests/dummy_client
 %{_libexecdir}/ctdb/tests/fake_ctdbd
 %{_libexecdir}/ctdb/tests/fetch_loop
 %{_libexecdir}/ctdb/tests/fetch_loop_key
@@ -2660,6 +2661,9 @@ rm -rf %{buildroot}
 %endif # with_clustering_support
 
 %changelog
+* Wed Oct 25 2017 Guenther Deschner <gdeschner@redhat.com> - 4.6.9-0
+- Update to Samba 4.6.9
+
 * Wed Sep 20 2017 Guenther Deschner <gdeschner@redhat.com> - 4.6.8-0
 - Update to Samba 4.6.8
 - resolves: #1493441 - Security fix for CVE-2017-12150 CVE-2017-12151 CVE-2017-12163
