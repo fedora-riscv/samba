@@ -8,10 +8,10 @@
 
 %define main_release 0
 
-%define samba_version 4.6.9
+%define samba_version 4.6.10
 %define talloc_version 2.1.9
 %define tdb_version 1.3.12
-%define tevent_version 0.9.31
+%define tevent_version 0.9.34
 %define ldb_version 1.1.29
 # This should be rc1 or nil
 %define pre_release %nil
@@ -208,7 +208,7 @@ BuildRequires: pytalloc-devel >= %{libtalloc_version}
 %endif
 
 %if ! %with_internal_tevent
-%global libtevent_version 0.9.31
+%global libtevent_version 0.9.34
 
 BuildRequires: libtevent-devel >= %{libtevent_version}
 BuildRequires: python-tevent >= %{libtevent_version}
@@ -2661,6 +2661,9 @@ rm -rf %{buildroot}
 %endif # with_clustering_support
 
 %changelog
+* Wed Nov 15 2017 Guenther Deschner <gdeschner@redhat.com> - 4.6.10-0
+- Update to Samba 4.6.10
+
 * Wed Oct 25 2017 Guenther Deschner <gdeschner@redhat.com> - 4.6.9-0
 - Update to Samba 4.6.9
 
