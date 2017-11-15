@@ -8,10 +8,10 @@
 
 %define main_release 0
 
-%define samba_version 4.7.1
+%define samba_version 4.7.2
 %define talloc_version 2.1.10
 %define tdb_version 1.3.15
-%define tevent_version 0.9.33
+%define tevent_version 0.9.34
 %define ldb_version 1.2.2
 # This should be rc1 or nil
 %define pre_release %nil
@@ -3375,6 +3375,9 @@ rm -rf %{buildroot}
 %endif # with_clustering_support
 
 %changelog
+* Wed Nov 15 2017 Guenther Deschner <gdeschner@redhat.com> - 4.7.2-0
+- resolves: #1513452 - Update to Samba 4.7.2
+
 * Thu Nov 02 2017 Guenther Deschner <gdeschner@redhat.com> - 4.7.1-0
 - resolves: #1508871 - Update to Samba 4.7.1
 
