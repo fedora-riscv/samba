@@ -115,8 +115,6 @@ Source200: README.dc
 Source201: README.downgrade
 
 Patch0: samba-4.7.0-bind_dlz.patch
-Patch1: samba-4.7-fix_samba_with_systemd.patch
-Patch2: samba-4.7-fix-linking-aesni-intel.patch
 
 Requires(pre): /usr/sbin/groupadd
 Requires(post): systemd
