@@ -6,7 +6,7 @@
 # ctdb is enabled by default, you can disable it with: --without clustering
 %bcond_without clustering
 
-%define main_release 1
+%define main_release 2
 
 %define samba_version 4.7.4
 %define talloc_version 2.1.10
@@ -3389,6 +3389,9 @@ rm -rf %{buildroot}
 %endif # with_clustering_support
 
 %changelog
+* Mon Jan 15 2018 Andreas Schneider <asn@redhat.com> - 4.7.4-2
+- Rebuild for libtalloc and libldb
+
 * Mon Jan 08 2018 Andreas Schneider <asn@redhat.com> - 4.7.4-1
 - resolves: #1508092 - Add missing dependency for tdbbackup
 
