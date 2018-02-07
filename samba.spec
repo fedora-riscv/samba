@@ -8,7 +8,7 @@
 
 %define main_release 2
 
-%define samba_version 4.7.4
+%define samba_version 4.7.5
 %define talloc_version 2.1.10
 %define tdb_version 1.3.15
 %define tevent_version 0.9.34
@@ -3389,6 +3389,9 @@ rm -rf %{buildroot}
 %endif # with_clustering_support
 
 %changelog
+* Wed Feb 07 2018 Guenther Deschner <gdeschner@redhat.com> - 4.7.5-2
+- Update to Samba 4.7.5
+
 * Mon Jan 15 2018 Andreas Schneider <asn@redhat.com> - 4.7.4-2
 - Rebuild for libtalloc and libldb
 
