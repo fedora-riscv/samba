@@ -8,7 +8,7 @@
 
 %define main_release 0
 
-%define samba_version 4.6.12
+%define samba_version 4.6.13
 %define talloc_version 2.1.9
 %define tdb_version 1.3.12
 %define tevent_version 0.9.34
@@ -113,6 +113,8 @@ Source14: samba.pamd
 
 Source200: README.dc
 Source201: README.downgrade
+
+Patch0: samba-4.8.0-ceph.patch
 
 Requires(pre): /usr/sbin/groupadd
 Requires(post): systemd
@@ -2661,6 +2663,9 @@ rm -rf %{buildroot}
 %endif # with_clustering_support
 
 %changelog
+* Wed Feb 14 2018 Guenther Deschner <gdeschner@redhat.com> - 4.6.13-0
+- Update to Samba 4.6.13
+
 * Thu Dec 21 2017 Guenther Deschner <gdeschner@redhat.com> - 4.6.12-0
 - Update to Samba 4.6.12
 
