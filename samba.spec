@@ -8,7 +8,7 @@
 
 %define main_release 0
 
-%define samba_version 4.6.13
+%define samba_version 4.6.14
 %define talloc_version 2.1.9
 %define tdb_version 1.3.12
 %define tevent_version 0.9.34
@@ -2663,6 +2663,10 @@ rm -rf %{buildroot}
 %endif # with_clustering_support
 
 %changelog
+* Tue Mar 13 2018 Guenther Deschner <gdeschner@redhat.com> - 4.6.14-0
+- Update to Samba 4.6.14
+- resolves: #1554754, #1554756 - Security fixes for CVE-2018-1050 CVE-2018-1057
+
 * Wed Feb 14 2018 Guenther Deschner <gdeschner@redhat.com> - 4.6.13-0
 - Update to Samba 4.6.13
 
