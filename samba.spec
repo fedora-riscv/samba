@@ -6,13 +6,13 @@
 # ctdb is enabled by default, you can disable it with: --without clustering
 %bcond_without clustering
 
-%define main_release 1
+%define main_release 2
 
 %define samba_version 4.8.3
 %define talloc_version 2.1.11
 %define tdb_version 1.3.15
 %define tevent_version 0.9.36
-%define ldb_version 1.3.3
+%define ldb_version 1.4.0-2%{?dist}.1.3.4
 # This should be rc1 or nil
 %define pre_release %nil
 
@@ -3553,6 +3553,12 @@ fi
 %endif # with_clustering_support
 
 %changelog
+* Tue Jul 24 2018 Alexander Bokovoy <abokovoy@redhat.com> - 4.8.3-2
+- Rebuild samba against a downgraded libldb version
+- Fixes: #1601944
+- Samba 4.8 is not compatible with libldb 1.4
+- Rely on a special downgrade version 1.4.0-2fc28.1.3.4
+
 * Tue Jun 26 2018 Andreas Schneider <asn@redhat.com> - 4.8.3-1
 - Update to Samba 4.8.3
 - Remove python(2|3)-subunit dependency
