@@ -8,10 +8,10 @@
 
 %define main_release 0
 
-%define samba_version 4.7.8
+%define samba_version 4.7.9
 %define talloc_version 2.1.10
 %define tdb_version 1.3.15
-%define tevent_version 0.9.34
+%define tevent_version 0.9.36
 %define ldb_version 1.2.3
 # This should be rc1 or nil
 %define pre_release %nil
@@ -3389,6 +3389,14 @@ rm -rf %{buildroot}
 %endif # with_clustering_support
 
 %changelog
+* Tue Aug 14 2018 Guenther Deschner <gdeschner@redhat.com> - 4.7.9-0
+- Update to Samba 4.7.9
+- resolves: #1589651, #1617916 - Security fixes for CVE-2018-1139
+- resolves: #1580230, #1618613 - Security fixes for CVE-2018-1140
+- resolves: #1612805, #1618697 - Security fixes for CVE-2018-10858
+- resolves: #1610640, #1617910 - Security fixes for CVE-2018-10918
+- resolves: #1610645, #1617911 - Security fixes for CVE-2018-10919
+
 * Thu Jun 21 2018 Guenther Deschner <gdeschner@redhat.com> - 4.7.8-0
 - Update to Samba 4.7.8
 
