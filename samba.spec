@@ -940,6 +940,7 @@ filenames=$(echo "
     tests/dns_base.py
     tests/dns_forwarder.py
     tests/dns_forwarder_helpers/server.py
+    tests/dns_invalid.py
     tests/docs.py
     tests/netcmd.py
     tests/posixacl.py
@@ -2205,6 +2206,7 @@ fi
 %{python_sitearch}/samba/tests/dns_forwarder.py*
 %dir %{python_sitearch}/samba/tests/dns_forwarder_helpers
 %{python_sitearch}/samba/tests/dns_forwarder_helpers/server.py*
+%{python_sitearch}/samba/tests/dns_invalid.py*
 %{python_sitearch}/samba/tests/dns_tkey.py*
 %{python_sitearch}/samba/tests/dns_wildcard.py*
 %{python_sitearch}/samba/tests/docs.py*
