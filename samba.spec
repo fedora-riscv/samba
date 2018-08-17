@@ -3555,6 +3555,11 @@ fi
 %changelog
 * Wed Aug 15 2018 Guenther Deschner <gdeschner@redhat.com> - 4.8.4-0
 - Update to Samba 4.8.4
+- resolves: #1589651, #1617916 - Security fixes for CVE-2018-1139
+- resolves: #1580230, #1618613 - Security fixes for CVE-2018-1140
+- resolves: #1612805, #1618697 - Security fixes for CVE-2018-10858
+- resolves: #1610640, #1617910 - Security fixes for CVE-2018-10918
+- resolves: #1610645, #1617911 - Security fixes for CVE-2018-10919
 
 * Tue Jul 24 2018 Alexander Bokovoy <abokovoy@redhat.com> - 4.8.3-2
 - Rebuild samba against a downgraded libldb version
