@@ -8,7 +8,7 @@
 
 %define main_release 0
 
-%define samba_version 4.7.9
+%define samba_version 4.7.10
 %define talloc_version 2.1.10
 %define tdb_version 1.3.15
 %define tevent_version 0.9.36
@@ -906,7 +906,6 @@ filenames=$(echo "
     remove_dc.py
     sites.py
     subnets.py
-    tests/auth_log.py
     tests/auth_log_base.py
     tests/auth_log_pass_change.py
     tests/blackbox/ndrdump.py
@@ -2356,6 +2355,7 @@ rm -rf %{buildroot}
 %dir %{python3_sitearch}/samba/tests/__pycache__
 %{python3_sitearch}/samba/tests/__pycache__/__init__.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/auth.*.pyc
+%{python3_sitearch}/samba/tests/__pycache__/auth_log.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/auth_log_ncalrpc.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/auth_log_netlogon.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/auth_log_netlogon_bad_creds.*.pyc
@@ -2401,6 +2401,7 @@ rm -rf %{buildroot}
 %{python3_sitearch}/samba/tests/__pycache__/upgradeprovisionneeddc.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/xattr.*.pyc
 %{python3_sitearch}/samba/tests/auth.py
+%{python3_sitearch}/samba/tests/auth_log.py
 %{python3_sitearch}/samba/tests/auth_log_ncalrpc.py
 %{python3_sitearch}/samba/tests/auth_log_netlogon.py
 %{python3_sitearch}/samba/tests/auth_log_netlogon_bad_creds.py
@@ -3160,6 +3161,7 @@ rm -rf %{buildroot}
 %{_datadir}/ctdb/tests/simple/76_ctdb_pdb_recovery.sh
 %{_datadir}/ctdb/tests/simple/77_ctdb_db_recovery.sh
 %{_datadir}/ctdb/tests/simple/78_ctdb_large_db_recovery.sh
+%{_datadir}/ctdb/tests/simple/79_volatile_db_traverse.sh
 %{_datadir}/ctdb/tests/simple/80_ctdb_traverse.sh
 %{_datadir}/ctdb/tests/simple/99_daemons_shutdown.sh
 %{_datadir}/ctdb/tests/simple/functions
@@ -3389,6 +3391,9 @@ rm -rf %{buildroot}
 %endif # with_clustering_support
 
 %changelog
+* Mon Aug 27 2018 Guenther Deschner <gdeschner@redhat.com> - 4.7.10-0
+- Update to Samba 4.7.10
+
 * Tue Aug 14 2018 Guenther Deschner <gdeschner@redhat.com> - 4.7.9-0
 - Update to Samba 4.7.9
 - resolves: #1589651, #1617916 - Security fixes for CVE-2018-1139
