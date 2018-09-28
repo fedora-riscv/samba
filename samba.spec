@@ -1497,6 +1497,7 @@ fi
 
 %dir %{_libdir}/samba
 %{_libdir}/samba/libCHARSET3-samba4.so
+%{_libdir}/samba/libMESSAGING-SEND-samba4.so
 %{_libdir}/samba/libaddns-samba4.so
 %{_libdir}/samba/libads-samba4.so
 %{_libdir}/samba/libasn1util-samba4.so
