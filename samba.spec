@@ -6,7 +6,7 @@
 # ctdb is enabled by default, you can disable it with: --without clustering
 %bcond_without clustering
 
-%define main_release 0
+%define main_release 1
 
 %define samba_version 4.8.5
 %define talloc_version 2.1.11
@@ -121,6 +121,8 @@ Source14:       samba.pamd
 
 Source200:      README.dc
 Source201:      README.downgrade
+
+Patch0:		samba-4.8.6-vfs_fruit.patch
 
 Requires(pre): /usr/sbin/groupadd
 Requires(post): systemd
@@ -3555,6 +3557,9 @@ fi
 %endif # with_clustering_support
 
 %changelog
+* Thu Oct 04 2018 Guenther Deschner <gdeschner@redhat.com> - 4.8.5-1
+- resolves: #1625170 - Fix vfs_fruit
+
 * Fri Aug 24 2018 Guenther Deschner <gdeschner@redhat.com> - 4.8.5-0
 - Update to Samba 4.8.5
 
