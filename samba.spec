@@ -843,6 +843,7 @@ export python_LDFLAGS="$(echo %{__global_ldflags} | sed -e 's/-Wl,-z,defs//g')"
 %endif
 %if %with_mitkrb5
         --with-system-mitkrb5 \
+	--with-experimental-mit-ad-dc \
 %endif
 %if ! %with_dc
         --without-ad-dc \
