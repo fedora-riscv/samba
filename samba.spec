@@ -8,11 +8,11 @@
 
 %define main_release 0
 
-%define samba_version 4.8.7
+%define samba_version 4.8.8
 %define talloc_version 2.1.11
 %define tdb_version 1.3.15
 %define tevent_version 0.9.36
-%define ldb_version 1.4.0-2%{?dist}.1.3.4
+%define ldb_version 1.4.0-2%{?dist}.1.3.6
 # This should be rc1 or nil
 %define pre_release %nil
 
@@ -1508,6 +1508,7 @@ fi
 %{_libdir}/samba/libcli-smb-common-samba4.so
 %{_libdir}/samba/libcli-spoolss-samba4.so
 %{_libdir}/samba/libcliauth-samba4.so
+%{_libdir}/samba/libcmdline-contexts-samba4.so
 %{_libdir}/samba/libcmdline-credentials-samba4.so
 %{_libdir}/samba/libcommon-auth-samba4.so
 %{_libdir}/samba/libdbwrap-samba4.so
@@ -1604,6 +1605,7 @@ fi
 %files common-libs
 %defattr(-,root,root)
 # common libraries
+%{_libdir}/samba/libpopt-samba3-cmdline-samba4.so
 %{_libdir}/samba/libpopt-samba3-samba4.so
 %if %{with_intel_aes_accel}
 %{_libdir}/samba/libaesni-intel-samba4.so
@@ -3319,6 +3321,7 @@ fi
 %{_datadir}/ctdb/tests/simple/56_replicated_transaction_recovery.sh
 %{_datadir}/ctdb/tests/simple/58_ctdb_restoredb.sh
 %{_datadir}/ctdb/tests/simple/60_recoverd_missing_ip.sh
+%{_datadir}/ctdb/tests/simple/69_recovery_resurrect_deleted.sh
 %{_datadir}/ctdb/tests/simple/70_recoverpdbbyseqnum.sh
 %{_datadir}/ctdb/tests/simple/71_ctdb_wipedb.sh
 %{_datadir}/ctdb/tests/simple/72_update_record_persistent.sh
@@ -3556,6 +3559,9 @@ fi
 %endif # with_clustering_support
 
 %changelog
+* Thu Dec 13 2018 Guenther Deschner <gdeschner@redhat.com> - 4.8.8-0
+- Update to Samba 4.8.8
+
 * Tue Nov 27 2018 Guenther Deschner <gdeschner@redhat.com> - 4.8.7-0
 - Update to Samba 4.8.7
 - resolves: #1625449, #1654078 - Security fixes for CVE-2018-14629
