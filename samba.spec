@@ -8,7 +8,7 @@
 
 %define main_release 0
 
-%define samba_version 4.8.8
+%define samba_version 4.8.9
 %define talloc_version 2.1.11
 %define tdb_version 1.3.15
 %define tevent_version 0.9.36
@@ -1415,6 +1415,7 @@ fi
 
 %if ! %{with_vfs_glusterfs}
 %exclude %{_mandir}/man8/vfs_glusterfs.8*
+%exclude %{_mandir}/man8/vfs_glusterfs_fuse.8*
 %endif
 
 %if ! %{with_vfs_cephfs}
@@ -1896,7 +1897,9 @@ fi
 %if %{with_vfs_glusterfs}
 %files vfs-glusterfs
 %{_libdir}/samba/vfs/glusterfs.so
+%{_libdir}/samba/vfs/glusterfs_fuse.so
 %{_mandir}/man8/vfs_glusterfs.8*
+%{_mandir}/man8/vfs_glusterfs_fuse.8*
 %endif
 
 ### KRB5-PRINTING
@@ -3559,6 +3562,9 @@ fi
 %endif # with_clustering_support
 
 %changelog
+* Thu Feb 07 2019 Guenther Deschner <gdeschner@redhat.com> - 4.8.9-0
+- Update to Samba 4.8.9
+
 * Thu Dec 13 2018 Guenther Deschner <gdeschner@redhat.com> - 4.8.8-0
 - Update to Samba 4.8.8
 
