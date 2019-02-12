@@ -6,7 +6,7 @@
 # ctdb is enabled by default, you can disable it with: --without clustering
 %bcond_without clustering
 
-%define main_release 0
+%define main_release 1
 
 %define samba_version 4.8.9
 %define talloc_version 2.1.11
@@ -2408,6 +2408,11 @@ fi
 %{python3_sitearch}/samba/subunit/__pycache__/run.*.pyc
 %{python3_sitearch}/samba/subunit/run.py
 %{python3_sitearch}/samba/tdb_util.py
+%dir %{python3_sitearch}/samba/web_server
+%{python3_sitearch}/samba/werror.*.so
+%{python3_sitearch}/samba/xattr.py
+%{python3_sitearch}/samba/xattr_native.*.so
+%{python3_sitearch}/samba/xattr_tdb.*.so
 
 %if %{with_dc}
 %files -n python3-%{name}-dc
@@ -2658,11 +2663,6 @@ fi
 %{python3_sitearch}/samba/tests/upgradeprovision.py
 %{python3_sitearch}/samba/tests/upgradeprovisionneeddc.py
 %{python3_sitearch}/samba/tests/xattr.py
-%dir %{python3_sitearch}/samba/web_server
-%{python3_sitearch}/samba/werror.*.so
-%{python3_sitearch}/samba/xattr.py
-%{python3_sitearch}/samba/xattr_native.*.so
-%{python3_sitearch}/samba/xattr_tdb.*.so
 
 ### TEST
 %files test
@@ -3562,6 +3562,9 @@ fi
 %endif # with_clustering_support
 
 %changelog
+* Tue Feb 12 2019 Guenther Deschner <gdeschner@redhat.com> - 4.8.9-1
+- resolves: #1674547 - Move samba.xattr modules out of python3 test package
+
 * Thu Feb 07 2019 Guenther Deschner <gdeschner@redhat.com> - 4.8.9-0
 - Update to Samba 4.8.9
 
