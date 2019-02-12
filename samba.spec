@@ -6,7 +6,7 @@
 # ctdb is enabled by default, you can disable it with: --without clustering
 %bcond_without clustering
 
-%define main_release 0
+%define main_release 1
 
 %define samba_version 4.9.4
 %define talloc_version 2.1.14
@@ -2510,6 +2510,14 @@ fi
 %{python3_sitearch}/samba/tdb_util.py
 %{python3_sitearch}/samba/upgrade.py
 %{python3_sitearch}/samba/upgradehelpers.py
+%dir %{python3_sitearch}/samba/web_server
+%{python3_sitearch}/samba/web_server/__init__.py
+%dir %{python3_sitearch}/samba/web_server/__pycache__
+%{python3_sitearch}/samba/web_server/__pycache__/__init__.*.pyc
+%{python3_sitearch}/samba/werror.*.so
+%{python3_sitearch}/samba/xattr.py
+%{python3_sitearch}/samba/xattr_native.*.so
+%{python3_sitearch}/samba/xattr_tdb.*.so
 # FIXME:
 # /usr/lib64/libsamba-policy.cpython-36m-x86-64-linux-gnu.so
 # /usr/lib64/libsamba-policy.cpython-36m-x86-64-linux-gnu.so.0
@@ -2883,14 +2891,6 @@ fi
 %{python3_sitearch}/samba/tests/upgradeprovision.py
 %{python3_sitearch}/samba/tests/upgradeprovisionneeddc.py
 %{python3_sitearch}/samba/tests/xattr.py
-%dir %{python3_sitearch}/samba/web_server
-%{python3_sitearch}/samba/web_server/__init__.py
-%dir %{python3_sitearch}/samba/web_server/__pycache__
-%{python3_sitearch}/samba/web_server/__pycache__/__init__.*.pyc
-%{python3_sitearch}/samba/werror.*.so
-%{python3_sitearch}/samba/xattr.py
-%{python3_sitearch}/samba/xattr_native.*.so
-%{python3_sitearch}/samba/xattr_tdb.*.so
 
 ### TEST
 %files test
@@ -3839,6 +3839,9 @@ fi
 %endif # with_clustering_support
 
 %changelog
+* Tue Feb 12 2019 Guenther Deschner <gdeschner@redhat.com> - 4.9.4-1
+- resolves: #1674547 - Move samba.xattr modules out of python3 test package
+
 * Thu Dec 20 2018 Guenther Deschner <gdeschner@redhat.com> - 4.9.4-0
 - Update to Samba 4.9.4
 
