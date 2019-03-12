@@ -6,13 +6,13 @@
 # ctdb is enabled by default, you can disable it with: --without clustering
 %bcond_without clustering
 
-%define main_release 1
+%define main_release 0
 
-%define samba_version 4.9.4
+%define samba_version 4.9.5
 %define talloc_version 2.1.14
 %define tdb_version 1.3.16
 %define tevent_version 0.9.37
-%define ldb_version 1.4.3
+%define ldb_version 1.4.6
 # This should be rc1 or nil
 %define pre_release %nil
 
@@ -1422,6 +1422,7 @@ fi
 
 %if ! %{with_vfs_glusterfs}
 %exclude %{_mandir}/man8/vfs_glusterfs.8*
+%exclude %{_mandir}/man8/vfs_glusterfs_fuse.8*
 %endif
 
 %if ! %{with_vfs_cephfs}
@@ -1901,7 +1902,9 @@ fi
 %if %{with_vfs_glusterfs}
 %files vfs-glusterfs
 %{_libdir}/samba/vfs/glusterfs.so
+%{_libdir}/samba/vfs/glusterfs_fuse.so
 %{_mandir}/man8/vfs_glusterfs.8*
+%{_mandir}/man8/vfs_glusterfs_fuse.8*
 %endif
 
 ### KRB5-PRINTING
@@ -3839,6 +3842,9 @@ fi
 %endif # with_clustering_support
 
 %changelog
+* Tue Mar 12 2019 Guenther Deschner <gdeschner@redhat.com> - 4.9.5-0
+- Update to Samba 4.9.5
+
 * Tue Feb 12 2019 Guenther Deschner <gdeschner@redhat.com> - 4.9.4-1
 - resolves: #1674547 - Move samba.xattr modules out of python3 test package
 
