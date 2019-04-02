@@ -197,6 +197,7 @@ BuildRequires: python2-iso8601
 # Add python3-iso8601 to avoid that the
 # version in Samba is being packaged
 BuildRequires: python3-iso8601
+BuildRequires: python3-subunit-test
 %endif # with_dc
 BuildRequires: quota-devel
 BuildRequires: readline-devel
