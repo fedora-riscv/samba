@@ -6,13 +6,13 @@
 # ctdb is enabled by default, you can disable it with: --without clustering
 %bcond_without clustering
 
-%define main_release 1
+%define main_release 0
 
-%define samba_version 4.8.9
+%define samba_version 4.8.10
 %define talloc_version 2.1.11
 %define tdb_version 1.3.15
 %define tevent_version 0.9.36
-%define ldb_version 1.4.0-2%{?dist}.1.3.6
+%define ldb_version 1.4.0-2%{?dist}.1.3.8
 # This should be rc1 or nil
 %define pre_release %nil
 
@@ -2854,6 +2854,7 @@ fi
 %{_libexecdir}/ctdb/tests/fetch_ring
 %{_libexecdir}/ctdb/tests/g_lock_loop
 %{_libexecdir}/ctdb/tests/hash_count_test
+%{_libexecdir}/ctdb/tests/line_test
 %{_libexecdir}/ctdb/tests/lock_tdb
 %{_libexecdir}/ctdb/tests/message_ring
 %{_libexecdir}/ctdb/tests/pidfile_test
@@ -2913,6 +2914,7 @@ fi
 %{_datadir}/ctdb/tests/cunit/comm_test_002.sh
 %{_datadir}/ctdb/tests/cunit/db_hash_test_001.sh
 %{_datadir}/ctdb/tests/cunit/hash_count_test_001.sh
+%{_datadir}/ctdb/tests/cunit/line_test_001.sh
 %{_datadir}/ctdb/tests/cunit/pidfile_test_001.sh
 %{_datadir}/ctdb/tests/cunit/pkt_read_001.sh
 %{_datadir}/ctdb/tests/cunit/pkt_write_001.sh
@@ -3562,6 +3564,9 @@ fi
 %endif # with_clustering_support
 
 %changelog
+* Thu Apr 04 2019 Guenther Deschner <gdeschner@redhat.com> - 4.8.10-0
+- Update to Samba 4.8.10
+
 * Tue Feb 12 2019 Guenther Deschner <gdeschner@redhat.com> - 4.8.9-1
 - resolves: #1674547 - Move samba.xattr modules out of python3 test package
 
