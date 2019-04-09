@@ -2314,6 +2314,7 @@ fi
 %{python2_sitearch}/samba/tests/samdb_api.py*
 %{python2_sitearch}/samba/tests/security.py*
 %{python2_sitearch}/samba/tests/smb.py*
+%{python2_sitearch}/samba/tests/smbd_base.py*
 %{python2_sitearch}/samba/tests/source.py*
 %{python2_sitearch}/samba/tests/strings.py*
 %{python2_sitearch}/samba/tests/subunitrun.py*
