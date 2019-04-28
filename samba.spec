@@ -6,7 +6,7 @@
 # ctdb is enabled by default, you can disable it with: --without clustering
 %bcond_without clustering
 
-%define main_release 1
+%define main_release 1.1
 
 %define samba_version 4.10.2
 %define talloc_version 2.1.16
@@ -3406,6 +3406,9 @@ fi
 %endif # with_clustering_support
 
 %changelog
+* Sun Apr 28 2019 Alexander Bokovoy <abokovoy@redhat.com> - 4.10.2-1.1
+- Rebuild against krb5 1.17-14
+
 * Mon Apr 15 2019 Andreas Schneider <asn@redhat.com> - 4.10.2-1
 - resolves: #1699230 - Rebuild for MIT Kerberos soname bump of libkadm5srv
 
