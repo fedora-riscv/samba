@@ -3025,6 +3025,9 @@ fi
 %{_libexecdir}/ctdb/smnotify
 
 %dir %{_localstatedir}/lib/ctdb/
+%dir %{_localstatedir}/lib/ctdb/persistent
+%dir %{_localstatedir}/lib/ctdb/state
+%dir %{_localstatedir}/lib/ctdb/volatile
 
 %{_mandir}/man1/ctdb.1.gz
 %{_mandir}/man1/ctdb_diagnostics.1.gz
@@ -3848,7 +3851,8 @@ fi
 
 %changelog
 * Tue May 28 2019 Guenther Deschner <gdeschner@redhat.com> - 4.9.8-1
-- Add missing /etc/ctdb/events/legacy directory
+- Add missing ctdb directories
+- resolves: #1656777
 
 * Tue May 14 2019 Guenther Deschner <gdeschner@redhat.com> - 4.9.8-0
 - Update to Samba 4.9.8
