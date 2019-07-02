@@ -8,11 +8,11 @@
 
 %define main_release 0
 
-%define samba_version 4.9.9
+%define samba_version 4.9.11
 %define talloc_version 2.1.14
 %define tdb_version 1.3.16
 %define tevent_version 0.9.37
-%define ldb_version 1.4.6
+%define ldb_version 1.4.7
 # This should be rc1 or nil
 %define pre_release %nil
 
@@ -2249,6 +2249,7 @@ fi
 %{python2_sitearch}/samba/tests/kcc/kcc_utils.py*
 %{python2_sitearch}/samba/tests/kcc/ldif_import_export.py*
 %{python2_sitearch}/samba/tests/krb5_credentials.py*
+%{python2_sitearch}/samba/tests/ldap_referrals.py*
 %{python2_sitearch}/samba/tests/libsmb_samba_internal.py*
 %{python2_sitearch}/samba/tests/loadparm.py*
 %{python2_sitearch}/samba/tests/lsa_string.py*
@@ -2638,6 +2639,7 @@ fi
 %{python3_sitearch}/samba/tests/__pycache__/hostconfig.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/join.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/krb5_credentials.*.pyc
+%{python3_sitearch}/samba/tests/__pycache__/ldap_referrals.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/libsmb_samba_internal.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/loadparm.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/lsa_string.*.pyc
@@ -2796,6 +2798,7 @@ fi
 %{python3_sitearch}/samba/tests/kcc/kcc_utils.py
 %{python3_sitearch}/samba/tests/kcc/ldif_import_export.py
 %{python3_sitearch}/samba/tests/krb5_credentials.py
+%{python3_sitearch}/samba/tests/ldap_referrals.py
 %{python3_sitearch}/samba/tests/libsmb_samba_internal.py
 %{python3_sitearch}/samba/tests/loadparm.py
 %{python3_sitearch}/samba/tests/lsa_string.py
@@ -3850,6 +3853,9 @@ fi
 %endif # with_clustering_support
 
 %changelog
+* Wed Jul 03 2019 Guenther Deschner <gdeschner@redhat.com> - 4.9.11-0
+- Update to Samba 4.9.11
+
 * Wed Jun 19 2019 Guenther Deschner <gdeschner@redhat.com> - 4.9.9-0
 - Update to Samba 4.9.9
 - resolves: #1711816, #1721872 - Security fixes for CVE-2019-12435
