@@ -6,15 +6,15 @@
 # ctdb is enabled by default, you can disable it with: --without clustering
 %bcond_without clustering
 
-%define main_release 1
+%define main_release 0
 
-%define samba_version 4.10.6
-%define talloc_version 2.1.16
-%define tdb_version 1.3.18
-%define tevent_version 0.9.39
-%define ldb_version 1.5.5
+%define samba_version 4.11.0
+%define talloc_version 2.2.0
+%define tdb_version 1.4.1
+%define tevent_version 0.10.0
+%define ldb_version 2.0.5
 # This should be rc1 or nil
-%define pre_release %nil
+%define pre_release rc1
 
 %if "x%{?pre_release}" != "x"
 %define samba_release 0.%{main_release}.%{pre_release}%{?dist}
@@ -118,8 +118,7 @@ Source14:       samba.pamd
 
 Source201:      README.downgrade
 
-Patch0:         samba-4.10.x-waf_update.patch
-Patch1:         samba-bz14091-v4.10-backport.patch
+Patch0:         samba-bz14091-v4.10-backport.patch
 
 Requires(pre): /usr/sbin/groupadd
 Requires(post): systemd
@@ -3440,6 +3439,9 @@ fi
 %endif # with_clustering_support
 
 %changelog
+* Tue Aug 20 2019 Guenther Deschner <gdeschner@redhat.com> - 4.11.0rc1-0
+- Update to Samba 4.11.0rc1
+
 * Fri Aug 16 2019 Alexander Bokovoy <abokovoy@redhat.com> - 2:4.10.6-1
 - Fix Samba bug https://bugzilla.samba.org/show_bug.cgi?id=14091
 - Fixes: Windows systems cannot resolve IPA users and groups over LSA RPC
