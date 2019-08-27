@@ -8,7 +8,7 @@
 
 %define main_release 0
 
-%define samba_version 4.9.11
+%define samba_version 4.9.12
 %define talloc_version 2.1.14
 %define tdb_version 1.3.16
 %define tevent_version 0.9.37
@@ -3853,6 +3853,9 @@ fi
 %endif # with_clustering_support
 
 %changelog
+* Tue Aug 27 2019 Guenther Deschner <gdeschner@redhat.com> - 4.9.12-0
+- Update to Samba 4.9.12
+
 * Wed Jul 03 2019 Guenther Deschner <gdeschner@redhat.com> - 4.9.11-0
 - Update to Samba 4.9.11
 
