@@ -8,11 +8,11 @@
 
 %define main_release 0
 
-%define samba_version 4.10.8
+%define samba_version 4.10.9
 %define talloc_version 2.1.16
 %define tdb_version 1.3.18
 %define tevent_version 0.9.39
-%define ldb_version 1.5.5
+%define ldb_version 1.5.6
 # This should be rc1 or nil
 %define pre_release %nil
 
@@ -2253,6 +2253,7 @@ fi
 %{python3_sitearch}/samba/tests/blackbox/__pycache__/traffic_learner.*.pyc
 %{python3_sitearch}/samba/tests/blackbox/__pycache__/traffic_replay.*.pyc
 %{python3_sitearch}/samba/tests/blackbox/__pycache__/traffic_summary.*.pyc
+%{python3_sitearch}/samba/tests/blackbox/__pycache__/undoguididx.*.pyc
 %{python3_sitearch}/samba/tests/blackbox/bug13653.py
 %{python3_sitearch}/samba/tests/blackbox/check_output.py
 %{python3_sitearch}/samba/tests/blackbox/ndrdump.py
@@ -2263,6 +2264,7 @@ fi
 %{python3_sitearch}/samba/tests/blackbox/traffic_learner.py
 %{python3_sitearch}/samba/tests/blackbox/traffic_replay.py
 %{python3_sitearch}/samba/tests/blackbox/traffic_summary.py
+%{python3_sitearch}/samba/tests/blackbox/undoguididx.py
 %{python3_sitearch}/samba/tests/common.py
 %{python3_sitearch}/samba/tests/complex_expressions.py
 %{python3_sitearch}/samba/tests/core.py
@@ -2679,7 +2681,6 @@ fi
 %{_libexecdir}/ctdb/tests/sock_io_test
 %{_libexecdir}/ctdb/tests/srvid_test
 %{_libexecdir}/ctdb/tests/system_socket_test
-%{_libexecdir}/ctdb/tests/test_mutex_raw
 %{_libexecdir}/ctdb/tests/transaction_loop
 %{_libexecdir}/ctdb/tests/tunnel_cmd
 %{_libexecdir}/ctdb/tests/tunnel_test
@@ -3408,6 +3409,9 @@ fi
 %endif # with_clustering_support
 
 %changelog
+* Thu Oct 17 2019 Guenther Deschner <gdeschner@redhat.com> - 4.10.9-0
+- Update to Samba 4.10.9
+
 * Tue Sep 03 2019 Guenther Deschner <gdeschner@redhat.com> - 4.10.8-0
 - Update to Samba 4.10.8
 - resolves: #1746225, #1748308 - Security fixes for CVE-2019-10197
