@@ -8,11 +8,11 @@
 
 %define main_release 0
 
-%define samba_version 4.9.13
+%define samba_version 4.9.14
 %define talloc_version 2.1.14
 %define tdb_version 1.3.16
 %define tevent_version 0.9.37
-%define ldb_version 1.4.7
+%define ldb_version 1.4.8
 # This should be rc1 or nil
 %define pre_release %nil
 
@@ -2194,6 +2194,7 @@ fi
 %{python2_sitearch}/samba/tests/blackbox/traffic_learner.py*
 %{python2_sitearch}/samba/tests/blackbox/traffic_replay.py*
 %{python2_sitearch}/samba/tests/blackbox/traffic_summary.py*
+%{python2_sitearch}/samba/tests/blackbox/undoguididx.py*
 %{python2_sitearch}/samba/tests/common.py*
 %{python2_sitearch}/samba/tests/core.py*
 %{python2_sitearch}/samba/tests/credentials.py*
@@ -2711,6 +2712,7 @@ fi
 %{python3_sitearch}/samba/tests/blackbox/__pycache__/traffic_learner.*.pyc
 %{python3_sitearch}/samba/tests/blackbox/__pycache__/traffic_replay.*.pyc
 %{python3_sitearch}/samba/tests/blackbox/__pycache__/traffic_summary.*.pyc
+%{python3_sitearch}/samba/tests/blackbox/__pycache__/undoguididx.*.pyc
 %{python3_sitearch}/samba/tests/blackbox/bug13653.py
 %{python3_sitearch}/samba/tests/blackbox/check_output.py
 %{python3_sitearch}/samba/tests/blackbox/ndrdump.py
@@ -2719,6 +2721,7 @@ fi
 %{python3_sitearch}/samba/tests/blackbox/traffic_learner.py
 %{python3_sitearch}/samba/tests/blackbox/traffic_replay.py
 %{python3_sitearch}/samba/tests/blackbox/traffic_summary.py
+%{python3_sitearch}/samba/tests/blackbox/undoguididx.py
 %{python3_sitearch}/samba/tests/common.py
 %{python3_sitearch}/samba/tests/core.py
 %{python3_sitearch}/samba/tests/credentials.py
@@ -3119,7 +3122,6 @@ fi
 %{_libexecdir}/ctdb/tests/sock_daemon_test
 %{_libexecdir}/ctdb/tests/sock_io_test
 %{_libexecdir}/ctdb/tests/srvid_test
-%{_libexecdir}/ctdb/tests/test_mutex_raw
 %{_libexecdir}/ctdb/tests/transaction_loop
 %{_libexecdir}/ctdb/tests/tunnel_cmd
 %{_libexecdir}/ctdb/tests/tunnel_test
@@ -3853,6 +3855,9 @@ fi
 %endif # with_clustering_support
 
 %changelog
+* Wed Oct 23 2019 Guenther Deschner <gdeschner@redhat.com> - 4.9.14-0
+- Update to Samba 4.9.14
+
 * Tue Sep 03 2019 Guenther Deschner <gdeschner@redhat.com> - 4.9.13-0
 - Update to Samba 4.9.13
 - resolves: #1746225, #1748308 - Security fixes for CVE-2019-10197
