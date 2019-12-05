@@ -110,7 +110,7 @@ Source1:        https://ftp.samba.org/pub/samba/samba-%{version}%{pre_release}.t
 Source2:        gpgkey-52FBC0B86D954B0843324CDC6F33915B6568B7EA.gpg
 
 # Red Hat specific replacement-files
-Source10:       samba.log
+Source10:       samba.logrotate
 Source11:       smb.conf.vendor
 Source12:       smb.conf.example
 Source13:       pam_winbind.conf
@@ -311,6 +311,7 @@ Summary: Files used by both Samba servers and clients
 BuildArch: noarch
 
 Requires(post): systemd
+Recommends:     logrotate
 
 Provides: samba4-common = %{samba_depver}
 Obsoletes: samba4-common < %{samba_depver}
