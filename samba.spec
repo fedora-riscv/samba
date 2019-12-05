@@ -842,7 +842,7 @@ export LDFLAGS="%{__global_ldflags} -fuse-ld=gold"
         --private-libraries=%{_samba_private_libraries} \
 %endif
         --with-system-mitkrb5 \
-	--with-experimental-mit-ad-dc \
+        --with-experimental-mit-ad-dc \
 %if ! %with_dc
         --without-ad-dc \
 %endif
@@ -944,7 +944,7 @@ install -d -m 0755 %{buildroot}%{_sysconfdir}/sysconfig
 install -m 0644 packaging/systemd/samba.sysconfig %{buildroot}%{_sysconfdir}/sysconfig/samba
 %if %with_clustering_support
 cat > %{buildroot}%{_sysconfdir}/sysconfig/ctdb <<EOF
-# CTDB configuration is now in %{_sysconfdir}/ctdb/ctdb.conf
+# CTDB configuration is now in %%{_sysconfdir}/ctdb/ctdb.conf
 EOF
 
 install -d -m 0755 %{buildroot}%{_sysconfdir}/ctdb
