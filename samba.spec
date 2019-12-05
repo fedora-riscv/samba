@@ -6,7 +6,7 @@
 # ctdb is enabled by default, you can disable it with: --without clustering
 %bcond_without clustering
 
-%define main_release 1
+%define main_release 2
 
 %define samba_version 4.11.2
 %define talloc_version 2.2.0
@@ -3485,6 +3485,9 @@ fi
 %endif # with_clustering_support
 
 %changelog
+* Thu Dec 05 2019 Andreas Schneider <asn@redhat.com> - 4.11.2-2
+- Restart winbindd on samba-winbind package upgrade
+
 * Wed Nov 06 2019 Alexander Bokovoy <abokovoy@redhat.com> - 4.11.2-1
 - Update DES removal patch
 
