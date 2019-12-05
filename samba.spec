@@ -360,6 +360,7 @@ SMB/CIFS clients.
 Summary: Samba AD Domain Controller
 Requires: %{name} = %{samba_depver}
 Requires: %{name}-libs = %{samba_depver}
+Requires: %{name}-dc-provision = %{samba_depver}
 Requires: %{name}-dc-libs = %{samba_depver}
 Requires: %{name}-winbind = %{samba_depver}
 # samba-tool needs tdbbackup
@@ -382,6 +383,14 @@ Obsoletes: samba4-dc < %{samba_depver}
 
 %description dc
 The samba-dc package provides AD Domain Controller functionality
+
+### DC-PROVISION
+%package dc-provision
+Summary: Samba AD files to provision a DC
+BuildArch: noarch
+
+%description dc-provision
+The samba-dc-provision package provides files to setup a domoin controller
 
 ### DC-LIBS
 %package dc-libs
@@ -1623,11 +1632,13 @@ fi
 %{_libdir}/samba/ldb/wins_ldb.so
 %{_libdir}/samba/vfs/posix_eadb.so
 %dir /var/lib/samba/sysvol
-%{_datadir}/samba/setup
 %{_mandir}/man8/samba.8*
 %{_mandir}/man8/samba_downgrade_db.8*
 %{_mandir}/man8/samba-gpupdate.8*
 %{_mandir}/man8/samba-tool.8*
+
+%files dc-provision
+%{_datadir}/samba/setup
 
 ### DC-LIBS
 %files dc-libs
