@@ -1409,6 +1409,7 @@ fi
 %dir %{_libdir}/samba
 %{_libdir}/samba/libCHARSET3-samba4.so
 %{_libdir}/samba/libMESSAGING-SEND-samba4.so
+%{_libdir}/samba/libMESSAGING-samba4.so
 %{_libdir}/samba/libaddns-samba4.so
 %{_libdir}/samba/libads-samba4.so
 %{_libdir}/samba/libasn1util-samba4.so
@@ -1817,7 +1818,6 @@ fi
 %files libs
 %{_libdir}/libdcerpc-samr.so.*
 
-%{_libdir}/samba/libMESSAGING-samba4.so
 %{_libdir}/samba/libLIBWBCLIENT-OLD-samba4.so
 %{_libdir}/samba/libauth4-samba4.so
 %{_libdir}/samba/libauth-unix-token-samba4.so
