@@ -1339,6 +1339,7 @@ fi
 
 ### CLIENT
 %files client
+%doc source3/client/README.smbspool
 %{_bindir}/cifsdd
 %{_bindir}/dbwrap_tool
 %{_bindir}/dumpmscat
@@ -1855,6 +1856,7 @@ fi
 
 ### PIDL
 %files pidl
+%doc pidl/README
 %attr(755,root,root) %{_bindir}/pidl
 %dir %{perl_vendorlib}/Parse
 %attr(644,root,root) %{perl_vendorlib}/Parse/Pidl.pm
