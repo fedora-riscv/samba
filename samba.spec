@@ -871,7 +871,7 @@ export LDFLAGS="%{__global_ldflags} -fuse-ld=gold"
 make %{?_smp_mflags}
 
 pushd pidl
-%__perl Makefile.PL PREFIX=%{_prefix} INSTALLSITELIB=%{perl_vendorlib}
+%__perl Makefile.PL PREFIX=%{_prefix}
 
 make %{?_smp_mflags}
 popd
@@ -1045,13 +1045,13 @@ done
 %endif # ! with_dc
 
 pushd pidl
-make DESTDIR=%{buildroot} install
+make DESTDIR=%{buildroot} install_vendor
 
 rm -f %{buildroot}%{perl_archlib}/perllocal.pod
-rm -f %{buildroot}%{perl_vendorlib}/auto/Parse/Pidl/.packlist
+rm -f %{buildroot}%{perl_archlib}/vendor_perl/auto/Parse/Pidl/.packlist
 
-# packaged by Parse:Yapp
-rm -f %{buildroot}%{perl_vendorlib}/Parse/Yapp/Driver.pm
+# Already packaged by perl Parse:Yapp
+rm -rf %{buildroot}%{perl_vendorlib}/Parse/Yapp
 popd
 
 %if %{with testsuite}
@@ -1856,45 +1856,44 @@ fi
 %files pidl
 %attr(755,root,root) %{_bindir}/pidl
 %dir %{perl_vendorlib}/Parse
-%{perl_vendorlib}/Parse/Pidl.pm
+%attr(644,root,root) %{perl_vendorlib}/Parse/Pidl.pm
 %dir %{perl_vendorlib}/Parse/Pidl
-%{perl_vendorlib}/Parse/Pidl/CUtil.pm
-%{perl_vendorlib}/Parse/Pidl/Samba4.pm
-%{perl_vendorlib}/Parse/Pidl/Expr.pm
-%{perl_vendorlib}/Parse/Pidl/ODL.pm
-%{perl_vendorlib}/Parse/Pidl/Typelist.pm
-%{perl_vendorlib}/Parse/Pidl/IDL.pm
-%{perl_vendorlib}/Parse/Pidl/Compat.pm
+%attr(644,root,root) %{perl_vendorlib}/Parse/Pidl/CUtil.pm
+%attr(644,root,root) %{perl_vendorlib}/Parse/Pidl/Samba4.pm
+%attr(644,root,root) %{perl_vendorlib}/Parse/Pidl/Expr.pm
+%attr(644,root,root) %{perl_vendorlib}/Parse/Pidl/ODL.pm
+%attr(644,root,root) %{perl_vendorlib}/Parse/Pidl/Typelist.pm
+%attr(644,root,root) %{perl_vendorlib}/Parse/Pidl/IDL.pm
+%attr(644,root,root) %{perl_vendorlib}/Parse/Pidl/Compat.pm
 %dir %{perl_vendorlib}/Parse/Pidl/Wireshark
-%{perl_vendorlib}/Parse/Pidl/Wireshark/Conformance.pm
-%{perl_vendorlib}/Parse/Pidl/Wireshark/NDR.pm
-%{perl_vendorlib}/Parse/Pidl/Dump.pm
+%attr(644,root,root) %{perl_vendorlib}/Parse/Pidl/Wireshark/Conformance.pm
+%attr(644,root,root) %{perl_vendorlib}/Parse/Pidl/Wireshark/NDR.pm
+%attr(644,root,root) %{perl_vendorlib}/Parse/Pidl/Dump.pm
 %dir %{perl_vendorlib}/Parse/Pidl/Samba3
-%{perl_vendorlib}/Parse/Pidl/Samba3/ServerNDR.pm
-%{perl_vendorlib}/Parse/Pidl/Samba3/ClientNDR.pm
-%{perl_vendorlib}/Parse/Pidl/Samba3/Template.pm
+%attr(644,root,root) %{perl_vendorlib}/Parse/Pidl/Samba3/ServerNDR.pm
+%attr(644,root,root) %{perl_vendorlib}/Parse/Pidl/Samba3/ClientNDR.pm
+%attr(644,root,root) %{perl_vendorlib}/Parse/Pidl/Samba3/Template.pm
 %dir %{perl_vendorlib}/Parse/Pidl/Samba4
-%{perl_vendorlib}/Parse/Pidl/Samba4/Header.pm
+%attr(644,root,root) %{perl_vendorlib}/Parse/Pidl/Samba4/Header.pm
 %dir %{perl_vendorlib}/Parse/Pidl/Samba4/COM
-%{perl_vendorlib}/Parse/Pidl/Samba4/COM/Header.pm
-%{perl_vendorlib}/Parse/Pidl/Samba4/COM/Proxy.pm
-%{perl_vendorlib}/Parse/Pidl/Samba4/COM/Stub.pm
-%{perl_vendorlib}/Parse/Pidl/Samba4/Python.pm
-%{perl_vendorlib}/Parse/Pidl/Samba4/Template.pm
+%attr(644,root,root) %{perl_vendorlib}/Parse/Pidl/Samba4/COM/Header.pm
+%attr(644,root,root) %{perl_vendorlib}/Parse/Pidl/Samba4/COM/Proxy.pm
+%attr(644,root,root) %{perl_vendorlib}/Parse/Pidl/Samba4/COM/Stub.pm
+%attr(644,root,root) %{perl_vendorlib}/Parse/Pidl/Samba4/Python.pm
+%attr(644,root,root) %{perl_vendorlib}/Parse/Pidl/Samba4/Template.pm
 %dir %{perl_vendorlib}/Parse/Pidl/Samba4/NDR
-%{perl_vendorlib}/Parse/Pidl/Samba4/NDR/Server.pm
-%{perl_vendorlib}/Parse/Pidl/Samba4/NDR/Client.pm
-%{perl_vendorlib}/Parse/Pidl/Samba4/NDR/Parser.pm
-%{perl_vendorlib}/Parse/Pidl/Samba4/TDR.pm
-%{perl_vendorlib}/Parse/Pidl/NDR.pm
-%{perl_vendorlib}/Parse/Pidl/Util.pm
-%dir %{perl_vendorlib}/Parse/Yapp
-%{_mandir}/man1/pidl.1*
-%{_mandir}/man3/Parse::Pidl::Dump.3pm*
-%{_mandir}/man3/Parse::Pidl::NDR.3pm*
-%{_mandir}/man3/Parse::Pidl::Util.3pm*
-%{_mandir}/man3/Parse::Pidl::Wireshark::Conformance.3pm*
-%{_mandir}/man3/Parse::Pidl::Wireshark::NDR.3pm*
+%attr(644,root,root) %{perl_vendorlib}/Parse/Pidl/Samba4/NDR/Server.pm
+%attr(644,root,root) %{perl_vendorlib}/Parse/Pidl/Samba4/NDR/Client.pm
+%attr(644,root,root) %{perl_vendorlib}/Parse/Pidl/Samba4/NDR/Parser.pm
+%attr(644,root,root) %{perl_vendorlib}/Parse/Pidl/Samba4/TDR.pm
+%attr(644,root,root) %{perl_vendorlib}/Parse/Pidl/NDR.pm
+%attr(644,root,root) %{perl_vendorlib}/Parse/Pidl/Util.pm
+%attr(644,root,root) %{_mandir}/man1/pidl.1*
+%attr(644,root,root) %{_mandir}/man3/Parse::Pidl::Dump.3pm*
+%attr(644,root,root) %{_mandir}/man3/Parse::Pidl::NDR.3pm*
+%attr(644,root,root) %{_mandir}/man3/Parse::Pidl::Util.3pm*
+%attr(644,root,root) %{_mandir}/man3/Parse::Pidl::Wireshark::Conformance.3pm*
+%attr(644,root,root) %{_mandir}/man3/Parse::Pidl::Wireshark::NDR.3pm*
 
 ### PYTHON3
 %files -n python3-%{name}
