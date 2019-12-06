@@ -165,6 +165,7 @@ BuildRequires: docbook-style-xsl
 BuildRequires: e2fsprogs-devel
 BuildRequires: gawk
 BuildRequires: gnupg2
+BuildRequires: gnutls-devel >= 3.4.7
 BuildRequires: gpgme-devel
 BuildRequires: jansson-devel
 BuildRequires: krb5-devel >= %{required_mit_krb5}
@@ -188,12 +189,6 @@ BuildRequires: perl(Archive::Tar)
 BuildRequires: perl(Test::More)
 BuildRequires: popt-devel
 BuildRequires: python3-devel
-%if %{with_dc}
-# Add python3-iso8601 to avoid that the
-# version in Samba is being packaged
-BuildRequires: python3-iso8601
-BuildRequires: python3-subunit-test
-%endif # with_dc
 BuildRequires: quota-devel
 BuildRequires: readline-devel
 BuildRequires: rpcgen
@@ -218,15 +213,16 @@ BuildRequires: libcephfs-devel
 %endif
 
 %if %{with_dc}
-BuildRequires: bind
-BuildRequires: gnutls-devel >= 3.4.7
-BuildRequires: krb5-server >= %{required_mit_krb5}
-
+# Add python3-iso8601 to avoid that the
+# version in Samba is being packaged
+BuildRequires: python3-iso8601
+BuildRequires: python3-subunit-test
 # Required by samba-tool to run tests
 BuildRequires: python3-crypto
-%else
-BuildRequires: gnutls-devel >= 3.2.0
-%endif
+
+BuildRequires: bind
+BuildRequires: krb5-server >= %{required_mit_krb5}
+%endif # with_dc
 
 # pidl requirements
 BuildRequires: perl(ExtUtils::MakeMaker)
