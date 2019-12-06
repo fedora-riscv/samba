@@ -41,7 +41,9 @@
 %if 0%{?fedora}
 %ifarch aarch64 ppc64le s390x x86_64
 %global with_vfs_cephfs 1
+#endifarch
 %endif
+#endif fedora
 %endif
 
 %global with_vfs_glusterfs 1
@@ -50,7 +52,9 @@
 # Only enable on x86_64
 %ifarch x86_64
 %global with_vfs_glusterfs 1
+#endif arch
 %endif
+#endif rhel
 %endif
 
 %global with_intel_aes_accel 0
@@ -222,7 +226,8 @@ BuildRequires: python3-crypto
 
 BuildRequires: bind
 BuildRequires: krb5-server >= %{required_mit_krb5}
-%endif # with_dc
+#endif with_dc
+%endif
 
 # pidl requirements
 BuildRequires: perl(ExtUtils::MakeMaker)
@@ -412,7 +417,8 @@ Requires: bind
 %description dc-bind-dlz
 The %{name}-dc-bind-dlz package contains the libraries for bind to manage all
 name server related details of Samba AD.
-%endif # with_dc
+#endif with_dc
+%endif
 
 ### DEVEL
 %package devel
@@ -437,6 +443,7 @@ Requires: %{name}-libs = %{samba_depver}
 
 %description vfs-cephfs
 Samba VFS module for Ceph distributed storage system integration.
+#endif with_vfs_cephfs
 %endif
 
 ### GLUSTER
@@ -514,7 +521,8 @@ Requires: libsmbclient = %{samba_depver}
 The libsmbclient-devel package contains the header files and libraries needed
 to develop programs that link against the SMB client library in the Samba
 suite.
-%endif # with_libsmbclient
+#endif with_libsmbclient
+%endif
 
 ### LIBWBCLIENT
 %if %with_libwbclient
@@ -536,7 +544,8 @@ Obsoletes: samba-winbind-devel < %{samba_depver}
 %description -n libwbclient-devel
 The libwbclient-devel package provides developer tools for the wbclient
 library.
-%endif # with_libwbclient
+#endif with_libwbclient
+%endif
 
 ### PYTHON3
 %package -n python3-%{name}
@@ -780,7 +789,8 @@ CTDB is a cluster implementation of the TDB database used by Samba and other
 projects to store temporary data. If an application is already using TDB for
 temporary data it is very easy to convert that application to be cluster aware
 and use CTDB instead.
-%endif # with_clustering_support
+#endif with_clustering_support
+%endif
 
 
 
@@ -1048,7 +1058,8 @@ for f in samba/libsamba-net-samba4.so \
          pkgconfig/samba-policy.pc ; do
     rm -f %{buildroot}%{_libdir}/$f
 done
-%endif # ! with_dc
+#endif ! with_dc
+%endif
 
 pushd pidl
 make DESTDIR=%{buildroot} install_vendor
@@ -1063,7 +1074,8 @@ popd
 %if %{with testsuite}
 %check
 TDB_NO_FSYNC=1 make %{?_smp_mflags} test
-%endif # with testsuite
+#endif with testsuite
+%endif
 
 %post
 %systemd_post smb.service
@@ -1115,7 +1127,8 @@ fi
 
 %postun dc
 %systemd_postun_with_restart samba.service
-%endif # with_dc
+#endif with_dc
+%endif
 
 %post krb5-printing
 %{_sbindir}/update-alternatives --install %{_libexecdir}/samba/cups_backend_smb \
@@ -1171,7 +1184,8 @@ else
     %{_sbindir}/update-alternatives --remove libwbclient.so%{libwbc_alternatives_suffix} %{_libdir}/samba/wbclient/libwbclient.so
 fi
 
-%endif # with_libwbclient
+#endif with_libwbclient
+%endif
 
 %ldconfig_scriptlets test
 
@@ -1498,12 +1512,14 @@ fi
 %if ! %with_libwbclient
 %{_libdir}/samba/libwbclient.so.*
 %{_libdir}/samba/libwinbind-client-samba4.so
-%endif # ! with_libwbclient
+#endif ! with_libwbclient
+%endif
 
 %if ! %with_libsmbclient
 %{_libdir}/samba/libsmbclient.so.*
 %{_mandir}/man7/libsmbclient.7*
-%endif # ! with_libsmbclient
+#endif ! with_libsmbclient
+%endif
 
 ### COMMON
 %files common
@@ -1673,7 +1689,8 @@ fi
 %{_libdir}/samba/bind9/dlz_bind9_10.so
 %{_libdir}/samba/bind9/dlz_bind9_11.so
 %{_libdir}/samba/bind9/dlz_bind9_12.so
-%endif # with_dc
+#endif with_dc
+%endif
 
 ### DEVEL
 %files devel
@@ -1796,11 +1813,13 @@ fi
 
 %if ! %with_libsmbclient
 %{_includedir}/samba-4.0/libsmbclient.h
-%endif # ! with_libsmbclient
+#endif ! with_libsmbclient
+%endif
 
 %if ! %with_libwbclient
 %{_includedir}/samba-4.0/wbclient.h
-%endif # ! with_libwbclient
+#endif ! with_libwbclient
+%endif
 
 ### VFS-CEPHFS
 %if %{with_vfs_cephfs}
@@ -1846,7 +1865,8 @@ fi
 %{_libdir}/libsmbclient.so
 %{_libdir}/pkgconfig/smbclient.pc
 %{_mandir}/man7/libsmbclient.7*
-%endif # with_libsmbclient
+#endif with_libsmbclient
+%endif
 
 ### LIBWBCLIENT
 %if %with_libwbclient
@@ -1859,7 +1879,8 @@ fi
 %{_includedir}/samba-4.0/wbclient.h
 %{_libdir}/samba/wbclient/libwbclient.so
 %{_libdir}/pkgconfig/wbclient.pc
-%endif # with_libwbclient
+#endif with_libwbclient
+%endif
 
 ### PIDL
 %files pidl
@@ -3492,7 +3513,8 @@ fi
 %dir %{_datadir}/ctdb/tests/tool/scripts
 %{_datadir}/ctdb/tests/tool/scripts/local.sh
 
-%endif # with_clustering_support
+#endif with_clustering_support
+%endif
 
 %changelog
 * Thu Dec 05 2019 Andreas Schneider <asn@redhat.com> - 4.11.2-2
