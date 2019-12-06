@@ -106,7 +106,7 @@ Epoch:          2
 
 Summary:        Server and Client software to interoperate with Windows machines
 License:        GPLv3+ and LGPLv3+
-URL:            http://www.samba.org/
+URL:            https://www.samba.org
 
 # This is a xz recompressed file of https://ftp.samba.org/pub/samba/samba-%%{version}%%{pre_release}.tar.gz
 Source0:        https://ftp.samba.org/pub/samba/samba-%{version}%{pre_release}.tar.gz#/samba-%{version}%{pre_release}.tar.xz
@@ -1650,6 +1650,7 @@ fi
 %{_mandir}/man8/samba-tool.8*
 
 %files dc-provision
+%license source4/setup/ad-schema/licence.txt
 %{_datadir}/samba/setup
 
 ### DC-LIBS
