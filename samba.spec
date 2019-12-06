@@ -621,7 +621,7 @@ Requires: libsmbclient = %{samba_depver}
 %if %with_libwbclient
 Requires: libwbclient = %{samba_depver}
 %endif
-Requires: python3-%{name} = %{version}-%{release}
+Requires: python3-%{name} = %{samba_depver}
 Requires: perl(Archive::Tar)
 
 Provides: samba4-test = %{samba_depver}
