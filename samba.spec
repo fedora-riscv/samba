@@ -6,9 +6,9 @@
 # ctdb is enabled by default, you can disable it with: --without clustering
 %bcond_without clustering
 
-%define main_release 2
+%define main_release 0
 
-%define samba_version 4.11.2
+%define samba_version 4.11.3
 %define talloc_version 2.2.0
 %define tdb_version 1.4.2
 %define tevent_version 0.10.0
@@ -3518,6 +3518,11 @@ fi
 %endif
 
 %changelog
+* Tue Dec 10 2019 Guenther Deschner <gdeschner@redhat.com> - 4.11.3-0
+- Update to Samba 4.11.3
+- resolves: #1778586, #1781542 - Security fixes for CVE-2019-14861
+- resolves: #1778589, #1781545 - Security fixes for CVE-2019-14870
+
 * Thu Dec 05 2019 Andreas Schneider <asn@redhat.com> - 4.11.2-2
 - Restart winbindd on samba-winbind package upgrade
 
