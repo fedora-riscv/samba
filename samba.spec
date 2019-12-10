@@ -8,7 +8,7 @@
 
 %define main_release 0
 
-%define samba_version 4.10.10
+%define samba_version 4.10.11
 %define talloc_version 2.1.16
 %define tdb_version 1.3.18
 %define tevent_version 0.9.39
@@ -3408,6 +3408,11 @@ fi
 %endif # with_clustering_support
 
 %changelog
+* Tue Dec 10 2019 Guenther Deschner <gdeschner@redhat.com> - 4.10.11-0
+- Update to Samba 4.10.11
+- resolves: #1778586, #1781542 - Security fixes for CVE-2019-14861
+- resolves: #1778589, #1781545 - Security fixes for CVE-2019-14870
+
 * Tue Oct 29 2019 Guenther Deschner <gdeschner@redhat.com> - 4.10.10-0
 - Update to Samba 4.10.10
 - resolves: #1763137, #1766558 - Security fixes for CVE-2019-10218
