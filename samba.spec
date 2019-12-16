@@ -8,11 +8,11 @@
 
 %define main_release 0
 
-%define samba_version 4.11.3
+%define samba_version 4.11.4
 %define talloc_version 2.2.0
 %define tdb_version 1.4.2
 %define tevent_version 0.10.0
-%define ldb_version 2.0.7
+%define ldb_version 2.0.8
 # This should be rc1 or nil
 %define pre_release %nil
 
@@ -2315,6 +2315,7 @@ fi
 %{python3_sitearch}/samba/tests/__pycache__/segfault.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/smb.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/smbd_base.*.pyc
+%{python3_sitearch}/samba/tests/__pycache__/smbd_fuzztest.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/source.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/strings.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/subunitrun.*.pyc
@@ -2560,6 +2561,7 @@ fi
 %{python3_sitearch}/samba/tests/segfault.py
 %{python3_sitearch}/samba/tests/smb.py
 %{python3_sitearch}/samba/tests/smbd_base.py
+%{python3_sitearch}/samba/tests/smbd_fuzztest.py
 %{python3_sitearch}/samba/tests/source.py
 %{python3_sitearch}/samba/tests/strings.py
 %{python3_sitearch}/samba/tests/subunitrun.py
@@ -3518,6 +3520,9 @@ fi
 %endif
 
 %changelog
+* Mon Dec 16 2019 Guenther Deschner <gdeschner@redhat.com> - 4.11.4-0
+- Update to Samba 4.11.4
+
 * Tue Dec 10 2019 Guenther Deschner <gdeschner@redhat.com> - 4.11.3-0
 - Update to Samba 4.11.3
 - resolves: #1778586, #1781542 - Security fixes for CVE-2019-14861
