@@ -1159,10 +1159,12 @@ fi
 %{?ldconfig}
 
 %preun -n libwbclient
-%{_sbindir}/update-alternatives \
-        --remove \
-        libwbclient.so.%{libwbc_alternatives_version}%{libwbc_alternatives_suffix} \
-        %{_libdir}/samba/wbclient/libwbclient.so.%{libwbc_alternatives_version}
+if [ $1 -eq 0 ]; then
+    %{_sbindir}/update-alternatives \
+            --remove \
+            libwbclient.so.%{libwbc_alternatives_version}%{libwbc_alternatives_suffix} \
+            %{_libdir}/samba/wbclient/libwbclient.so.%{libwbc_alternatives_version}
+fi
 /sbin/ldconfig
 
 %posttrans -n libwbclient-devel
@@ -1178,10 +1180,17 @@ fi
 # When downgrading to a version where alternatives is not used and
 # libwbclient.so is a link and not a file it will be removed. The following
 # check removes the alternatives files manually if that is the case.
-if [ "`readlink %{_libdir}/libwbclient.so`" == "libwbclient.so.%{libwbc_alternatives_version}" ]; then
-    /bin/rm -f /etc/alternatives/libwbclient.so%{libwbc_alternatives_suffix} /var/lib/alternatives/libwbclient.so%{libwbc_alternatives_suffix} 2> /dev/null
-else
-    %{_sbindir}/update-alternatives --remove libwbclient.so%{libwbc_alternatives_suffix} %{_libdir}/samba/wbclient/libwbclient.so
+if [ $1 -eq 0 ]; then
+    if [ "`readlink %{_libdir}/libwbclient.so`" == "libwbclient.so.%{libwbc_alternatives_version}" ]; then
+        /bin/rm -f \
+            /etc/alternatives/libwbclient.so%{libwbc_alternatives_suffix} \
+            /var/lib/alternatives/libwbclient.so%{libwbc_alternatives_suffix} 2> /dev/null
+    else
+        %{_sbindir}/update-alternatives \
+            --remove \
+            libwbclient.so%{libwbc_alternatives_suffix} \
+            %{_libdir}/samba/wbclient/libwbclient.so
+    fi
 fi
 
 #endif with_libwbclient
