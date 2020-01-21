@@ -391,7 +391,7 @@ Summary: Samba AD files to provision a DC
 BuildArch: noarch
 
 %description dc-provision
-The samba-dc-provision package provides files to setup a domoin controller
+The samba-dc-provision package provides files to setup a domain controller
 
 ### DC-LIBS
 %package dc-libs
