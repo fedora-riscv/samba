@@ -6,7 +6,7 @@
 # ctdb is enabled by default, you can disable it with: --without clustering
 %bcond_without clustering
 
-%define main_release 0
+%define main_release 1
 
 %define samba_version 4.11.5
 %define talloc_version 2.2.0
@@ -125,6 +125,7 @@ Source201:      README.downgrade
 Patch100:       0000-use-gnutls-for-des-cbc.patch
 Patch101:       0001-handle-removal-des-enctypes-from-krb5.patch
 Patch102:       0002-samba-tool-create-working-private-krb5.conf.patch
+Patch103:       new_mit_118.patch
 
 Requires(pre): /usr/sbin/groupadd
 Requires(post): systemd
