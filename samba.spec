@@ -8,7 +8,7 @@
 
 %define main_release 0
 
-%define samba_version 4.11.4
+%define samba_version 4.11.5
 %define talloc_version 2.2.0
 %define tdb_version 1.4.2
 %define tevent_version 0.10.0
@@ -3529,6 +3529,12 @@ fi
 %endif
 
 %changelog
+* Tue Jan 21 2020 Guenther Deschner <gdeschner@redhat.com> - 4.11.5-0
+- Update to Samba 4.11.5
+- resolves: #1791201, #1793405 - Security fixes for CVE-2019-14902
+- resolves: #1791207, #1793407 - Security fixes for CVE-2019-14907
+- resolves: #1791204, #1793406 - Security fixes for CVE-2019-19344
+
 * Mon Dec 16 2019 Guenther Deschner <gdeschner@redhat.com> - 4.11.4-0
 - Update to Samba 4.11.4
 
