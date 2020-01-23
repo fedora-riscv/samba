@@ -1074,7 +1074,7 @@ popd
 
 %if %{with testsuite}
 %check
-TDB_NO_FSYNC=1 make %{?_smp_mflags} test
+TDB_NO_FSYNC=1 make %{?_smp_mflags} test FAIL_IMMEDIATELY=1
 #endif with testsuite
 %endif
 
