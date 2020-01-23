@@ -8,7 +8,7 @@
 
 %define main_release 0
 
-%define samba_version 4.10.12
+%define samba_version 4.10.13
 %define talloc_version 2.1.16
 %define tdb_version 1.3.18
 %define tevent_version 0.9.39
@@ -2223,11 +2223,13 @@ fi
 %{python3_sitearch}/samba/tests/__pycache__/s3registry.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/s3windb.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/samba3sam.*.pyc
+%{python3_sitearch}/samba/tests/__pycache__/samba_upgradedns_lmdb.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/samdb.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/samdb_api.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/security.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/smb.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/smbd_base.*.pyc
+%{python3_sitearch}/samba/tests/__pycache__/smbd_fuzztest.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/source.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/strings.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/subunitrun.*.pyc
@@ -2401,6 +2403,7 @@ fi
 %{python3_sitearch}/samba/tests/s3registry.py
 %{python3_sitearch}/samba/tests/s3windb.py
 %{python3_sitearch}/samba/tests/samba3sam.py
+%{python3_sitearch}/samba/tests/samba_upgradedns_lmdb.py
 %dir %{python3_sitearch}/samba/tests/samba_tool
 %{python3_sitearch}/samba/tests/samba_tool/__init__.py
 %dir %{python3_sitearch}/samba/tests/samba_tool/__pycache__
@@ -2460,6 +2463,7 @@ fi
 %{python3_sitearch}/samba/tests/security.py
 %{python3_sitearch}/samba/tests/smb.py
 %{python3_sitearch}/samba/tests/smbd_base.py
+%{python3_sitearch}/samba/tests/smbd_fuzztest.py
 %{python3_sitearch}/samba/tests/source.py
 %{python3_sitearch}/samba/tests/strings.py
 %{python3_sitearch}/samba/tests/subunitrun.py
@@ -3417,6 +3421,9 @@ fi
 %endif # with_clustering_support
 
 %changelog
+* Thu Jan 23 2020 Guenther Deschner <gdeschner@redhat.com> - 4.10.13-0
+- Update to Samba 4.10.13
+
 * Tue Jan 21 2020 Guenther Deschner <gdeschner@redhat.com> - 4.10.12-0
 - Update to Samba 4.10.12
 - resolves: #1791201, #1793405 - Security fixes for CVE-2019-14902
