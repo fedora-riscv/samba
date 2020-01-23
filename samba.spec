@@ -6,7 +6,7 @@
 # ctdb is enabled by default, you can disable it with: --without clustering
 %bcond_without clustering
 
-%define main_release 0
+%define main_release 1
 
 %define samba_version 4.12.0
 %define talloc_version 2.3.1
@@ -78,7 +78,7 @@
 %global with_dc 1
 %endif
 
-%global required_mit_krb5 1.15.1
+%global required_mit_krb5 1.18
 
 %global with_clustering_support 0
 
@@ -3538,6 +3538,9 @@ fi
 %endif
 
 %changelog
+* Fri Jan 24 2020 Alexander Bokovoy <abokovoy@redhat.com> - 4.12.0.rc1-1
+- Allow building against krb5 1.18 beta and require it for Rawhide
+
 * Wed Jan 22 2020 Guenther Deschner <gdeschner@redhat.com> - 4.12.0rc1-0
 - Update to Samba 4.12.0rc1
 
