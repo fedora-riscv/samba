@@ -78,7 +78,7 @@
 %global with_dc 1
 %endif
 
-%global required_mit_krb5 1.15.1
+%global required_mit_krb5 1.18
 
 %global with_clustering_support 0
 
@@ -3530,6 +3530,9 @@ fi
 %endif
 
 %changelog
+* Thu Jan 23 2020 Alexander Bokovoy <abokovoy@redhat.com> - 4.11.5-1
+- Allow building against krb5 1.18 beta and require it for Rawhide
+
 * Tue Jan 21 2020 Guenther Deschner <gdeschner@redhat.com> - 4.11.5-0
 - Update to Samba 4.11.5
 - resolves: #1791201, #1793405 - Security fixes for CVE-2019-14902
