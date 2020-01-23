@@ -161,10 +161,12 @@ Obsoletes: samba4-swat < %{samba_depver}
 
 BuildRequires: gcc
 BuildRequires: avahi-devel
+BuildRequires: bison
 BuildRequires: cups-devel
 BuildRequires: dbus-devel
 BuildRequires: docbook-style-xsl
 BuildRequires: e2fsprogs-devel
+BuildRequires: flex
 BuildRequires: gawk
 BuildRequires: gnupg2
 BuildRequires: gnutls-devel >= 3.4.7
@@ -176,6 +178,7 @@ BuildRequires: libaio-devel
 BuildRequires: libarchive-devel
 BuildRequires: libattr-devel
 BuildRequires: libcap-devel
+BuildRequires: libicu-devel
 BuildRequires: libcmocka-devel
 BuildRequires: libnsl2-devel
 BuildRequires: libtirpc-devel
