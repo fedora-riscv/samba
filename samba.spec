@@ -221,9 +221,6 @@ BuildRequires: libcephfs-devel
 # Add python3-iso8601 to avoid that the
 # version in Samba is being packaged
 BuildRequires: python3-iso8601
-BuildRequires: python3-subunit-test
-# Required by samba-tool to run tests
-BuildRequires: python3-crypto
 
 BuildRequires: bind
 BuildRequires: krb5-server >= %{required_mit_krb5}
