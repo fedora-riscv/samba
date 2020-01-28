@@ -8,7 +8,7 @@
 
 %define main_release 0
 
-%define samba_version 4.11.5
+%define samba_version 4.11.6
 %define talloc_version 2.2.0
 %define tdb_version 1.4.2
 %define tevent_version 0.10.0
@@ -2315,6 +2315,7 @@ fi
 %{python3_sitearch}/samba/tests/__pycache__/s3registry.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/s3windb.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/samba3sam.*.pyc
+%{python3_sitearch}/samba/tests/__pycache__/samba_upgradedns_lmdb.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/samdb.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/samdb_api.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/security.*.pyc
@@ -2495,6 +2496,7 @@ fi
 %{python3_sitearch}/samba/tests/s3registry.py
 %{python3_sitearch}/samba/tests/s3windb.py
 %{python3_sitearch}/samba/tests/samba3sam.py
+%{python3_sitearch}/samba/tests/samba_upgradedns_lmdb.py
 %dir %{python3_sitearch}/samba/tests/samba_tool
 %{python3_sitearch}/samba/tests/samba_tool/__init__.py
 %dir %{python3_sitearch}/samba/tests/samba_tool/__pycache__
@@ -3526,6 +3528,9 @@ fi
 %endif
 
 %changelog
+* Tue Jan 28 2020 Guenther Deschner <gdeschner@redhat.com> - 4.11.6-0
+- Update to Samba 4.11.6
+
 * Tue Jan 21 2020 Guenther Deschner <gdeschner@redhat.com> - 4.11.5-0
 - Update to Samba 4.11.5
 - resolves: #1791201, #1793405 - Security fixes for CVE-2019-14902
