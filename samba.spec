@@ -90,7 +90,7 @@
 
 Name:           samba
 Version:        %{samba_version}
-Release:        %{samba_release}
+Release:        %{samba_release}.1
 
 %if 0%{?rhel}
 Epoch:          0
@@ -3538,6 +3538,9 @@ fi
 %endif
 
 %changelog
+* Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2:4.12.0-0.1.rc1.1
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
+
 * Fri Jan 24 2020 Alexander Bokovoy <abokovoy@redhat.com> - 4.12.0.rc1-1
 - Allow building against krb5 1.18 beta and require it for Rawhide
 
