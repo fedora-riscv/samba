@@ -6,7 +6,7 @@
 # ctdb is enabled by default, you can disable it with: --without clustering
 %bcond_without clustering
 
-%define main_release 1
+%define main_release 2
 
 %define samba_version 4.12.0
 %define talloc_version 2.3.1
@@ -14,7 +14,7 @@
 %define tevent_version 0.10.2
 %define ldb_version 2.1.0
 # This should be rc1 or nil
-%define pre_release rc1
+%define pre_release rc2
 
 %if "x%{?pre_release}" != "x"
 %define samba_release 0.%{main_release}.%{pre_release}%{?dist}
@@ -3538,6 +3538,9 @@ fi
 %endif
 
 %changelog
+* Tue Feb 04 2020 Guenther Deschner <gdeschner@redhat.com> - 4.12.0rc2-2
+- Update to Samba 4.12.0rc2
+
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2:4.12.0-0.1.rc1.1
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
 
