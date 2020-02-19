@@ -14,7 +14,7 @@
 %define tevent_version 0.10.2
 %define ldb_version 2.1.0
 # This should be rc1 or nil
-%define pre_release rc2
+%define pre_release rc3
 
 %if "x%{?pre_release}" != "x"
 %define samba_release 0.%{main_release}.%{pre_release}%{?dist}
@@ -55,11 +55,6 @@
 #endif arch
 %endif
 #endif rhel
-%endif
-
-%global with_intel_aes_accel 0
-%ifarch x86_64
-%global with_intel_aes_accel 1
 %endif
 
 %global libwbc_alternatives_version 0.15
@@ -871,9 +866,6 @@ export LDFLAGS="%{__global_ldflags} -fuse-ld=gold"
 %if %{with testsuite}
         --enable-selftest \
 %endif
-%if %with_intel_aes_accel
-        --accel-aes=intelaesni \
-%endif
         --with-systemd \
         --systemd-install-services \
         --with-systemddir=/usr/lib/systemd/system \
@@ -1558,9 +1550,6 @@ fi
 # common libraries
 %{_libdir}/samba/libpopt-samba3-cmdline-samba4.so
 %{_libdir}/samba/libpopt-samba3-samba4.so
-%if %{with_intel_aes_accel}
-#%{_libdir}/samba/libaesni-intel-samba4.so
-%endif
 
 %dir %{_libdir}/samba/ldb
 
@@ -3538,6 +3527,9 @@ fi
 %endif
 
 %changelog
+* Wed Feb 19 2020 Guenther Deschner <gdeschner@redhat.com> - 4.12.0rc3-2
+- Update to Samba 4.12.0rc3
+
 * Tue Feb 04 2020 Guenther Deschner <gdeschner@redhat.com> - 4.12.0rc2-2
 - Update to Samba 4.12.0rc2
 
