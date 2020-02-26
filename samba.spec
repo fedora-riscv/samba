@@ -12,9 +12,9 @@
 %define talloc_version 2.3.1
 %define tdb_version 1.4.3
 %define tevent_version 0.10.2
-%define ldb_version 2.1.0
+%define ldb_version 2.1.1
 # This should be rc1 or nil
-%define pre_release rc3
+%define pre_release rc4
 
 %if "x%{?pre_release}" != "x"
 %define samba_release 0.%{main_release}.%{pre_release}%{?dist}
@@ -3527,6 +3527,9 @@ fi
 %endif
 
 %changelog
+* Wed Feb 26 2020 Guenther Deschner <gdeschner@redhat.com> - 4.12.0rc4-2
+- Update to Samba 4.12.0rc4
+
 * Wed Feb 19 2020 Guenther Deschner <gdeschner@redhat.com> - 4.12.0rc3-2
 - Update to Samba 4.12.0rc3
 
