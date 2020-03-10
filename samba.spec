@@ -6,7 +6,7 @@
 # ctdb is enabled by default, you can disable it with: --without clustering
 %bcond_without clustering
 
-%define main_release 3
+%define main_release 4
 
 %define samba_version 4.12.0
 %define talloc_version 2.3.1
@@ -224,6 +224,7 @@ BuildRequires: krb5-server >= %{required_mit_krb5}
 
 # pidl requirements
 BuildRequires: perl(ExtUtils::MakeMaker)
+BuildRequires: perl(FindBin)
 BuildRequires: perl(Parse::Yapp)
 
 BuildRequires: libtalloc-devel >= %{talloc_version}
@@ -587,6 +588,7 @@ to manage Samba AD.
 %package pidl
 Summary: Perl IDL compiler
 Requires: perl-interpreter
+Requires: perl(FindBin)
 Requires: perl(Parse::Yapp)
 Requires: perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
 BuildArch: noarch
@@ -3527,6 +3529,9 @@ fi
 %endif
 
 %changelog
+* Tue Mar 10 2020 Guenther Deschner <gdeschner@redhat.com> - 4.12.0-4
+- Add build requirement for perl-FindBin
+
 * Tue Mar 03 2020 Guenther Deschner <gdeschner@redhat.com> - 4.12.0-3
 - Update to Samba 4.12.0
 
