@@ -8,11 +8,11 @@
 
 %define main_release 0
 
-%define samba_version 4.11.6
+%define samba_version 4.11.7
 %define talloc_version 2.2.0
 %define tdb_version 1.4.2
 %define tevent_version 0.10.0
-%define ldb_version 2.0.8
+%define ldb_version 2.0.9
 # This should be rc1 or nil
 %define pre_release %nil
 
@@ -3528,6 +3528,9 @@ fi
 %endif
 
 %changelog
+* Tue Mar 10 2020 Guenther Deschner <gdeschner@redhat.com> - 4.11.7-0
+- Update to Samba 4.11.7
+
 * Tue Jan 28 2020 Guenther Deschner <gdeschner@redhat.com> - 4.11.6-0
 - Update to Samba 4.11.6
 
