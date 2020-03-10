@@ -1,0 +1,438 @@
+From a1fdd83ab776f981e992c3f2fc8c341d6b37a0d4 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?G=C3=BCnther=20Deschner?= <gd@samba.org>
+Date: Thu, 5 Mar 2020 22:45:48 +0100
+Subject: [PATCH 1/3] s4-torture: add rpc test for ChangeServiceConfigW
+
+BUG: https://bugzilla.samba.org/show_bug.cgi?id=14313
+
+Guenther
+
+Signed-off-by: Guenther Deschner <gd@samba.org>
+Reviewed-by: Andreas Schneider <asn@samba.org>
+(cherry picked from commit 0825324bc75d2ab10164a1f137be782d84c822b8)
+---
+ selftest/knownfail           |  3 ++
+ source4/torture/rpc/svcctl.c | 78 +++++++++++++++++++++++++++++++++++-
+ 2 files changed, 80 insertions(+), 1 deletion(-)
+
+diff --git a/selftest/knownfail b/selftest/knownfail
+index c9ef0851172..20441c078b4 100644
+--- a/selftest/knownfail
++++ b/selftest/knownfail
+@@ -234,6 +234,9 @@
+ ^samba3.rpc.eventlog.eventlog.GetNumRecords\(ad_dc\)
+ ^samba3.rpc.eventlog.eventlog.OpenEventLog\(ad_dc\)
+ ^samba3.rap.basic.netsessiongetinfo\(ad_dc\)
++# not implemented
++^samba3.rpc.svcctl.svcctl.ChangeServiceConfigW\(ad_dc\)
++^samba3.rpc.svcctl.svcctl.ChangeServiceConfigW\(nt4_dc\)
+ #
+ # This makes less sense when not running against an AD DC
+ #
+diff --git a/source4/torture/rpc/svcctl.c b/source4/torture/rpc/svcctl.c
+index ebb2bc6ad0e..bd16ed4627d 100644
+--- a/source4/torture/rpc/svcctl.c
++++ b/source4/torture/rpc/svcctl.c
+@@ -3,7 +3,7 @@
+    test suite for svcctl rpc operations
+ 
+    Copyright (C) Jelmer Vernooij 2004
+-   Copyright (C) Guenther Deschner 2008,2009
++   Copyright (C) Guenther Deschner 2008,2009,2020
+ 
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+@@ -623,6 +623,80 @@ static bool test_SCManager(struct torture_context *tctx,
+ 	return true;
+ }
+ 
++static bool test_ChangeServiceConfigW(struct torture_context *tctx,
++				      struct dcerpc_pipe *p)
++{
++	struct svcctl_ChangeServiceConfigW r;
++	struct svcctl_QueryServiceConfigW q;
++	struct policy_handle h, s;
++	NTSTATUS status;
++	struct dcerpc_binding_handle *b = p->binding_handle;
++	struct QUERY_SERVICE_CONFIG query;
++	bool ok;
++
++	uint32_t offered = 0;
++	uint32_t needed = 0;
++
++	ok = test_OpenSCManager(b, tctx, &h);
++	if (!ok) {
++		return false;
++	}
++
++	ok = test_OpenService(b, tctx, &h, TORTURE_DEFAULT_SERVICE, &s);
++	if (!ok) {
++		return false;
++	}
++
++	q.in.handle = &s;
++	q.in.offered = offered;
++	q.out.query = &query;
++	q.out.needed = &needed;
++
++	status = dcerpc_svcctl_QueryServiceConfigW_r(b, tctx, &q);
++	torture_assert_ntstatus_ok(tctx, status, "QueryServiceConfigW failed!");
++
++	if (W_ERROR_EQUAL(q.out.result, WERR_INSUFFICIENT_BUFFER)) {
++		q.in.offered = needed;
++		status = dcerpc_svcctl_QueryServiceConfigW_r(b, tctx, &q);
++		torture_assert_ntstatus_ok(tctx, status, "QueryServiceConfigW failed!");
++	}
++	torture_assert_werr_ok(tctx, q.out.result, "QueryServiceConfigW failed!");
++
++	r.in.handle = &s;
++	r.in.type		= query.service_type;
++	r.in.start_type		= query.start_type;
++	r.in.error_control	= query.error_control;
++
++	/*
++	 * according to MS-SCMR 3.1.4.11 NULL params are supposed to leave the
++	 * existing values intact.
++	 */
++
++	r.in.binary_path	= NULL;
++	r.in.load_order_group	= NULL;
++	r.in.dependencies	= NULL;
++	r.in.service_start_name	= NULL;
++	r.in.password		= NULL;
++	r.in.display_name	= NULL;
++	r.out.tag_id		= NULL;
++
++	status = dcerpc_svcctl_ChangeServiceConfigW_r(b, tctx, &r);
++	torture_assert_ntstatus_ok(tctx, status, "ChangeServiceConfigW failed!");
++	torture_assert_werr_ok(tctx, r.out.result, "ChangeServiceConfigW failed!");
++
++	ok = test_CloseServiceHandle(b, tctx, &s);
++	if (!ok) {
++		return false;
++	}
++
++	ok = test_CloseServiceHandle(b, tctx, &h);
++	if (!ok) {
++		return false;
++	}
++
++	return true;
++}
++
+ struct torture_suite *torture_rpc_svcctl(TALLOC_CTX *mem_ctx)
+ {
+ 	struct torture_suite *suite = torture_suite_create(mem_ctx, "svcctl");
+@@ -652,6 +726,8 @@ struct torture_suite *torture_rpc_svcctl(TALLOC_CTX *mem_ctx)
+ 				   test_StartServiceW);
+ 	torture_rpc_tcase_add_test(tcase, "ControlService",
+ 				   test_ControlService);
++	torture_rpc_tcase_add_test(tcase, "ChangeServiceConfigW",
++				   test_ChangeServiceConfigW);
+ 
+ 	return suite;
+ }
+-- 
+2.24.1
+
+
+From 1168f1c392b3e315b5a4af9be793b93234420786 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?G=C3=BCnther=20Deschner?= <gd@samba.org>
+Date: Thu, 5 Mar 2020 20:42:21 +0100
+Subject: [PATCH 2/3] s4-torture: add ndr svcctl testsuite
+
+BUG: https://bugzilla.samba.org/show_bug.cgi?id=14313
+
+Guenther
+
+Signed-off-by: Guenther Deschner <gd@samba.org>
+Reviewed-by: Andreas Schneider <asn@samba.org>
+(cherry picked from commit c3fa0b2df9fc53dddcc3160b6a3dc751bbb389a4)
+---
+ librpc/idl/svcctl.idl         |  2 +-
+ selftest/knownfail            |  5 +++
+ source4/torture/ndr/ndr.c     |  1 +
+ source4/torture/ndr/svcctl.c  | 85 +++++++++++++++++++++++++++++++++++
+ source4/torture/wscript_build |  1 +
+ 5 files changed, 93 insertions(+), 1 deletion(-)
+ create mode 100644 source4/torture/ndr/svcctl.c
+
+diff --git a/librpc/idl/svcctl.idl b/librpc/idl/svcctl.idl
+index 671a1dc47be..e909bf2dbed 100644
+--- a/librpc/idl/svcctl.idl
++++ b/librpc/idl/svcctl.idl
+@@ -188,7 +188,7 @@ import "misc.idl", "security.idl";
+ 		SVCCTL_DISABLED			= 0x00000004
+ 	} svcctl_StartType;
+ 
+-	WERROR svcctl_ChangeServiceConfigW(
++	[public] WERROR svcctl_ChangeServiceConfigW(
+ 		[in,ref] policy_handle *handle,
+ 		[in] uint32 type,
+ 		[in] svcctl_StartType start_type,
+diff --git a/selftest/knownfail b/selftest/knownfail
+index 20441c078b4..c5d4cdd9419 100644
+--- a/selftest/knownfail
++++ b/selftest/knownfail
+@@ -237,6 +237,11 @@
+ # not implemented
+ ^samba3.rpc.svcctl.svcctl.ChangeServiceConfigW\(ad_dc\)
+ ^samba3.rpc.svcctl.svcctl.ChangeServiceConfigW\(nt4_dc\)
++# broken IDL
++^samba4.local.ndr.svcctl_ChangeServiceConfigW_NDR_IN
++^samba4.local.ndr.svcctl_ChangeServiceConfigW_NDR_OUT
++^samba4.local.ndr.system.iconv.svcctl_ChangeServiceConfigW_NDR_IN
++^samba4.local.ndr.system.iconv.svcctl_ChangeServiceConfigW_NDR_OUT
+ #
+ # This makes less sense when not running against an AD DC
+ #
+diff --git a/source4/torture/ndr/ndr.c b/source4/torture/ndr/ndr.c
+index 32efe90757d..690301f31b1 100644
+--- a/source4/torture/ndr/ndr.c
++++ b/source4/torture/ndr/ndr.c
+@@ -708,6 +708,7 @@ struct torture_suite *torture_local_ndr(TALLOC_CTX *mem_ctx)
+ 	torture_suite_add_suite(suite, ndr_krb5pac_suite(suite));
+ 	torture_suite_add_suite(suite, ndr_cabinet_suite(suite));
+ 	torture_suite_add_suite(suite, ndr_charset_suite(suite));
++	torture_suite_add_suite(suite, ndr_svcctl_suite(suite));
+ 
+ 	torture_suite_add_simple_test(suite, "string terminator",
+ 				      test_check_string_terminator);
+diff --git a/source4/torture/ndr/svcctl.c b/source4/torture/ndr/svcctl.c
+new file mode 100644
+index 00000000000..1c9404597cd
+--- /dev/null
++++ b/source4/torture/ndr/svcctl.c
+@@ -0,0 +1,85 @@
++/*
++   Unix SMB/CIFS implementation.
++   test suite for svcctl ndr operations
++
++   Copyright (C) Guenther Deschner 2020
++
++   This program is free software; you can redistribute it and/or modify
++   it under the terms of the GNU General Public License as published by
++   the Free Software Foundation; either version 3 of the License, or
++   (at your option) any later version.
++
++   This program is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++   GNU General Public License for more details.
++
++   You should have received a copy of the GNU General Public License
++   along with this program.  If not, see <http://www.gnu.org/licenses/>.
++*/
++
++#include "includes.h"
++#include "torture/ndr/ndr.h"
++#include "librpc/gen_ndr/ndr_svcctl.h"
++#include "torture/ndr/proto.h"
++#include "param/param.h"
++
++static const uint8_t svcctl_ChangeServiceConfigW_req_data[] = {
++	0x00, 0x00, 0x00, 0x00, 0xcd, 0x94, 0x05, 0x40, 0x30, 0x28, 0x00, 0x49,
++	0x8d, 0xe4, 0x8e, 0x85, 0xb7, 0x19, 0x5c, 0x83, 0x10, 0x01, 0x00, 0x00,
++	0x02, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
++};
++
++static bool svcctl_ChangeServiceConfigW_req_check(struct torture_context *tctx,
++						  struct svcctl_ChangeServiceConfigW *r)
++{
++	struct policy_handle handle = { 0 };
++	GUID_from_string("400594cd-2830-4900-8de4-8e85b7195c83", &handle.uuid);
++
++	torture_assert_guid_equal(tctx, r->in.handle->uuid, handle.uuid, "handle");
++	torture_assert_u32_equal(tctx, r->in.type, 0x00000110, "type");
++	torture_assert_u32_equal(tctx, r->in.start_type, SVCCTL_AUTO_START, "start_type");
++	torture_assert_u32_equal(tctx, r->in.error_control, SVCCTL_SVC_ERROR_NORMAL, "error_control");
++	torture_assert_str_equal(tctx, r->in.binary_path, NULL, "binary_path");
++	torture_assert_str_equal(tctx, r->in.load_order_group, NULL, "load_order_group");
++	torture_assert_str_equal(tctx, r->in.dependencies, NULL, "dependencies");
++	torture_assert_str_equal(tctx, r->in.service_start_name, NULL, "service_start_name");
++	torture_assert_str_equal(tctx, r->in.password, NULL, "password");
++	torture_assert_str_equal(tctx, r->in.display_name, NULL, "display_name");
++
++	return true;
++}
++
++static const uint8_t svcctl_ChangeServiceConfigW_rep_data[] = {
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
++};
++
++static bool svcctl_ChangeServiceConfigW_rep_check(struct torture_context *tctx,
++						  struct svcctl_ChangeServiceConfigW *r)
++{
++	torture_assert(tctx, r->out.tag_id == NULL, "tag_id");
++	torture_assert_werr_ok(tctx, r->out.result, "result");
++
++	return true;
++}
++
++struct torture_suite *ndr_svcctl_suite(TALLOC_CTX *ctx)
++{
++	struct torture_suite *suite = torture_suite_create(ctx, "svcctl");
++
++	torture_suite_add_ndr_pull_fn_test(suite,
++					   svcctl_ChangeServiceConfigW,
++					   svcctl_ChangeServiceConfigW_req_data,
++					   NDR_IN,
++					   svcctl_ChangeServiceConfigW_req_check);
++
++	torture_suite_add_ndr_pull_fn_test(suite,
++					   svcctl_ChangeServiceConfigW,
++					   svcctl_ChangeServiceConfigW_rep_data,
++					   NDR_OUT,
++					   svcctl_ChangeServiceConfigW_rep_check);
++	return suite;
++}
+diff --git a/source4/torture/wscript_build b/source4/torture/wscript_build
+index 65af160b322..05a6fbcbf14 100644
+--- a/source4/torture/wscript_build
++++ b/source4/torture/wscript_build
+@@ -71,6 +71,7 @@ bld.SAMBA_SUBSYSTEM('TORTURE_NDR',
+                   ndr/winspool.c
+                   ndr/cabinet.c
+                   ndr/charset.c
++                  ndr/svcctl.c
+ 		  ''',
+ 	autoproto='ndr/proto.h',
+ 	deps='torture krb5samba',
+-- 
+2.24.1
+
+
+From 28d86d48adfee6c1d03ea192b69be87a0b9ce400 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?G=C3=BCnther=20Deschner?= <gd@samba.org>
+Date: Wed, 4 Mar 2020 15:23:43 +0100
+Subject: [PATCH 3/3] librpc: fix IDL for svcctl_ChangeServiceConfigW
+
+Found while trying to run winexe against Windows Server 2019.
+
+BUG: https://bugzilla.samba.org/show_bug.cgi?id=14313
+
+Guenther
+
+Signed-off-by: Guenther Deschner <gd@samba.org>
+Reviewed-by: Andreas Schneider <asn@samba.org>
+(cherry picked from commit ebda529b59105e9b70cc74377fe4d54cc16b4f37)
+---
+ examples/winexe/winexe.c     |  2 ++
+ librpc/idl/svcctl.idl        | 23 ++++++++++++++++++-----
+ selftest/knownfail           |  5 -----
+ source4/torture/ndr/svcctl.c |  3 +++
+ source4/torture/rpc/svcctl.c |  3 +++
+ 5 files changed, 26 insertions(+), 10 deletions(-)
+
+diff --git a/examples/winexe/winexe.c b/examples/winexe/winexe.c
+index 22f748b1d45..fc6b15f8e52 100644
+--- a/examples/winexe/winexe.c
++++ b/examples/winexe/winexe.c
+@@ -625,8 +625,10 @@ static NTSTATUS winexe_svc_install(
+ 			NULL,	    /* load_order_group */
+ 			NULL,	    /* tag_id */
+ 			NULL,	    /* dependencies */
++			0,	    /* dwDependSize */
+ 			NULL,	    /* service_start_name */
+ 			NULL,	    /* password */
++			0,	    /* dwPwSize */
+ 			NULL,	    /* display_name */
+ 			&werr);
+ 
+diff --git a/librpc/idl/svcctl.idl b/librpc/idl/svcctl.idl
+index e909bf2dbed..a9dd3dec990 100644
+--- a/librpc/idl/svcctl.idl
++++ b/librpc/idl/svcctl.idl
+@@ -13,6 +13,17 @@ import "misc.idl", "security.idl";
+   helpstring("Service Control")
+ ] interface svcctl
+ {
++	const int MAX_SERVICE_NAME_LENGTH = 256;
++	const short SC_MAX_DEPEND_SIZE = 4 * 1024;
++	const short SC_MAX_NAME_LENGTH = MAX_SERVICE_NAME_LENGTH + 1;
++	const short SC_MAX_PATH_LENGTH = 32 * 1024;
++	const short SC_MAX_PWD_SIZE = 514;
++	const short SC_MAX_COMPUTER_NAME_LENGTH = 1024;
++	const short SC_MAX_ACCOUNT_NAME_LENGTH = 2 * 1024;
++	const short SC_MAX_COMMENT_LENGTH = 128;
++	const short SC_MAX_ARGUMENT_LENGTH = 1024;
++	const short SC_MAX_ARGUMENTS = 1024;
++
+ 	typedef struct {
+ 		uint32 is_locked;
+ 		[string,charset(UTF16)] uint16 *lock_owner;
+@@ -195,11 +206,13 @@ import "misc.idl", "security.idl";
+ 		[in] svcctl_ErrorControl error_control,
+ 		[in,unique] [string,charset(UTF16)] uint16 *binary_path,
+ 		[in,unique] [string,charset(UTF16)] uint16 *load_order_group,
+-		[out,ref] uint32 *tag_id,
+-		[in,unique] [string,charset(UTF16)] uint16 *dependencies,
+-		[in,unique] [string,charset(UTF16)] uint16 *service_start_name,
+-		[in,unique] [string,charset(UTF16)] uint16 *password,
+-		[in,unique] [string,charset(UTF16)] uint16 *display_name
++		[in,out,unique] uint32 *tag_id,
++		[in,unique,size_is(dwDependSize)] [string,charset(UTF16)] uint16 *dependencies,
++		[in,range(0, SC_MAX_DEPEND_SIZE)] uint32 dwDependSize,
++		[in,unique,range(0, SC_MAX_ACCOUNT_NAME_LENGTH)] [string,charset(UTF16)] uint16 *service_start_name,
++		[in,unique,size_is(dwPwSize)] [string,charset(UTF16)] uint16 *password,
++		[in,range(0, SC_MAX_PWD_SIZE)] uint32 dwPwSize,
++		[in,unique,range(0, SC_MAX_NAME_LENGTH)] [string,charset(UTF16)] uint16 *display_name
+ 	);
+ 
+ 	/*****************/
+diff --git a/selftest/knownfail b/selftest/knownfail
+index c5d4cdd9419..20441c078b4 100644
+--- a/selftest/knownfail
++++ b/selftest/knownfail
+@@ -237,11 +237,6 @@
+ # not implemented
+ ^samba3.rpc.svcctl.svcctl.ChangeServiceConfigW\(ad_dc\)
+ ^samba3.rpc.svcctl.svcctl.ChangeServiceConfigW\(nt4_dc\)
+-# broken IDL
+-^samba4.local.ndr.svcctl_ChangeServiceConfigW_NDR_IN
+-^samba4.local.ndr.svcctl_ChangeServiceConfigW_NDR_OUT
+-^samba4.local.ndr.system.iconv.svcctl_ChangeServiceConfigW_NDR_IN
+-^samba4.local.ndr.system.iconv.svcctl_ChangeServiceConfigW_NDR_OUT
+ #
+ # This makes less sense when not running against an AD DC
+ #
+diff --git a/source4/torture/ndr/svcctl.c b/source4/torture/ndr/svcctl.c
+index 1c9404597cd..6592beda02e 100644
+--- a/source4/torture/ndr/svcctl.c
++++ b/source4/torture/ndr/svcctl.c
+@@ -45,9 +45,12 @@ static bool svcctl_ChangeServiceConfigW_req_check(struct torture_context *tctx,
+ 	torture_assert_u32_equal(tctx, r->in.error_control, SVCCTL_SVC_ERROR_NORMAL, "error_control");
+ 	torture_assert_str_equal(tctx, r->in.binary_path, NULL, "binary_path");
+ 	torture_assert_str_equal(tctx, r->in.load_order_group, NULL, "load_order_group");
++	torture_assert(tctx, r->in.tag_id == NULL, "tag_id");
+ 	torture_assert_str_equal(tctx, r->in.dependencies, NULL, "dependencies");
++	torture_assert_u32_equal(tctx, r->in.dwDependSize, 0, "dwDependSize");
+ 	torture_assert_str_equal(tctx, r->in.service_start_name, NULL, "service_start_name");
+ 	torture_assert_str_equal(tctx, r->in.password, NULL, "password");
++	torture_assert_u32_equal(tctx, r->in.dwPwSize, 0, "dwPwSize");
+ 	torture_assert_str_equal(tctx, r->in.display_name, NULL, "display_name");
+ 
+ 	return true;
+diff --git a/source4/torture/rpc/svcctl.c b/source4/torture/rpc/svcctl.c
+index bd16ed4627d..746b399360e 100644
+--- a/source4/torture/rpc/svcctl.c
++++ b/source4/torture/rpc/svcctl.c
+@@ -675,9 +675,12 @@ static bool test_ChangeServiceConfigW(struct torture_context *tctx,
+ 	r.in.binary_path	= NULL;
+ 	r.in.load_order_group	= NULL;
+ 	r.in.dependencies	= NULL;
++	r.in.dwDependSize	= 0;
+ 	r.in.service_start_name	= NULL;
+ 	r.in.password		= NULL;
++	r.in.dwPwSize		= 0;
+ 	r.in.display_name	= NULL;
++	r.in.tag_id		= NULL;
+ 	r.out.tag_id		= NULL;
+ 
+ 	status = dcerpc_svcctl_ChangeServiceConfigW_r(b, tctx, &r);
+-- 
+2.24.1
+

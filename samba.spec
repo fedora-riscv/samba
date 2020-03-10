@@ -8,7 +8,7 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%define main_release 4
+%define main_release 5
 
 %define samba_version 4.12.0
 %define talloc_version 2.3.1
@@ -83,6 +83,11 @@
 %global with_clustering_support 1
 %endif
 
+%global with_winexe 1
+%if 0%{?rhel}
+%global with_winexe 0
+%endif
+
 %global _systemd_extra "Environment=KRB5CCNAME=FILE:/run/samba/krb5cc_samba"
 
 Name:           samba
@@ -120,6 +125,7 @@ Source14:       samba.pamd
 Source201:      README.downgrade
 
 Patch100:       new_mit_118.patch
+Patch101:       samba-4.12.0-winexe.patch
 
 Requires(pre): /usr/sbin/groupadd
 Requires(post): systemd
@@ -182,6 +188,10 @@ BuildRequires: libtirpc-devel
 BuildRequires: libuuid-devel
 BuildRequires: libxslt
 BuildRequires: lmdb
+%if %{with_winexe}
+BuildRequires: mingw32-gcc
+BuildRequires: mingw64-gcc
+%endif
 BuildRequires: ncurses-devel
 BuildRequires: openldap-devel
 BuildRequires: pam-devel
@@ -732,6 +742,16 @@ Requires: pam
 The samba-winbind-modules package provides the NSS library and a PAM module
 necessary to communicate to the Winbind Daemon
 
+### WINEXE
+%if %{with_winexe}
+%package winexe
+Summary: Samba Winexe Windows Binary
+License: GPLv3
+
+%description winexe
+Winexe is a Remote Windows®-command executor
+%endif
+
 ### CTDB
 %if %with_clustering_support
 %package -n ctdb
@@ -869,6 +889,9 @@ export LDFLAGS="%{__global_ldflags} -fuse-ld=gold"
 %endif
 %if %{with testsuite}
         --enable-selftest \
+%endif
+%if ! %with_winexe
+	--without-winexe \
 %endif
         --with-systemd \
         --systemd-install-services \
@@ -3530,9 +3553,16 @@ fi
 #endif with_clustering_support
 %endif
 
+%if %{with_winexe}
+### WINEXE
+%files winexe
+%{_bindir}/winexe
+%endif
+
 %changelog
-* Tue Mar 10 2020 Guenther Deschner <gdeschner@redhat.com> - 4.12.0-4
+* Tue Mar 10 2020 Guenther Deschner <gdeschner@redhat.com> - 4.12.0-5
 - Add build requirement for perl-FindBin
+- resolves: #1661213 - Add winexe subpackage for remote windows command execution
 
 * Tue Mar 03 2020 Guenther Deschner <gdeschner@redhat.com> - 4.12.0-3
 - Update to Samba 4.12.0
