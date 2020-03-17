@@ -6,6 +6,8 @@
 # ctdb is enabled by default, you can disable it with: --without clustering
 %bcond_without clustering
 
+%define samba_requires_eq  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
+
 %define main_release 4
 
 %define samba_version 4.12.0
@@ -366,7 +368,7 @@ Requires: ldb-tools
 # Force using libldb version to be the same as build version
 # Otherwise LDB modules will not be loaded and samba-tool will fail
 # See bug 1507420
-%requires_eq libldb
+%samba_requires_eq libldb
 
 Requires: python3-crypto
 Requires: python3-%{name} = %{samba_depver}
