@@ -6,9 +6,9 @@
 # ctdb is enabled by default, you can disable it with: --without clustering
 %bcond_without clustering
 
-%define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
+%define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%define main_release 5
+%define main_release 6
 
 %define samba_version 4.12.0
 %define talloc_version 2.3.1
@@ -3560,6 +3560,10 @@ fi
 %endif
 
 %changelog
+* Sat Mar 21 2020 Alexander Bokovoy <abokovoy@redhat.com> - 4.12.0-6
+- Fix samba_requires_eq macro definition
+- Resolves rhbz#1815739
+
 * Tue Mar 10 2020 Guenther Deschner <gdeschner@redhat.com> - 4.12.0-5
 - Add build requirement for perl-FindBin
 - resolves: #1661213 - Add winexe subpackage for remote windows command execution
