@@ -8,7 +8,7 @@
 
 %define main_release 0
 
-%define samba_version 4.10.13
+%define samba_version 4.10.14
 %define talloc_version 2.1.16
 %define tdb_version 1.3.18
 %define tevent_version 0.9.39
@@ -3421,6 +3421,9 @@ fi
 %endif # with_clustering_support
 
 %changelog
+* Thu Mar 26 2020 Guenther Deschner <gdeschner@redhat.com> - 4.10.14-0
+- Update to Samba 4.10.14
+
 * Thu Jan 23 2020 Guenther Deschner <gdeschner@redhat.com> - 4.10.13-0
 - Update to Samba 4.10.13
 
