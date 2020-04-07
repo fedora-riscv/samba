@@ -8,9 +8,9 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%define main_release 6
+%define main_release 0
 
-%define samba_version 4.12.0
+%define samba_version 4.12.1
 %define talloc_version 2.3.1
 %define tdb_version 1.4.3
 %define tevent_version 0.10.2
@@ -125,7 +125,6 @@ Source14:       samba.pamd
 Source201:      README.downgrade
 
 Patch100:       new_mit_118.patch
-Patch101:       samba-4.12.0-winexe.patch
 
 Requires(pre): /usr/sbin/groupadd
 Requires(post): systemd
@@ -3560,6 +3559,9 @@ fi
 %endif
 
 %changelog
+* Tue Apr 07 2020 Guenther Deschner <gdeschner@redhat.com> - 4.12.1-0
+- Update to Samba 4.12.1
+
 * Sat Mar 21 2020 Alexander Bokovoy <abokovoy@redhat.com> - 4.12.0-6
 - Fix samba_requires_eq macro definition
 - Resolves rhbz#1815739
