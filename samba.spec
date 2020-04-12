@@ -8,7 +8,7 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%define main_release 0
+%define main_release 1
 
 %define samba_version 4.12.1
 %define talloc_version 2.3.1
@@ -125,6 +125,7 @@ Source14:       samba.pamd
 Source201:      README.downgrade
 
 Patch100:       new_mit_118.patch
+Patch101:       0001-libsmb-Don-t-try-to-find-posix-stat-info-in-SMBC_get.patch
 
 Requires(pre): /usr/sbin/groupadd
 Requires(post): systemd
@@ -3559,6 +3560,10 @@ fi
 %endif
 
 %changelog
+* Sun Apr 12 2020 Alexander Bokovoy <abokovoy@redhat.com> - 4.12.1-1
+- Revert POSIX stat tuning in libsmbclient
+- Resolves rhbz#1801442
+
 * Tue Apr 07 2020 Guenther Deschner <gdeschner@redhat.com> - 4.12.1-0
 - Update to Samba 4.12.1
 
