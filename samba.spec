@@ -6,13 +6,13 @@
 # ctdb is enabled by default, you can disable it with: --without clustering
 %bcond_without clustering
 
-%define main_release 1
+%define main_release 0
 
-%define samba_version 4.11.7
+%define samba_version 4.11.8
 %define talloc_version 2.2.0
 %define tdb_version 1.4.2
 %define tevent_version 0.10.0
-%define ldb_version 2.0.9
+%define ldb_version 2.0.10
 # This should be rc1 or nil
 %define pre_release %nil
 
@@ -2275,6 +2275,7 @@ fi
 %{python3_sitearch}/samba/tests/__pycache__/hostconfig.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/join.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/krb5_credentials.*.pyc
+%{python3_sitearch}/samba/tests/__pycache__/ldap_raw.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/ldap_referrals.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/loadparm.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/libsmb.*.pyc
@@ -2456,6 +2457,7 @@ fi
 %{python3_sitearch}/samba/tests/kcc/kcc_utils.py
 %{python3_sitearch}/samba/tests/kcc/ldif_import_export.py
 %{python3_sitearch}/samba/tests/krb5_credentials.py
+%{python3_sitearch}/samba/tests/ldap_raw.py
 %{python3_sitearch}/samba/tests/ldap_referrals.py
 %{python3_sitearch}/samba/tests/libsmb.py
 %{python3_sitearch}/samba/tests/loadparm.py
@@ -3529,6 +3531,11 @@ fi
 %endif
 
 %changelog
+* Tue Apr 28 2020 Guenther Deschner <gdeschner@redhat.com> - 4.11.8-0
+- Update to Samba 4.11.8
+- resolves: #1825731, #1828870 - Security fixes for CVE-2020-10700
+- resolves: #1825734, #1828872 - Security fixes for CVE-2020-10704
+
 * Sun Apr 12 2020 Alexander Bokovoy <abokovoy@redhat.com> - 4.11.7-1
 - Revert SMBv1 POSIX stat use in libsmb by default
 - Resolves: rhbz#1801442
