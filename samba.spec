@@ -8,11 +8,11 @@
 
 %define main_release 0
 
-%define samba_version 4.10.14
+%define samba_version 4.10.15
 %define talloc_version 2.1.16
 %define tdb_version 1.3.18
 %define tevent_version 0.9.39
-%define ldb_version 1.5.6
+%define ldb_version 1.5.7
 # This should be rc1 or nil
 %define pre_release %nil
 
@@ -2182,6 +2182,7 @@ fi
 %{python3_sitearch}/samba/tests/__pycache__/hostconfig.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/join.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/krb5_credentials.*.pyc
+%{python3_sitearch}/samba/tests/__pycache__/ldap_raw.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/ldap_referrals.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/loadparm.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/libsmb.*.pyc
@@ -2362,6 +2363,7 @@ fi
 %{python3_sitearch}/samba/tests/kcc/kcc_utils.py
 %{python3_sitearch}/samba/tests/kcc/ldif_import_export.py
 %{python3_sitearch}/samba/tests/krb5_credentials.py
+%{python3_sitearch}/samba/tests/ldap_raw.py
 %{python3_sitearch}/samba/tests/ldap_referrals.py
 %{python3_sitearch}/samba/tests/libsmb.py
 %{python3_sitearch}/samba/tests/loadparm.py
@@ -3421,6 +3423,11 @@ fi
 %endif # with_clustering_support
 
 %changelog
+* Tue Apr 28 2020 Guenther Deschner <gdeschner@redhat.com> - 4.10.15-0
+- Update to Samba 4.10.15
+- resolves: #1825731, #1828870 - Security fixes for CVE-2020-10700
+- resolves: #1825734, #1828872 - Security fixes for CVE-2020-10704
+
 * Thu Mar 26 2020 Guenther Deschner <gdeschner@redhat.com> - 4.10.14-0
 - Update to Samba 4.10.14
 
