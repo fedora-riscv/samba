@@ -8,7 +8,7 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%define main_release 0
+%define main_release 1
 
 %define samba_version 4.12.2
 %define talloc_version 2.3.1
@@ -88,6 +88,8 @@
 %global with_winexe 0
 %endif
 
+%global with_vfs_io_uring 1
+
 %global _systemd_extra "Environment=KRB5CCNAME=FILE:/run/samba/krb5cc_samba"
 
 Name:           samba
@@ -126,6 +128,7 @@ Source201:      README.downgrade
 
 Patch100:       new_mit_118.patch
 Patch101:       0001-libsmb-Don-t-try-to-find-posix-stat-info-in-SMBC_get.patch
+Patch102:       samba-4.12.3-vfs_io_uring-bz14361.patch
 
 Requires(pre): /usr/sbin/groupadd
 Requires(post): systemd
@@ -222,6 +225,10 @@ BuildRequires: glusterfs-devel >= 3.4.0.16
 
 %if %{with_vfs_cephfs}
 BuildRequires: libcephfs-devel
+%endif
+
+%if %{with_vfs_io_uring}
+BuildRequires: liburing-devel
 %endif
 
 %if %{with_dc}
@@ -1299,6 +1306,9 @@ fi
 %{_libdir}/samba/vfs/full_audit.so
 %{_libdir}/samba/vfs/gpfs.so
 %{_libdir}/samba/vfs/glusterfs_fuse.so
+%if %{with_vfs_io_uring}
+%{_libdir}/samba/vfs/io_uring.so
+%endif
 %{_libdir}/samba/vfs/linux_xfs_sgid.so
 %{_libdir}/samba/vfs/media_harmony.so
 %{_libdir}/samba/vfs/offline.so
@@ -1348,6 +1358,9 @@ fi
 %{_mandir}/man8/vfs_full_audit.8*
 %{_mandir}/man8/vfs_gpfs.8*
 %{_mandir}/man8/vfs_glusterfs_fuse.8*
+%if %{with_vfs_io_uring}
+%{_mandir}/man8/vfs_io_uring.8*
+%endif
 %{_mandir}/man8/vfs_linux_xfs_sgid.8*
 %{_mandir}/man8/vfs_media_harmony.8*
 %{_mandir}/man8/vfs_offline.8*
@@ -3562,6 +3575,9 @@ fi
 %endif
 
 %changelog
+* Wed May 13 2020 Guenther Deschner <gdeschner@redhat.com> - 4.12.2-1
+- Add support for building the new experimental io_uring VFS module
+
 * Tue Apr 28 2020 Guenther Deschner <gdeschner@redhat.com> - 4.12.2-0
 - Update to Samba 4.12.2
 - resolves: #1825731, #1828870 - Security fixes for CVE-2020-10700
