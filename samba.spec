@@ -88,7 +88,10 @@
 %global with_winexe 0
 %endif
 
+%global with_vfs_io_uring 0
+%ifarch aarch64 ppc64le s390x x86_64 i686
 %global with_vfs_io_uring 1
+%endif
 
 %global _systemd_extra "Environment=KRB5CCNAME=FILE:/run/samba/krb5cc_samba"
 
