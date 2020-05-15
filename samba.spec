@@ -97,7 +97,7 @@
 
 Name:           samba
 Version:        %{samba_version}
-Release:        %{samba_release}.1
+Release:        %{samba_release}.2
 
 %if 0%{?rhel}
 Epoch:          0
@@ -3578,6 +3578,9 @@ fi
 %endif
 
 %changelog
+* Fri May 15 2020 Pete Walter <pwalter@fedoraproject.org> - 2:4.12.2-1.2
+- Rebuild for ICU 67
+
 * Wed May 13 2020 Guenther Deschner <gdeschner@redhat.com> - 4.12.2-1
 - Add support for building the new experimental io_uring VFS module
 
