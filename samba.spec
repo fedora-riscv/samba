@@ -8,13 +8,13 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%define main_release 1
+%define main_release 0
 
-%define samba_version 4.12.2
+%define samba_version 4.12.3
 %define talloc_version 2.3.1
 %define tdb_version 1.4.3
 %define tevent_version 0.10.2
-%define ldb_version 2.1.2
+%define ldb_version 2.1.3
 # This should be rc1 or nil
 %define pre_release %nil
 
@@ -128,10 +128,6 @@ Source13:       pam_winbind.conf
 Source14:       samba.pamd
 
 Source201:      README.downgrade
-
-Patch100:       new_mit_118.patch
-Patch101:       0001-libsmb-Don-t-try-to-find-posix-stat-info-in-SMBC_get.patch
-Patch102:       samba-4.12.3-vfs_io_uring-bz14361.patch
 
 Requires(pre): /usr/sbin/groupadd
 Requires(post): systemd
@@ -3578,6 +3574,9 @@ fi
 %endif
 
 %changelog
+* Tue May 19 2020 Guenther Deschner <gdeschner@redhat.com> - 4.12.3-0
+- Update to Samba 4.12.3
+
 * Fri May 15 2020 Pete Walter <pwalter@fedoraproject.org> - 2:4.12.2-1.2
 - Rebuild for ICU 67
 
