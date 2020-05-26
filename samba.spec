@@ -97,7 +97,7 @@
 
 Name:           samba
 Version:        %{samba_version}
-Release:        %{samba_release}.2
+Release:        %{samba_release}.3
 
 %if 0%{?rhel}
 Epoch:          0
@@ -3574,6 +3574,9 @@ fi
 %endif
 
 %changelog
+* Tue May 26 2020 Miro Hrončok <mhroncok@redhat.com> - 2:4.12.3-0.3
+- Rebuilt for Python 3.9
+
 * Tue May 19 2020 Guenther Deschner <gdeschner@redhat.com> - 4.12.3-0
 - Update to Samba 4.12.3
 
