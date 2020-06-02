@@ -89,8 +89,12 @@
 %endif
 
 %global with_vfs_io_uring 0
+# We need liburing >= 0.4 which is not available in RHEL yet
+%if 0%{?fedora}
 %ifarch aarch64 ppc64le s390x x86_64 i686
 %global with_vfs_io_uring 1
+%endif
+# /fedora
 %endif
 
 %global _systemd_extra "Environment=KRB5CCNAME=FILE:/run/samba/krb5cc_samba"
@@ -227,7 +231,7 @@ BuildRequires: libcephfs-devel
 %endif
 
 %if %{with_vfs_io_uring}
-BuildRequires: liburing-devel
+BuildRequires: liburing-devel >= 0.4
 %endif
 
 %if %{with_dc}
