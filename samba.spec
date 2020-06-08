@@ -901,7 +901,7 @@ export LDFLAGS="%{__global_ldflags} -fuse-ld=gold"
         --enable-selftest \
 %endif
 %if ! %with_winexe
-	--without-winexe \
+        --without-winexe \
 %endif
         --with-systemd \
         --systemd-install-services \
