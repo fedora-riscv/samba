@@ -1073,6 +1073,15 @@ for i in \
 done
 %endif
 
+%if ! %{with_vfs_glusterfs}
+rm -f %{buildroot}%{_mandir}/man8/vfs_glusterfs.8*
+%endif
+
+%if ! %{with_vfs_cephfs}
+rm -f %{buildroot}%{_mandir}/man8/vfs_ceph.8*
+rm -f %{buildroot}%{_mandir}/man8/vfs_ceph_snapshots.8*
+%endif
+
 # This makes the right links, as rpmlint requires that
 # the ldconfig-created links be recorded in the RPM.
 /sbin/ldconfig -N -n %{buildroot}%{_libdir}
@@ -1382,15 +1391,6 @@ fi
 %{_mandir}/man8/vfs_virusfilter.8*
 %{_mandir}/man8/vfs_worm.8*
 %{_mandir}/man8/vfs_xattr_tdb.8*
-
-%if ! %{with_vfs_glusterfs}
-%exclude %{_mandir}/man8/vfs_glusterfs.8*
-%endif
-
-%if ! %{with_vfs_cephfs}
-%exclude %{_mandir}/man8/vfs_ceph.8*
-%exclude %{_mandir}/man8/vfs_ceph_snapshots.8*
-%endif
 
 %attr(775,root,printadmin) %dir /var/lib/samba/drivers
 
