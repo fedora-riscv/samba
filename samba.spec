@@ -1715,7 +1715,6 @@ fi
 %{_libdir}/samba/service/winbindd.so
 %{_libdir}/samba/service/wrepl.so
 %{_libdir}/libdcerpc-server.so.*
-%{_libdir}/libdcerpc-server-core.so.*
 %{_libdir}/samba/libdnsserver-common-samba4.so
 %{_libdir}/samba/libdsdb-module-samba4.so
 %{_libdir}/samba/libdsdb-garbage-collect-tombstones-samba4.so
@@ -1820,6 +1819,7 @@ fi
 %{_includedir}/samba-4.0/util_ldb.h
 %{_libdir}/libdcerpc-binding.so
 %{_libdir}/libdcerpc-samr.so
+%{_libdir}/libdcerpc-server-core.so
 %{_libdir}/libdcerpc.so
 %{_libdir}/libndr-krb5pac.so
 %{_libdir}/libndr-nbt.so
@@ -1850,7 +1850,6 @@ fi
 %if %with_dc
 %{_includedir}/samba-4.0/dcerpc_server.h
 %{_libdir}/libdcerpc-server.so
-%{_libdir}/libdcerpc-server-core.so
 %{_libdir}/pkgconfig/dcerpc_server.pc
 %endif
 
@@ -1888,6 +1887,7 @@ fi
 ### LIBS
 %files libs
 %{_libdir}/libdcerpc-samr.so.*
+%{_libdir}/libdcerpc-server-core.so.*
 
 %{_libdir}/samba/libLIBWBCLIENT-OLD-samba4.so
 %{_libdir}/samba/libauth4-samba4.so
