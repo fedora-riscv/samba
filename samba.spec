@@ -921,8 +921,6 @@ make %{?_smp_mflags}
 popd
 
 %install
-rm -rf %{buildroot}
-
 make %{?_smp_mflags} install DESTDIR=%{buildroot}
 
 install -d -m 0755 %{buildroot}/usr/{sbin,bin}
