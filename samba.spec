@@ -101,7 +101,7 @@
 
 Name:           samba
 Version:        %{samba_version}
-Release:        %{samba_release}.3
+Release:        %{samba_release}.4
 
 %if 0%{?rhel}
 Epoch:          0
@@ -3578,6 +3578,9 @@ fi
 %endif
 
 %changelog
+* Thu Jun 25 2020 Jitka Plesnikova <jplesnik@redhat.com> - 2:4.12.3-0.4
+- Perl 5.32 rebuild
+
 * Tue May 26 2020 Miro Hrončok <mhroncok@redhat.com> - 2:4.12.3-0.3
 - Rebuilt for Python 3.9
 
