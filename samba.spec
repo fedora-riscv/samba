@@ -8,7 +8,7 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%define main_release 0
+%define main_release 1
 
 %define samba_version 4.12.3
 %define talloc_version 2.3.1
@@ -101,7 +101,7 @@
 
 Name:           samba
 Version:        %{samba_version}
-Release:        %{samba_release}.4
+Release:        %{samba_release}
 
 %if 0%{?rhel}
 Epoch:          0
@@ -207,6 +207,7 @@ BuildRequires: perl(Archive::Tar)
 BuildRequires: perl(Test::More)
 BuildRequires: popt-devel
 BuildRequires: python3-devel
+BuildRequires: python3-setuptools
 BuildRequires: quota-devel
 BuildRequires: readline-devel
 BuildRequires: rpcgen
@@ -3578,6 +3579,9 @@ fi
 %endif
 
 %changelog
+* Thu Jun 25 2020 Guenther Deschner <gdeschner@redhat.com> - 4.12.3-1
+- Add BuildRequires for python3-setuptools
+
 * Thu Jun 25 2020 Jitka Plesnikova <jplesnik@redhat.com> - 2:4.12.3-0.4
 - Perl 5.32 rebuild
 
