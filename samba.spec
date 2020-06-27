@@ -101,7 +101,7 @@
 
 Name:           samba
 Version:        %{samba_version}
-Release:        %{samba_release}
+Release:        %{samba_release}.1
 
 %if 0%{?rhel}
 Epoch:          0
@@ -3579,6 +3579,9 @@ fi
 %endif
 
 %changelog
+* Sat Jun 27 2020 Jitka Plesnikova <jplesnik@redhat.com> - 2:4.12.3-1.1
+- Perl 5.32 re-rebuild updated packages
+
 * Thu Jun 25 2020 Guenther Deschner <gdeschner@redhat.com> - 4.12.3-1
 - Add BuildRequires for python3-setuptools
 
