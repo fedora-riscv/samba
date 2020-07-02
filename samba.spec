@@ -8,13 +8,13 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%define main_release 1
+%define main_release 0
 
-%define samba_version 4.12.3
+%define samba_version 4.12.4
 %define talloc_version 2.3.1
 %define tdb_version 1.4.3
 %define tevent_version 0.10.2
-%define ldb_version 2.1.3
+%define ldb_version 2.1.4
 # This should be rc1 or nil
 %define pre_release %nil
 
@@ -101,7 +101,7 @@
 
 Name:           samba
 Version:        %{samba_version}
-Release:        %{samba_release}.1
+Release:        %{samba_release}
 
 %if 0%{?rhel}
 Epoch:          0
@@ -2295,6 +2295,7 @@ fi
 %{python3_sitearch}/samba/tests/__pycache__/dns_base.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/dns_forwarder.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/dns_invalid.*.pyc
+%{python3_sitearch}/samba/tests/__pycache__/dns_packet.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/dns_tkey.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/dns_wildcard.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/dsdb.*.pyc
@@ -2461,6 +2462,7 @@ fi
 %{python3_sitearch}/samba/tests/dns_forwarder_helpers/__pycache__/server.*.pyc
 %{python3_sitearch}/samba/tests/dns_forwarder_helpers/server.py
 %{python3_sitearch}/samba/tests/dns_invalid.py
+%{python3_sitearch}/samba/tests/dns_packet.py
 %{python3_sitearch}/samba/tests/dns_tkey.py
 %{python3_sitearch}/samba/tests/dns_wildcard.py
 %{python3_sitearch}/samba/tests/dsdb.py
@@ -3577,6 +3579,13 @@ fi
 %endif
 
 %changelog
+* Thu Jul 02 2020 Guenther Deschner <gdeschner@redhat.com> - 4.12.4-0
+- Update to Samba 4.12.4
+- resolves: #1849489, #1853255 - Security fixes for CVE-2020-10730
+- resolves: #1849491, #1853256 - Security fixes for CVE-2020-10745
+- resolves: #1849509, #1853276 - Security fixes for CVE-2020-10760
+- resolves: #1851298, #1853259 - Security fixes for CVE-2020-14303
+
 * Sat Jun 27 2020 Jitka Plesnikova <jplesnik@redhat.com> - 2:4.12.3-1.1
 - Perl 5.32 re-rebuild updated packages
 
