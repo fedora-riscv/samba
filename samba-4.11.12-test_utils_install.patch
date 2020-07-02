@@ -1,0 +1,26 @@
+From 7080e2b4b9923b54e92dbb920b2d7739444b2c31 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?G=C3=BCnther=20Deschner?= <gd@samba.org>
+Date: Thu, 2 Jul 2020 18:56:20 +0200
+Subject: [PATCH] lib/util: do not install "test_util_paths"
+
+Guenther
+
+Signed-off-by: Guenther Deschner <gd@samba.org>
+---
+ lib/util/wscript_build | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/lib/util/wscript_build b/lib/util/wscript_build
+index 9cf411007eb..84c19bb136f 100644
+--- a/lib/util/wscript_build
++++ b/lib/util/wscript_build
+@@ -285,4 +285,5 @@ else:
+     bld.SAMBA_BINARY('test_util_paths',
+                      source='tests/test_util_paths.c',
+                      deps='cmocka replace talloc samba-util',
+-                     local_include=False)
++                     local_include=False,
++                     install=False)
+-- 
+2.26.2
+

@@ -8,11 +8,12 @@
 
 %define main_release 0
 
-%define samba_version 4.11.10
+%define samba_version 4.11.11
 %define talloc_version 2.2.0
 %define tdb_version 1.4.2
 %define tevent_version 0.10.0
-%define ldb_version 2.0.11
+%define ldb_version 2.0.12
+
 # This should be rc1 or nil
 %define pre_release %nil
 
@@ -125,6 +126,7 @@ Source201:      README.downgrade
 Patch100:       0000-use-gnutls-for-des-cbc.patch
 Patch101:       0001-handle-removal-des-enctypes-from-krb5.patch
 Patch102:       0002-samba-tool-create-working-private-krb5.conf.patch
+Patch103:       samba-4.11.12-test_utils_install.patch
 
 Requires(pre): /usr/sbin/groupadd
 Requires(post): systemd
@@ -2255,6 +2257,7 @@ fi
 %{python3_sitearch}/samba/tests/__pycache__/dns_base.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/dns_forwarder.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/dns_invalid.*.pyc
+%{python3_sitearch}/samba/tests/__pycache__/dns_packet.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/dns_tkey.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/dns_wildcard.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/dsdb.*.pyc
@@ -2417,6 +2420,7 @@ fi
 %{python3_sitearch}/samba/tests/dns_forwarder_helpers/__pycache__/server.*.pyc
 %{python3_sitearch}/samba/tests/dns_forwarder_helpers/server.py
 %{python3_sitearch}/samba/tests/dns_invalid.py
+%{python3_sitearch}/samba/tests/dns_packet.py
 %{python3_sitearch}/samba/tests/dns_tkey.py
 %{python3_sitearch}/samba/tests/dns_wildcard.py
 %{python3_sitearch}/samba/tests/dsdb.py
@@ -3530,6 +3534,13 @@ fi
 %endif
 
 %changelog
+* Thu Jul 02 2020 Guenther Deschner <gdeschner@redhat.com> - 4.11.11-0
+- Update to Samba 4.11.11
+- resolves: #1849489, #1853255 - Security fixes for CVE-2020-10730
+- resolves: #1849491, #1853256 - Security fixes for CVE-2020-10745
+- resolves: #1849509, #1853276 - Security fixes for CVE-2020-10760
+- resolves: #1851298, #1853259 - Security fixes for CVE-2020-14303
+
 * Tue Jun 30 2020 Guenther Deschner <gdeschner@redhat.com> - 4.11.10-0
 - Update to Samba 4.11.10
 
