@@ -10,7 +10,7 @@
 
 %define main_release 0
 
-%define samba_version 4.12.4
+%define samba_version 4.12.5
 %define talloc_version 2.3.1
 %define tdb_version 1.4.3
 %define tevent_version 0.10.2
@@ -3576,6 +3576,9 @@ fi
 %endif
 
 %changelog
+* Thu Jul 02 2020 Guenther Deschner <gdeschner@redhat.com> - 4.12.5-0
+- Update to Samba 4.12.5
+
 * Thu Jul 02 2020 Guenther Deschner <gdeschner@redhat.com> - 4.12.4-0
 - Update to Samba 4.12.4
 - resolves: #1849489, #1853255 - Security fixes for CVE-2020-10730
