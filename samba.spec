@@ -8,15 +8,15 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%define main_release 1
+%define main_release 0
 
-%define samba_version 4.12.5
+%define samba_version 4.13.0
 %define talloc_version 2.3.1
 %define tdb_version 1.4.3
 %define tevent_version 0.10.2
-%define ldb_version 2.1.4
+%define ldb_version 2.2.0
 # This should be rc1 or nil
-%define pre_release %nil
+%define pre_release rc1
 
 %if "x%{?pre_release}" != "x"
 %define samba_release 0.%{main_release}.%{pre_release}%{?dist}
@@ -1334,6 +1334,7 @@ fi
 %{_libdir}/samba/vfs/time_audit.so
 %{_libdir}/samba/vfs/unityed_media.so
 %{_libdir}/samba/vfs/virusfilter.so
+%{_libdir}/samba/vfs/widelinks.so
 %{_libdir}/samba/vfs/worm.so
 %{_libdir}/samba/vfs/xattr_tdb.so
 
@@ -1386,6 +1387,7 @@ fi
 %{_mandir}/man8/vfs_time_audit.8*
 %{_mandir}/man8/vfs_unityed_media.8*
 %{_mandir}/man8/vfs_virusfilter.8*
+%{_mandir}/man8/vfs_widelinks.8*
 %{_mandir}/man8/vfs_worm.8*
 %{_mandir}/man8/vfs_xattr_tdb.8*
 
@@ -1683,6 +1685,10 @@ fi
 %{_mandir}/man8/samba_downgrade_db.8*
 %{_mandir}/man8/samba-gpupdate.8*
 %{_mandir}/man8/samba-tool.8*
+%dir %{_datadir}/samba/admx
+%{_datadir}/samba/admx/samba.admx
+%dir %{_datadir}/samba/admx/en-US
+%{_datadir}/samba/admx/en-US/samba.adml
 
 %files dc-provision
 %license source4/setup/ad-schema/licence.txt
@@ -1796,7 +1802,6 @@ fi
 %dir %{_includedir}/samba-4.0/util
 %{_includedir}/samba-4.0/util/attr.h
 %{_includedir}/samba-4.0/util/blocking.h
-%{_includedir}/samba-4.0/util/byteorder.h
 %{_includedir}/samba-4.0/util/data_blob.h
 %{_includedir}/samba-4.0/util/debug.h
 %{_includedir}/samba-4.0/util/discard.h
@@ -1954,6 +1959,7 @@ fi
 %attr(644,root,root) %{perl_vendorlib}/Parse/Pidl/Samba4/Template.pm
 %dir %{perl_vendorlib}/Parse/Pidl/Samba4/NDR
 %attr(644,root,root) %{perl_vendorlib}/Parse/Pidl/Samba4/NDR/Server.pm
+%attr(644,root,root) %{perl_vendorlib}/Parse/Pidl/Samba4/NDR/ServerCompat.pm
 %attr(644,root,root) %{perl_vendorlib}/Parse/Pidl/Samba4/NDR/Client.pm
 %attr(644,root,root) %{perl_vendorlib}/Parse/Pidl/Samba4/NDR/Parser.pm
 %attr(644,root,root) %{perl_vendorlib}/Parse/Pidl/Samba4/TDR.pm
@@ -1982,6 +1988,7 @@ fi
 %{python3_sitearch}/samba/__pycache__/getopt.*.pyc
 %{python3_sitearch}/samba/__pycache__/gpclass.*.pyc
 %{python3_sitearch}/samba/__pycache__/gp_ext_loader.*.pyc
+%{python3_sitearch}/samba/__pycache__/gp_scripts_ext.*.pyc
 %{python3_sitearch}/samba/__pycache__/gp_sec_ext.*.pyc
 %{python3_sitearch}/samba/__pycache__/graph.*.pyc
 %{python3_sitearch}/samba/__pycache__/hostconfig.*.pyc
@@ -2058,6 +2065,7 @@ fi
 %{python3_sitearch}/samba/gensec.*.so
 %{python3_sitearch}/samba/getopt.py
 %{python3_sitearch}/samba/gpclass.py
+%{python3_sitearch}/samba/gp_scripts_ext.py
 %{python3_sitearch}/samba/gp_sec_ext.py
 %{python3_sitearch}/samba/gpo.*.so
 %{python3_sitearch}/samba/graph.py
@@ -2394,6 +2402,8 @@ fi
 %{python3_sitearch}/samba/tests/blackbox/__pycache__/ndrdump.*.pyc
 %{python3_sitearch}/samba/tests/blackbox/__pycache__/netads_json.*.pyc
 %{python3_sitearch}/samba/tests/blackbox/__pycache__/samba_dnsupdate.*.pyc
+%{python3_sitearch}/samba/tests/blackbox/__pycache__/smbcacls.*.pyc
+%{python3_sitearch}/samba/tests/blackbox/__pycache__/smbcacls_basic.*.pyc
 %{python3_sitearch}/samba/tests/blackbox/__pycache__/smbcontrol.*.pyc
 %{python3_sitearch}/samba/tests/blackbox/__pycache__/smbcontrol_process.*.pyc
 %{python3_sitearch}/samba/tests/blackbox/__pycache__/traffic_learner.*.pyc
@@ -2406,6 +2416,8 @@ fi
 %{python3_sitearch}/samba/tests/blackbox/ndrdump.py
 %{python3_sitearch}/samba/tests/blackbox/netads_json.py
 %{python3_sitearch}/samba/tests/blackbox/samba_dnsupdate.py
+%{python3_sitearch}/samba/tests/blackbox/smbcacls.py
+%{python3_sitearch}/samba/tests/blackbox/smbcacls_basic.py
 %{python3_sitearch}/samba/tests/blackbox/smbcontrol.py
 %{python3_sitearch}/samba/tests/blackbox/smbcontrol_process.py
 %{python3_sitearch}/samba/tests/blackbox/traffic_learner.py
@@ -2498,6 +2510,20 @@ fi
 %{python3_sitearch}/samba/tests/kcc/graph_utils.py
 %{python3_sitearch}/samba/tests/kcc/kcc_utils.py
 %{python3_sitearch}/samba/tests/kcc/ldif_import_export.py
+%dir %{python3_sitearch}/samba/tests/krb5
+%dir %{python3_sitearch}/samba/tests/krb5/__pycache__
+%{python3_sitearch}/samba/tests/krb5/__pycache__/kcrypto.*.pyc
+%{python3_sitearch}/samba/tests/krb5/__pycache__/raw_testcase.*.pyc
+%{python3_sitearch}/samba/tests/krb5/__pycache__/rfc4120_pyasn1.*.pyc
+%{python3_sitearch}/samba/tests/krb5/__pycache__/simple_tests.*.pyc
+%{python3_sitearch}/samba/tests/krb5/__pycache__/s4u_tests.*.pyc
+%{python3_sitearch}/samba/tests/krb5/__pycache__/xrealm_tests.*.pyc
+%{python3_sitearch}/samba/tests/krb5/kcrypto.py
+%{python3_sitearch}/samba/tests/krb5/raw_testcase.py
+%{python3_sitearch}/samba/tests/krb5/rfc4120_pyasn1.py
+%{python3_sitearch}/samba/tests/krb5/simple_tests.py
+%{python3_sitearch}/samba/tests/krb5/s4u_tests.py
+%{python3_sitearch}/samba/tests/krb5/xrealm_tests.py
 %{python3_sitearch}/samba/tests/krb5_credentials.py
 %{python3_sitearch}/samba/tests/ldap_raw.py
 %{python3_sitearch}/samba/tests/ldap_referrals.py
@@ -2574,6 +2600,9 @@ fi
 %{python3_sitearch}/samba/tests/samba_tool/__pycache__/user.*.pyc
 %{python3_sitearch}/samba/tests/samba_tool/__pycache__/user_check_password_script.*.pyc
 %{python3_sitearch}/samba/tests/samba_tool/__pycache__/user_virtualCryptSHA.*.pyc
+%{python3_sitearch}/samba/tests/samba_tool/__pycache__/user_virtualCryptSHA_base.*.pyc
+%{python3_sitearch}/samba/tests/samba_tool/__pycache__/user_virtualCryptSHA_gpg.*.pyc
+%{python3_sitearch}/samba/tests/samba_tool/__pycache__/user_virtualCryptSHA_userPassword.*.pyc
 %{python3_sitearch}/samba/tests/samba_tool/__pycache__/user_wdigest.*.pyc
 %{python3_sitearch}/samba/tests/samba_tool/__pycache__/visualize.*.pyc
 %{python3_sitearch}/samba/tests/samba_tool/__pycache__/visualize_drs.*.pyc
@@ -2605,6 +2634,9 @@ fi
 %{python3_sitearch}/samba/tests/samba_tool/user.py
 %{python3_sitearch}/samba/tests/samba_tool/user_check_password_script.py
 %{python3_sitearch}/samba/tests/samba_tool/user_virtualCryptSHA.py
+%{python3_sitearch}/samba/tests/samba_tool/user_virtualCryptSHA_base.py
+%{python3_sitearch}/samba/tests/samba_tool/user_virtualCryptSHA_gpg.py
+%{python3_sitearch}/samba/tests/samba_tool/user_virtualCryptSHA_userPassword.py
 %{python3_sitearch}/samba/tests/samba_tool/user_wdigest.py
 %{python3_sitearch}/samba/tests/samba_tool/visualize.py
 %{python3_sitearch}/samba/tests/samba_tool/visualize_drs.py
@@ -2789,6 +2821,7 @@ fi
 %{_datadir}/ctdb/events/legacy/31.clamd.script
 %{_datadir}/ctdb/events/legacy/40.vsftpd.script
 %{_datadir}/ctdb/events/legacy/41.httpd.script
+%{_datadir}/ctdb/events/legacy/48.netbios.script
 %{_datadir}/ctdb/events/legacy/49.winbind.script
 %{_datadir}/ctdb/events/legacy/50.samba.script
 %{_datadir}/ctdb/events/legacy/60.nfs.script
@@ -2889,6 +2922,7 @@ fi
 %{_datadir}/ctdb/tests/INTEGRATION/database/basics.004.wipe.sh
 %{_datadir}/ctdb/tests/INTEGRATION/database/basics.010.backup_restore.sh
 %{_datadir}/ctdb/tests/INTEGRATION/database/fetch.001.ring.sh
+%{_datadir}/ctdb/tests/INTEGRATION/database/fetch.002.ring-hotkeys.sh
 %{_datadir}/ctdb/tests/INTEGRATION/database/readonly.001.basic.sh
 %{_datadir}/ctdb/tests/INTEGRATION/database/recovery.001.volatile.sh
 %{_datadir}/ctdb/tests/INTEGRATION/database/recovery.002.large.sh
@@ -2999,6 +3033,8 @@ fi
 %{_datadir}/ctdb/tests/UNIT/cunit/sock_io_test_001.sh
 %{_datadir}/ctdb/tests/UNIT/cunit/srvid_test_001.sh
 %{_datadir}/ctdb/tests/UNIT/cunit/system_socket_test_001.sh
+%{_datadir}/ctdb/tests/UNIT/cunit/system_socket_test_002.sh
+%{_datadir}/ctdb/tests/UNIT/cunit/system_socket_test_003.sh
 %dir %{_datadir}/ctdb/tests/UNIT/eventd
 %dir %{_datadir}/ctdb/tests/UNIT/eventd/etc-ctdb
 %{_datadir}/ctdb/tests/UNIT/eventd/etc-ctdb/ctdb.conf
@@ -3182,6 +3218,8 @@ fi
 %{_datadir}/ctdb/tests/UNIT/eventscripts/41.httpd.monitor.002.sh
 %{_datadir}/ctdb/tests/UNIT/eventscripts/41.httpd.shutdown.002.sh
 %{_datadir}/ctdb/tests/UNIT/eventscripts/41.httpd.startup.002.sh
+%{_datadir}/ctdb/tests/UNIT/eventscripts/48.netbios.shutdown.011.sh
+%{_datadir}/ctdb/tests/UNIT/eventscripts/48.netbios.startup.011.sh
 %{_datadir}/ctdb/tests/UNIT/eventscripts/49.winbind.monitor.101.sh
 %{_datadir}/ctdb/tests/UNIT/eventscripts/49.winbind.monitor.102.sh
 %{_datadir}/ctdb/tests/UNIT/eventscripts/49.winbind.shutdown.002.sh
@@ -3271,6 +3309,7 @@ fi
 %{_datadir}/ctdb/tests/UNIT/eventscripts/scripts/31.clamd.sh
 %{_datadir}/ctdb/tests/UNIT/eventscripts/scripts/40.vsftpd.sh
 %{_datadir}/ctdb/tests/UNIT/eventscripts/scripts/41.httpd.sh
+%{_datadir}/ctdb/tests/UNIT/eventscripts/scripts/48.netbios.sh
 %{_datadir}/ctdb/tests/UNIT/eventscripts/scripts/49.winbind.sh
 %{_datadir}/ctdb/tests/UNIT/eventscripts/scripts/50.samba.sh
 %{_datadir}/ctdb/tests/UNIT/eventscripts/scripts/60.nfs.sh
@@ -3462,6 +3501,7 @@ fi
 %{_datadir}/ctdb/tests/UNIT/tool/ctdb.getdbstatus.001.sh
 %{_datadir}/ctdb/tests/UNIT/tool/ctdb.getdbstatus.002.sh
 %{_datadir}/ctdb/tests/UNIT/tool/ctdb.getpid.001.sh
+%{_datadir}/ctdb/tests/UNIT/tool/ctdb.getpid.010.sh
 %{_datadir}/ctdb/tests/UNIT/tool/ctdb.getreclock.001.sh
 %{_datadir}/ctdb/tests/UNIT/tool/ctdb.getreclock.002.sh
 %{_datadir}/ctdb/tests/UNIT/tool/ctdb.getvar.001.sh
@@ -3488,6 +3528,7 @@ fi
 %{_datadir}/ctdb/tests/UNIT/tool/ctdb.lvs.006.sh
 %{_datadir}/ctdb/tests/UNIT/tool/ctdb.lvs.007.sh
 %{_datadir}/ctdb/tests/UNIT/tool/ctdb.lvs.008.sh
+%{_datadir}/ctdb/tests/UNIT/tool/ctdb.lvs.010.sh
 %{_datadir}/ctdb/tests/UNIT/tool/ctdb.natgw.001.sh
 %{_datadir}/ctdb/tests/UNIT/tool/ctdb.natgw.002.sh
 %{_datadir}/ctdb/tests/UNIT/tool/ctdb.natgw.003.sh
@@ -3496,6 +3537,7 @@ fi
 %{_datadir}/ctdb/tests/UNIT/tool/ctdb.natgw.006.sh
 %{_datadir}/ctdb/tests/UNIT/tool/ctdb.natgw.007.sh
 %{_datadir}/ctdb/tests/UNIT/tool/ctdb.natgw.008.sh
+%{_datadir}/ctdb/tests/UNIT/tool/ctdb.natgw.010.sh
 %{_datadir}/ctdb/tests/UNIT/tool/ctdb.nodestatus.001.sh
 %{_datadir}/ctdb/tests/UNIT/tool/ctdb.nodestatus.002.sh
 %{_datadir}/ctdb/tests/UNIT/tool/ctdb.nodestatus.003.sh
@@ -3576,6 +3618,9 @@ fi
 %endif
 
 %changelog
+* Thu Jul 09 2020 Guenther Deschner <gdeschner@redhat.com> - 4.13.0rc1-0
+- Update to Samba 4.13.0rc1
+
 * Wed Jul 08 2020 Merlin Mathesius <mmathesi@redhat.com> - 4.12.5-1
 - Remove nonexistent --without-winexe option from configure
 
