@@ -8,7 +8,7 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%define main_release 0
+%define main_release 1
 
 %define samba_version 4.13.0
 %define talloc_version 2.3.1
@@ -1338,6 +1338,10 @@ fi
 %{_libdir}/samba/vfs/worm.so
 %{_libdir}/samba/vfs/xattr_tdb.so
 
+%dir %{_datadir}/samba
+%dir %{_datadir}/samba/mdssvc
+%{_datadir}/samba/mdssvc/elasticsearch_mappings.json
+
 %{_unitdir}/nmb.service
 %{_unitdir}/smb.service
 %attr(1777,root,root) %dir /var/spool/samba
@@ -1446,9 +1450,6 @@ fi
 %{_mandir}/man8/cifsdd.8.*
 %{_mandir}/man8/samba-regedit.8*
 %{_mandir}/man8/smbspool.8*
-%dir %{_datadir}/samba
-%dir %{_datadir}/samba/mdssvc
-%{_datadir}/samba/mdssvc/elasticsearch_mappings.json
 
 ### CLIENT-LIBS
 %files client-libs
@@ -3618,6 +3619,9 @@ fi
 %endif
 
 %changelog
+* Tue Jul 14 2020 Andreas Schneider <asn@redhat.com> - 4.13.0rc1-1
+- Move mdssvc data files to correct package
+
 * Thu Jul 09 2020 Guenther Deschner <gdeschner@redhat.com> - 4.13.0rc1-0
 - Update to Samba 4.13.0rc1
 
