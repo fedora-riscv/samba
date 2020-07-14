@@ -101,7 +101,7 @@
 
 Name:           samba
 Version:        %{samba_version}
-Release:        %{samba_release}
+Release:        %{samba_release}.1
 
 %if 0%{?rhel}
 Epoch:          0
@@ -909,16 +909,16 @@ export LDFLAGS="%{__global_ldflags} -fuse-ld=gold"
         --systemd-winbind-extra=%{_systemd_extra} \
         --systemd-samba-extra=%{_systemd_extra}
 
-make %{?_smp_mflags}
+%make_build
 
 pushd pidl
 %__perl Makefile.PL PREFIX=%{_prefix}
 
-make %{?_smp_mflags}
+%make_build
 popd
 
 %install
-make %{?_smp_mflags} install DESTDIR=%{buildroot}
+%make_install
 
 install -d -m 0755 %{buildroot}/usr/{sbin,bin}
 install -d -m 0755 %{buildroot}%{_libdir}/security
@@ -1105,7 +1105,7 @@ popd
 
 %if %{with testsuite}
 %check
-TDB_NO_FSYNC=1 make %{?_smp_mflags} test FAIL_IMMEDIATELY=1
+TDB_NO_FSYNC=1 %make_build test FAIL_IMMEDIATELY=1
 #endif with testsuite
 %endif
 
@@ -3619,6 +3619,10 @@ fi
 %endif
 
 %changelog
+* Tue Jul 14 2020 Tom Stellard <tstellar@redhat.com> - 2:4.13.0-0.1.rc1.1
+- Use make macros
+- https://fedoraproject.org/wiki/Changes/UseMakeBuildInstallMacro
+
 * Tue Jul 14 2020 Andreas Schneider <asn@redhat.com> - 4.13.0rc1-1
 - Move mdssvc data files to correct package
 
