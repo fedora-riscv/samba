@@ -8,7 +8,7 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%define main_release 1
+%define main_release 2
 
 %define samba_version 4.13.0
 %define talloc_version 2.3.1
@@ -101,7 +101,7 @@
 
 Name:           samba
 Version:        %{samba_version}
-Release:        %{samba_release}.1
+Release:        %{samba_release}
 
 %if 0%{?rhel}
 Epoch:          0
@@ -3619,9 +3619,9 @@ fi
 %endif
 
 %changelog
-* Tue Jul 14 2020 Tom Stellard <tstellar@redhat.com> - 2:4.13.0-0.1.rc1.1
+* Tue Jul 14 2020 Tom Stellard <tstellar@redhat.com> - 2:4.13.0-0.2.rc1
 - Use make macros
-- https://fedoraproject.org/wiki/Changes/UseMakeBuildInstallMacro
+  https://fedoraproject.org/wiki/Changes/UseMakeBuildInstallMacro
 
 * Tue Jul 14 2020 Andreas Schneider <asn@redhat.com> - 4.13.0rc1-1
 - Move mdssvc data files to correct package
