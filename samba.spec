@@ -101,7 +101,7 @@
 
 Name:           samba
 Version:        %{samba_version}
-Release:        %{samba_release}
+Release:        %{samba_release}.1
 
 %if 0%{?rhel}
 Epoch:          0
@@ -3619,6 +3619,9 @@ fi
 %endif
 
 %changelog
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2:4.13.0-0.2.rc1.1
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
 * Tue Jul 14 2020 Tom Stellard <tstellar@redhat.com> - 2:4.13.0-0.2.rc1
 - Use make macros
   https://fedoraproject.org/wiki/Changes/UseMakeBuildInstallMacro
