@@ -8,7 +8,7 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%define main_release 1
+%define main_release 2
 
 %define samba_version 4.12.5
 %define talloc_version 2.3.1
@@ -386,7 +386,6 @@ Requires: ldb-tools
 # See bug 1507420
 %samba_requires_eq libldb
 
-Requires: python3-crypto
 Requires: python3-%{name} = %{samba_depver}
 Requires: python3-%{name}-dc = %{samba_depver}
 Requires: krb5-server >= %{required_mit_krb5}
@@ -2680,6 +2679,7 @@ fi
 ### WINBIND-KRB5-LOCATOR
 %files winbind-krb5-locator
 %ghost %{_libdir}/krb5/plugins/libkrb5/winbind_krb5_locator.so
+%dir %{_libdir}/samba/krb5
 %{_libdir}/samba/krb5/winbind_krb5_locator.so
 %{_mandir}/man8/winbind_krb5_locator.8*
 
@@ -3577,6 +3577,10 @@ fi
 %endif
 
 %changelog
+* Wed Aug 12 2020 Andreas Schneider <asn@redhat.com> - 4.12.15-2
+- resolves: #1865831 - Add missing /usr/lib64/samba/krb5 directory
+- resolves: #1866989 - Remove obsolete python3-crypto dependency
+
 * Tue Jul 14 2020 Andreas Schneider <asn@redhat.com> - 4.12.15-1
 - Move mdssvc data files to correct package
 
