@@ -8,7 +8,7 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%define main_release 2
+%define main_release 3
 
 %define samba_version 4.13.0
 %define talloc_version 2.3.1
@@ -101,7 +101,7 @@
 
 Name:           samba
 Version:        %{samba_version}
-Release:        %{samba_release}.1
+Release:        %{samba_release}
 
 %if 0%{?rhel}
 Epoch:          0
@@ -391,7 +391,6 @@ Requires: ldb-tools
 # See bug 1507420
 %samba_requires_eq libldb
 
-Requires: python3-crypto
 Requires: python3-%{name} = %{samba_depver}
 Requires: python3-%{name}-dc = %{samba_depver}
 Requires: krb5-server >= %{required_mit_krb5}
@@ -2712,6 +2711,7 @@ fi
 ### WINBIND-KRB5-LOCATOR
 %files winbind-krb5-locator
 %ghost %{_libdir}/krb5/plugins/libkrb5/winbind_krb5_locator.so
+%dir %{_libdir}/samba/krb5
 %{_libdir}/samba/krb5/winbind_krb5_locator.so
 %{_mandir}/man8/winbind_krb5_locator.8*
 
@@ -3619,6 +3619,10 @@ fi
 %endif
 
 %changelog
+* Wed Aug 12 2020 Andreas Schneider <asn@redhat.com> - 4.13.0rc1-3
+- resolves: #1865831 - Add missing /usr/lib64/samba/krb5 directory
+- resolves: #1866989 - Remove obsolete python3-crypto dependency
+
 * Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2:4.13.0-0.2.rc1.1
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
