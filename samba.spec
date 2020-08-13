@@ -8,9 +8,9 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%define main_release 2
+%define main_release 0
 
-%define samba_version 4.12.5
+%define samba_version 4.12.6
 %define talloc_version 2.3.1
 %define tdb_version 1.4.3
 %define tevent_version 0.10.2
@@ -2574,6 +2574,9 @@ fi
 %{python3_sitearch}/samba/tests/samba_tool/__pycache__/user.*.pyc
 %{python3_sitearch}/samba/tests/samba_tool/__pycache__/user_check_password_script.*.pyc
 %{python3_sitearch}/samba/tests/samba_tool/__pycache__/user_virtualCryptSHA.*.pyc
+%{python3_sitearch}/samba/tests/samba_tool/__pycache__/user_virtualCryptSHA_base.*.pyc
+%{python3_sitearch}/samba/tests/samba_tool/__pycache__/user_virtualCryptSHA_gpg.*.pyc
+%{python3_sitearch}/samba/tests/samba_tool/__pycache__/user_virtualCryptSHA_userPassword.*.pyc
 %{python3_sitearch}/samba/tests/samba_tool/__pycache__/user_wdigest.*.pyc
 %{python3_sitearch}/samba/tests/samba_tool/__pycache__/visualize.*.pyc
 %{python3_sitearch}/samba/tests/samba_tool/__pycache__/visualize_drs.*.pyc
@@ -2605,6 +2608,9 @@ fi
 %{python3_sitearch}/samba/tests/samba_tool/user.py
 %{python3_sitearch}/samba/tests/samba_tool/user_check_password_script.py
 %{python3_sitearch}/samba/tests/samba_tool/user_virtualCryptSHA.py
+%{python3_sitearch}/samba/tests/samba_tool/user_virtualCryptSHA_base.py
+%{python3_sitearch}/samba/tests/samba_tool/user_virtualCryptSHA_gpg.py
+%{python3_sitearch}/samba/tests/samba_tool/user_virtualCryptSHA_userPassword.py
 %{python3_sitearch}/samba/tests/samba_tool/user_wdigest.py
 %{python3_sitearch}/samba/tests/samba_tool/visualize.py
 %{python3_sitearch}/samba/tests/samba_tool/visualize_drs.py
@@ -3304,6 +3310,7 @@ fi
 %{_datadir}/ctdb/tests/UNIT/eventscripts/stubs/killall
 %{_datadir}/ctdb/tests/UNIT/eventscripts/stubs/multipath
 %{_datadir}/ctdb/tests/UNIT/eventscripts/stubs/net
+%{_datadir}/ctdb/tests/UNIT/eventscripts/stubs/nfsconf
 %{_datadir}/ctdb/tests/UNIT/eventscripts/stubs/pidof
 %{_datadir}/ctdb/tests/UNIT/eventscripts/stubs/pkill
 %{_datadir}/ctdb/tests/UNIT/eventscripts/stubs/ps
@@ -3577,6 +3584,9 @@ fi
 %endif
 
 %changelog
+* Thu Aug 13 2020 Guenther Deschner <gdeschner@redhat.com> - 4.12.6-0
+- Update to Samba 4.12.6
+
 * Wed Aug 12 2020 Andreas Schneider <asn@redhat.com> - 4.12.15-2
 - resolves: #1865831 - Add missing /usr/lib64/samba/krb5 directory
 - resolves: #1866989 - Remove obsolete python3-crypto dependency
