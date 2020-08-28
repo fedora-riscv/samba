@@ -8,7 +8,7 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%define main_release 4
+%define main_release 5
 
 %define samba_version 4.13.0
 %define talloc_version 2.3.1
@@ -16,7 +16,7 @@
 %define tevent_version 0.10.2
 %define ldb_version 2.2.0
 # This should be rc1 or nil
-%define pre_release rc2
+%define pre_release rc3
 
 %if "x%{?pre_release}" != "x"
 %define samba_release 0.%{main_release}.%{pre_release}%{?dist}
@@ -3617,9 +3617,13 @@ fi
 ### WINEXE
 %files winexe
 %{_bindir}/winexe
+%{_mandir}/man1/winexe.1.gz
 %endif
 
 %changelog
+* Fri Aug 28 2020 Guenther Deschner <gdeschner@redhat.com> - 4.13.0rc2-5
+- Update to Samba 4.13.0rc3
+
 * Fri Aug 14 2020 Guenther Deschner <gdeschner@redhat.com> - 4.13.0rc2-4
 - Update to Samba 4.13.0rc2
 
