@@ -8,7 +8,7 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%define main_release 5
+%define main_release 6
 
 %define samba_version 4.13.0
 %define talloc_version 2.3.1
@@ -83,10 +83,8 @@
 %global with_clustering_support 1
 %endif
 
-%global with_winexe 1
-%if 0%{?rhel}
-%global with_winexe 0
-%endif
+# Enable winexe by default
+%bcond_without winexe
 
 %global with_vfs_io_uring 0
 # We need liburing >= 0.4 which is not available in RHEL yet
@@ -194,7 +192,7 @@ BuildRequires: libtirpc-devel
 BuildRequires: libuuid-devel
 BuildRequires: libxslt
 BuildRequires: lmdb
-%if %{with_winexe}
+%if %{with winexe}
 BuildRequires: mingw32-gcc
 BuildRequires: mingw64-gcc
 %endif
@@ -753,7 +751,7 @@ The samba-winbind-modules package provides the NSS library and a PAM module
 necessary to communicate to the Winbind Daemon
 
 ### WINEXE
-%if %{with_winexe}
+%if %{with winexe}
 %package winexe
 Summary: Samba Winexe Windows Binary
 License: GPLv3
@@ -3613,7 +3611,7 @@ fi
 #endif with_clustering_support
 %endif
 
-%if %{with_winexe}
+%if %{with winexe}
 ### WINEXE
 %files winexe
 %{_bindir}/winexe
@@ -3621,6 +3619,9 @@ fi
 %endif
 
 %changelog
+* Fri Aug 28 2020 Neal Gompa <ngompa13@gmail.com> - 4.13.0rc3-6
+- Enable winexe by default everywhere
+
 * Fri Aug 28 2020 Guenther Deschner <gdeschner@redhat.com> - 4.13.0rc3-5
 - Update to Samba 4.13.0rc3
 
