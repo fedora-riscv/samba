@@ -3621,7 +3621,7 @@ fi
 %endif
 
 %changelog
-* Fri Aug 28 2020 Guenther Deschner <gdeschner@redhat.com> - 4.13.0rc2-5
+* Fri Aug 28 2020 Guenther Deschner <gdeschner@redhat.com> - 4.13.0rc3-5
 - Update to Samba 4.13.0rc3
 
 * Fri Aug 14 2020 Guenther Deschner <gdeschner@redhat.com> - 4.13.0rc2-4
