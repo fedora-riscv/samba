@@ -8,7 +8,7 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%define main_release 7
+%define main_release 8
 
 %define samba_version 4.13.0
 %define talloc_version 2.3.1
@@ -3619,7 +3619,7 @@ fi
 %endif
 
 %changelog
-* Mon Sep 07 2020 Guenther Deschner <gdeschner@redhat.com> - 4.13.0rc4-7
+* Mon Sep 07 2020 Guenther Deschner <gdeschner@redhat.com> - 4.13.0rc4-8
 - Update to Samba 4.13.0rc4
 
 * Fri Aug 28 2020 Neal Gompa <ngompa13@gmail.com> - 4.13.0rc3-6
