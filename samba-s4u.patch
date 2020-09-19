@@ -1,0 +1,726 @@
+From fe300549844509624d944b93fc64dc6d382e71c1 Mon Sep 17 00:00:00 2001
+From: Isaac Boukris <iboukris@gmail.com>
+Date: Fri, 27 Sep 2019 18:25:03 +0300
+Subject: [PATCH 3/7] mit-kdc: add basic loacl realm S4U support
+
+Signed-off-by: Isaac Boukris <iboukris@gmail.com>
+Pair-Programmed-With: Andreas Schneider <asn@samba.org>
+---
+ source4/kdc/mit-kdb/kdb_samba_policies.c      | 148 +++++++++---------
+ source4/kdc/mit_samba.c                       |  47 ++----
+ source4/kdc/mit_samba.h                       |   6 +-
+ wscript_configure_system_mitkrb5              |   3 +
+ 6 files changed, 91 insertions(+), 115 deletions(-)
+
+diff --git a/source4/kdc/mit-kdb/kdb_samba_policies.c b/source4/kdc/mit-kdb/kdb_samba_policies.c
+index 9197551ed61..944324d9a2f 100644
+--- a/source4/kdc/mit-kdb/kdb_samba_policies.c
++++ b/source4/kdc/mit-kdb/kdb_samba_policies.c
+@@ -192,13 +192,17 @@ static krb5_error_code ks_verify_pac(krb5_context context,
+ 				     krb5_keyblock *krbtgt_key,
+ 				     krb5_timestamp authtime,
+ 				     krb5_authdata **tgt_auth_data,
+-				     krb5_pac *pac)
++				     krb5_pac *out_pac)
+ {
+ 	struct mit_samba_context *mit_ctx;
+ 	krb5_authdata **authdata = NULL;
+-	krb5_pac ipac = NULL;
+-	DATA_BLOB logon_data = { NULL, 0 };
++	krb5_keyblock *header_server_key = NULL;
++	krb5_key_data *impersonator_kd = NULL;
++	krb5_keyblock impersonator_key = {0};
+ 	krb5_error_code code;
++	krb5_pac pac;
++
++	*out_pac = NULL;
+ 
+ 	mit_ctx = ks_get_context(context);
+ 	if (mit_ctx == NULL) {
+@@ -230,41 +234,43 @@ static krb5_error_code ks_verify_pac(krb5_context context,
+ 	code = krb5_pac_parse(context,
+ 			      authdata[0]->contents,
+ 			      authdata[0]->length,
+-			      &ipac);
++			      &pac);
+ 	if (code != 0) {
+ 		goto done;
+ 	}
+ 
+-	/* TODO: verify this is correct
+-	 *
+-	 * In the constrained delegation case, the PAC is from a service
+-	 * ticket rather than a TGT; we must verify the server and KDC
+-	 * signatures to assert that the server did not forge the PAC.
++	/*
++	 * For constrained delegation in MIT version < 1.18 we aren't provided
++	 * with the 2nd ticket server key to verify the PAC.
++	 * We can workaround that by fetching the key from the client db entry,
++	 * which is the impersonator account in that version.
++	 * TODO: use the provided entry in the new 1.18 version.
+ 	 */
+ 	if (flags & KRB5_KDB_FLAG_CONSTRAINED_DELEGATION) {
+-		code = krb5_pac_verify(context,
+-				       ipac,
+-				       authtime,
+-				       client_princ,
+-				       server_key,
+-				       krbtgt_key);
++		/* The impersonator must be local. */
++		if (client == NULL) {
++			code = KRB5KDC_ERR_BADOPTION;
++			goto done;
++		}
++		/* Fetch and decrypt 2nd ticket server's current key. */
++		code = krb5_dbe_find_enctype(context, client, -1, -1, 0,
++					     &impersonator_kd);
++		if (code != 0) {
++			goto done;
++		}
++		code = krb5_dbe_decrypt_key_data(context, NULL,
++						 impersonator_kd,
++						 &impersonator_key, NULL);
++		if (code != 0) {
++			goto done;
++		}
++		header_server_key = &impersonator_key;
+ 	} else {
+-		code = krb5_pac_verify(context,
+-				       ipac,
+-				       authtime,
+-				       client_princ,
+-				       krbtgt_key,
+-				       NULL);
+-	}
+-	if (code != 0) {
+-		goto done;
++		header_server_key = krbtgt_key;
+ 	}
+ 
+-	/* check and update PAC */
+-	code = krb5_pac_parse(context,
+-			      authdata[0]->contents,
+-			      authdata[0]->length,
+-			      pac);
++	code = krb5_pac_verify(context, pac, authtime, client_princ,
++			       header_server_key, NULL);
+ 	if (code != 0) {
+ 		goto done;
+ 	}
+@@ -272,17 +278,22 @@ static krb5_error_code ks_verify_pac(krb5_context context,
+ 	code = mit_samba_reget_pac(mit_ctx,
+ 				   context,
+ 				   flags,
+-				   client_princ,
+ 				   client,
+ 				   server,
+ 				   krbtgt,
+ 				   krbtgt_key,
+-				   pac);
++				   &pac);
++	if (code != 0) {
++		goto done;
++	}
++
++	*out_pac = pac;
++	pac = NULL;
+ 
+ done:
++	krb5_free_keyblock_contents(context, &impersonator_key);
+ 	krb5_free_authdata(context, authdata);
+-	krb5_pac_free(context, ipac);
+-	free(logon_data.data);
++	krb5_pac_free(context, pac);
+ 
+ 	return code;
+ }
+@@ -324,7 +335,7 @@ krb5_error_code kdb_samba_db_sign_auth_data(krb5_context context,
+ {
+ #endif
+ 	krb5_authdata **authdata = NULL;
+-	krb5_boolean is_as_req;
++	krb5_const_principal pac_client;
+ 	krb5_error_code code;
+ 	krb5_pac pac = NULL;
+ 	krb5_data pac_data;
+@@ -334,24 +345,21 @@ krb5_error_code kdb_samba_db_sign_auth_data(krb5_context context,
+ 	krbtgt_key = krbtgt_key == NULL ? local_krbtgt_key : krbtgt_key;
+ #endif
+ 
+-	/* FIXME: We don't support S4U yet */
+-	if (flags & KRB5_KDB_FLAGS_S4U) {
+-		return KRB5_KDB_DBTYPE_NOSUP;
+-	}
+-
+-	is_as_req = ((flags & KRB5_KDB_FLAG_CLIENT_REFERRALS_ONLY) != 0);
+-
+-	if (is_as_req && (flags & KRB5_KDB_FLAG_INCLUDE_PAC)) {
+-		code = ks_get_pac(context, client, client_key, &pac);
+-		if (code != 0) {
+-			goto done;
+-		}
++	/* In protocol transition, we are currently not provided with the tgt
++	 * client name to verify the PAC, we could probably skip the name
++	 * verification and just verify the signatures, but since we don't
++	 * support cross-realm nor aliases, we can just use server->princ */
++	if (flags & KRB5_KDB_FLAG_PROTOCOL_TRANSITION) {
++		pac_client = server->princ;
++	} else {
++		pac_client = client_princ;
+ 	}
+ 
+-	if (!is_as_req) {
++	/* TGS request */
++	if (!(flags & KRB5_KDB_FLAG_CLIENT_REFERRALS_ONLY)) {
+ 		code = ks_verify_pac(context,
+ 				     flags,
+-				     client_princ,
++				     pac_client,
+ 				     client,
+ 				     server,
+ 				     krbtgt,
+@@ -363,14 +371,28 @@ krb5_error_code kdb_samba_db_sign_auth_data(krb5_context context,
+ 		if (code != 0) {
+ 			goto done;
+ 		}
++
++		/* We require PAC as we don't support LSA_TRUST_TYPE_MIT */
++		if (pac == NULL) {
++			code = KRB5_KDB_DBTYPE_NOSUP;
++			goto done;
++		}
+ 	}
+ 
+-	if (pac == NULL && client != NULL) {
++	if (flags & KRB5_KDB_FLAG_PROTOCOL_TRANSITION) {
++		krb5_pac_free(context, pac);
++		pac = NULL;
++	}
+ 
++	/* AS request or local realm protocol transition */
++	if ((flags & KRB5_KDB_FLAG_CLIENT_REFERRALS_ONLY) ||
++	    (client != NULL && (flags & KRB5_KDB_FLAG_PROTOCOL_TRANSITION))) {
+ 		code = ks_get_pac(context, client, client_key, &pac);
+ 		if (code != 0) {
+ 			goto done;
+ 		}
++		/* We require a pac! */
++		SMB_ASSERT(pac != NULL);
+ 	}
+ 
+ 	if (pac == NULL) {
+@@ -379,7 +401,7 @@ krb5_error_code kdb_samba_db_sign_auth_data(krb5_context context,
+ 	}
+ 
+ 	code = krb5_pac_sign(context, pac, authtime, client_princ,
+-			server_key, krbtgt_key, &pac_data);
++			     server_key, krbtgt_key, &pac_data);
+ 	if (code != 0) {
+ 		DBG_ERR("krb5_pac_sign failed: %d\n", code);
+ 		goto done;
+@@ -405,11 +427,6 @@ krb5_error_code kdb_samba_db_sign_auth_data(krb5_context context,
+ 					      KRB5_AUTHDATA_IF_RELEVANT,
+ 					      authdata,
+ 					      signed_auth_data);
+-	if (code != 0) {
+-		goto done;
+-	}
+-
+-	code = 0;
+ 
+ done:
+ 	krb5_pac_free(context, pac);
+@@ -432,32 +449,13 @@ krb5_error_code kdb_samba_db_check_allowed_to_delegate(krb5_context context,
+ 	 * server; -> delegating service
+ 	 * proxy; -> target principal
+ 	 */
+-	krb5_db_entry *delegating_service = discard_const_p(krb5_db_entry, server);
+-
+-	char *target_name = NULL;
+-	bool is_enterprise;
+-	krb5_error_code code;
+ 
+ 	mit_ctx = ks_get_context(context);
+ 	if (mit_ctx == NULL) {
+ 		return KRB5_KDB_DBNOTINITED;
+ 	}
+ 
+-	code = krb5_unparse_name(context, proxy, &target_name);
+-	if (code) {
+-		goto done;
+-	}
+-
+-	is_enterprise = (proxy->type == KRB5_NT_ENTERPRISE_PRINCIPAL);
+-
+-	code = mit_samba_check_s4u2proxy(mit_ctx,
+-					 delegating_service,
+-					 target_name,
+-					 is_enterprise);
+-
+-done:
+-	free(target_name);
+-	return code;
++	return mit_samba_check_s4u2proxy(mit_ctx, server, proxy);
+ }
+ 
+ 
+diff --git a/source4/kdc/mit_samba.c b/source4/kdc/mit_samba.c
+index 54dcd545ea1..f23327c9613 100644
+--- a/source4/kdc/mit_samba.c
++++ b/source4/kdc/mit_samba.c
+@@ -467,7 +467,6 @@ int mit_samba_get_pac(struct mit_samba_context *smb_ctx,
+ krb5_error_code mit_samba_reget_pac(struct mit_samba_context *ctx,
+ 				    krb5_context context,
+ 				    int flags,
+-				    krb5_const_principal client_principal,
+ 				    krb5_db_entry *client,
+ 				    krb5_db_entry *server,
+ 				    krb5_db_entry *krbtgt,
+@@ -615,7 +614,7 @@ krb5_error_code mit_samba_reget_pac(struct mit_samba_context *ctx,
+ 								  context,
+ 								  *pac,
+ 								  server->princ,
+-								  discard_const(client_principal),
++								  client->princ,
+ 								  deleg_blob);
+ 		if (!NT_STATUS_IS_OK(nt_status)) {
+ 			DEBUG(0, ("Update delegation info failed: %s\n",
+@@ -937,41 +936,17 @@ int mit_samba_check_client_access(struct mit_samba_context *ctx,
+ }
+ 
+ int mit_samba_check_s4u2proxy(struct mit_samba_context *ctx,
+-			      krb5_db_entry *kentry,
+-			      const char *target_name,
+-			      bool is_nt_enterprise_name)
++			      const krb5_db_entry *server,
++			      krb5_const_principal target_principal)
+ {
+-#if 1
+-	/*
+-	 * This is disabled because mit_samba_update_pac_data() does not handle
+-	 * S4U_DELEGATION_INFO
+-	 */
+-
+-	return KRB5KDC_ERR_BADOPTION;
+-#else
+-	krb5_principal target_principal;
+-	int flags = 0;
+-	int ret;
+-
+-	if (is_nt_enterprise_name) {
+-		flags = KRB5_PRINCIPAL_PARSE_ENTERPRISE;
+-	}
+-
+-	ret = krb5_parse_name_flags(ctx->context, target_name,
+-				    flags, &target_principal);
+-	if (ret) {
+-		return ret;
+-	}
+-
+-	ret = samba_kdc_check_s4u2proxy(ctx->context,
+-					ctx->db_ctx,
+-					skdc_entry,
+-					target_principal);
+-
+-	krb5_free_principal(ctx->context, target_principal);
+-
+-	return ret;
+-#endif
++	struct samba_kdc_entry *server_skdc_entry =
++		 talloc_get_type_abort(server->e_data,
++				       struct samba_kdc_entry);
++
++	return samba_kdc_check_s4u2proxy(ctx->context,
++					 ctx->db_ctx,
++					 server_skdc_entry,
++					 target_principal);
+ }
+ 
+ static krb5_error_code mit_samba_change_pwd_error(krb5_context context,
+diff --git a/source4/kdc/mit_samba.h b/source4/kdc/mit_samba.h
+index ba824557bd5..5aadf206443 100644
+--- a/source4/kdc/mit_samba.h
++++ b/source4/kdc/mit_samba.h
+@@ -56,7 +56,6 @@ int mit_samba_get_pac(struct mit_samba_context *smb_ctx,
+ krb5_error_code mit_samba_reget_pac(struct mit_samba_context *ctx,
+ 				    krb5_context context,
+ 				    int flags,
+-				    krb5_const_principal client_principal,
+ 				    krb5_db_entry *client,
+ 				    krb5_db_entry *server,
+ 				    krb5_db_entry *krbtgt,
+@@ -73,9 +72,8 @@ int mit_samba_check_client_access(struct mit_samba_context *ctx,
+ 				  DATA_BLOB *e_data);
+ 
+ int mit_samba_check_s4u2proxy(struct mit_samba_context *ctx,
+-			      krb5_db_entry *kentry,
+-			      const char *target_name,
+-			      bool is_nt_enterprise_name);
++			      const krb5_db_entry *server,
++			      krb5_const_principal target_principal);
+ 
+ int mit_samba_kpasswd_change_password(struct mit_samba_context *ctx,
+ 				      char *pwd,
+-- 
+2.25.4
+
+From ff1b225493ede3d43cfad571770dacb73f75ec42 Mon Sep 17 00:00:00 2001
+From: Isaac Boukris <iboukris@gmail.com>
+Date: Fri, 27 Sep 2019 18:35:30 +0300
+Subject: [PATCH 5/7] krb5-mit: enable S4U client support for MIT build
+
+Signed-off-by: Isaac Boukris <iboukris@gmail.com>
+Pair-Programmed-With: Andreas Schneider <asn@samba.org>
+---
+ lib/krb5_wrap/krb5_samba.c            | 185 ++++++++++++++++++++++++++
+ lib/krb5_wrap/krb5_samba.h            |   2 -
+ source4/auth/kerberos/kerberos_util.c |  11 --
+ 4 files changed, 185 insertions(+), 14 deletions(-)
+
+diff --git a/lib/krb5_wrap/krb5_samba.c b/lib/krb5_wrap/krb5_samba.c
+index 20ce86c708d..e72ab3c30f7 100644
+--- a/lib/krb5_wrap/krb5_samba.c
++++ b/lib/krb5_wrap/krb5_samba.c
+@@ -2568,6 +2568,191 @@ krb5_error_code smb_krb5_kinit_s4u2_ccache(krb5_context ctx,
+ 
+ 	return 0;
+ }
++
++#else /* MIT */
++
++static bool princ_compare_no_dollar(krb5_context ctx,
++				    krb5_principal a,
++				    krb5_principal b)
++{
++	bool cmp;
++	krb5_principal mod = NULL;
++
++	if (a->length == 1 && b->length == 1 &&
++	    a->data[0].length != 0 && b->data[0].length != 0 &&
++	    a->data[0].data[a->data[0].length -1] !=
++	    b->data[0].data[b->data[0].length -1]) {
++		if (a->data[0].data[a->data[0].length -1] == '$') {
++			mod = a;
++			mod->data[0].length--;
++		} else if (b->data[0].data[b->data[0].length -1] == '$') {
++			mod = b;
++			mod->data[0].length--;
++		}
++	}
++
++	cmp = krb5_principal_compare_flags(ctx, a, b,
++					   KRB5_PRINCIPAL_COMPARE_CASEFOLD);
++
++	if (mod != NULL) {
++		mod->data[0].length++;
++	}
++
++	return cmp;
++}
++
++krb5_error_code smb_krb5_kinit_s4u2_ccache(krb5_context ctx,
++					   krb5_ccache store_cc,
++					   krb5_principal init_principal,
++					   const char *init_password,
++					   krb5_principal impersonate_principal,
++					   const char *self_service,
++					   const char *target_service,
++					   krb5_get_init_creds_opt *krb_options,
++					   time_t *expire_time,
++					   time_t *kdc_time)
++{
++	krb5_error_code code;
++	krb5_principal self_princ = NULL;
++	krb5_principal target_princ = NULL;
++	krb5_creds *store_creds;
++	krb5_creds *s4u2self_creds = NULL;
++	krb5_creds *s4u2proxy_creds = NULL;
++	krb5_creds init_creds = {0};
++	krb5_creds mcreds = {0};
++	krb5_flags options = KRB5_GC_NO_STORE;
++	krb5_ccache tmp_cc;
++	bool s4u2proxy;
++
++	code = krb5_cc_new_unique(ctx, "MEMORY", NULL, &tmp_cc);
++	if (code != 0) {
++		return code;
++	}
++
++	code = krb5_get_init_creds_password(ctx, &init_creds,
++					    init_principal,
++					    init_password,
++					    NULL, NULL,
++					    0,
++					    NULL,
++					    krb_options);
++	if (code != 0) {
++		goto done;
++	}
++
++	code = krb5_cc_initialize(ctx, tmp_cc, init_creds.client);
++	if (code != 0) {
++		goto done;
++	}
++
++	code = krb5_cc_store_cred(ctx, tmp_cc, &init_creds);
++	if (code != 0) {
++		goto done;
++	}
++
++	/*
++	 * Check if we also need S4U2Proxy or if S4U2Self is
++	 * enough in order to get a ticket for the target.
++	 */
++	if (target_service == NULL) {
++		s4u2proxy = false;
++	} else if (strcmp(target_service, self_service) == 0) {
++		s4u2proxy = false;
++	} else {
++		s4u2proxy = true;
++	}
++
++	code = krb5_parse_name(ctx, self_service, &self_princ);
++	if (code != 0) {
++		goto done;
++	}
++
++	/* MIT lacks aliases support in S4U, for S4U2Self we require the tgt
++	 * client and the request server to be the same principal name. */
++	if (!princ_compare_no_dollar(ctx, init_creds.client, self_princ)) {
++		code = KRB5KDC_ERR_PADATA_TYPE_NOSUPP;
++		goto done;
++	}
++
++	mcreds.client = impersonate_principal;
++	mcreds.server = init_creds.client;
++
++	code = krb5_get_credentials_for_user(ctx, options, tmp_cc, &mcreds,
++					     NULL, &s4u2self_creds);
++	if (code != 0) {
++		goto done;
++	}
++
++	if (s4u2proxy) {
++		code = krb5_parse_name(ctx, target_service, &target_princ);
++		if (code != 0) {
++			goto done;
++		}
++
++		mcreds.client = init_creds.client;
++		mcreds.server = target_princ;
++		mcreds.second_ticket = s4u2self_creds->ticket;
++
++		code = krb5_get_credentials(ctx, options |
++					    KRB5_GC_CONSTRAINED_DELEGATION,
++					    tmp_cc, &mcreds, &s4u2proxy_creds);
++		if (code != 0) {
++			goto done;
++		}
++
++		/* Check KDC support of S4U2Proxy extension */
++		if (!krb5_principal_compare(ctx, s4u2self_creds->client,
++					    s4u2proxy_creds->client)) {
++			code = KRB5KDC_ERR_PADATA_TYPE_NOSUPP;
++			goto done;
++		}
++
++		store_creds = s4u2proxy_creds;
++	} else {
++		store_creds = s4u2self_creds;;
++
++		/* We need to save the ticket with the requested server name
++		 * or the caller won't be able to find it in cache. */
++		if (!krb5_principal_compare(ctx, self_princ,
++			store_creds->server)) {
++			krb5_free_principal(ctx, store_creds->server);
++			store_creds->server = NULL;
++			code = krb5_copy_principal(ctx, self_princ,
++						   &store_creds->server);
++			if (code != 0) {
++				goto done;
++			}
++		}
++	}
++
++	code = krb5_cc_initialize(ctx, store_cc, store_creds->client);
++	if (code != 0) {
++		goto done;
++	}
++
++	code = krb5_cc_store_cred(ctx, store_cc, store_creds);
++	if (code != 0) {
++		goto done;
++	}
++
++	if (expire_time) {
++		*expire_time = (time_t) store_creds->times.endtime;
++	}
++
++	if (kdc_time) {
++		*kdc_time = (time_t) store_creds->times.starttime;
++	}
++
++done:
++	krb5_cc_destroy(ctx, tmp_cc);
++	krb5_free_cred_contents(ctx, &init_creds);
++	krb5_free_creds(ctx, s4u2self_creds);
++	krb5_free_creds(ctx, s4u2proxy_creds);
++	krb5_free_principal(ctx, self_princ);
++	krb5_free_principal(ctx, target_princ);
++
++	return code;
++}
+ #endif
+ 
+ #if !defined(HAVE_KRB5_MAKE_PRINCIPAL) && defined(HAVE_KRB5_BUILD_PRINCIPAL_ALLOC_VA)
+diff --git a/lib/krb5_wrap/krb5_samba.h b/lib/krb5_wrap/krb5_samba.h
+index ca9a893e4f7..3264ce5eb3b 100644
+--- a/lib/krb5_wrap/krb5_samba.h
++++ b/lib/krb5_wrap/krb5_samba.h
+@@ -252,7 +252,6 @@ krb5_error_code smb_krb5_kinit_password_ccache(krb5_context ctx,
+ 					       krb5_get_init_creds_opt *krb_options,
+ 					       time_t *expire_time,
+ 					       time_t *kdc_time);
+-#ifdef SAMBA4_USES_HEIMDAL
+ krb5_error_code smb_krb5_kinit_s4u2_ccache(krb5_context ctx,
+ 					   krb5_ccache store_cc,
+ 					   krb5_principal init_principal,
+@@ -263,7 +262,6 @@ krb5_error_code smb_krb5_kinit_s4u2_ccache(krb5_context ctx,
+ 					   krb5_get_init_creds_opt *krb_options,
+ 					   time_t *expire_time,
+ 					   time_t *kdc_time);
+-#endif
+ 
+ #if defined(HAVE_KRB5_MAKE_PRINCIPAL)
+ #define smb_krb5_make_principal krb5_make_principal
+diff --git a/source4/auth/kerberos/kerberos_util.c b/source4/auth/kerberos/kerberos_util.c
+index 544d9d853cc..c14d8c72d8c 100644
+--- a/source4/auth/kerberos/kerberos_util.c
++++ b/source4/auth/kerberos/kerberos_util.c
+@@ -234,9 +234,7 @@ done:
+ {
+ 	krb5_error_code ret;
+ 	const char *password;
+-#ifdef SAMBA4_USES_HEIMDAL
+ 	const char *self_service;
+-#endif
+ 	const char *target_service;
+ 	time_t kdc_time = 0;
+ 	krb5_principal princ;
+@@ -268,9 +266,7 @@ done:
+ 		return ret;
+ 	}
+ 
+-#ifdef SAMBA4_USES_HEIMDAL
+ 	self_service = cli_credentials_get_self_service(credentials);
+-#endif
+ 	target_service = cli_credentials_get_target_service(credentials);
+ 
+ 	password = cli_credentials_get_password(credentials);
+@@ -331,7 +327,6 @@ done:
+ #endif
+ 		if (password) {
+ 			if (impersonate_principal) {
+-#ifdef SAMBA4_USES_HEIMDAL
+ 				ret = smb_krb5_kinit_s4u2_ccache(smb_krb5_context->krb5_context,
+ 								 ccache,
+ 								 princ,
+@@ -342,12 +337,6 @@ done:
+ 								 krb_options,
+ 								 NULL,
+ 								 &kdc_time);
+-#else
+-				talloc_free(mem_ctx);
+-				(*error_string) = "INTERNAL error: s4u2 ops "
+-					"are not supported with MIT build yet";
+-				return EINVAL;
+-#endif
+ 			} else {
+ 				ret = smb_krb5_kinit_password_ccache(smb_krb5_context->krb5_context,
+ 								     ccache,
+-- 
+2.25.4
+
+
+
+From cf1b9bdc09180d68e2b30258839d2f78b7af9c62 Mon Sep 17 00:00:00 2001
+From: Isaac Boukris <iboukris@gmail.com>
+Date: Sat, 19 Sep 2020 14:16:20 +0200
+Subject: [PATCH 7/7] wip: for canonicalization with new MIT kdc code
+
+---
+ source4/heimdal/lib/hdb/hdb.h | 1 +
+ source4/kdc/db-glue.c         | 8 ++++++--
+ source4/kdc/mit_samba.c       | 3 +++
+ source4/kdc/sdb.h             | 1 +
+ 4 files changed, 11 insertions(+), 2 deletions(-)
+
+diff --git a/source4/heimdal/lib/hdb/hdb.h b/source4/heimdal/lib/hdb/hdb.h
+index 6a09ecb6fe1..bc5211fef35 100644
+--- a/source4/heimdal/lib/hdb/hdb.h
++++ b/source4/heimdal/lib/hdb/hdb.h
+@@ -63,6 +63,7 @@ enum hdb_lockop{ HDB_RLOCK, HDB_WLOCK };
+ #define HDB_F_ALL_KVNOS		2048	/* we want all the keys, live or not */
+ #define HDB_F_FOR_AS_REQ	4096	/* fetch is for a AS REQ */
+ #define HDB_F_FOR_TGS_REQ	8192	/* fetch is for a TGS REQ */
++#define HDB_F_FORCE_CANON	16384	/* force canonicalition */
+ 
+ /* hdb_capability_flags */
+ #define HDB_CAP_F_HANDLE_ENTERPRISE_PRINCIPAL 1
+diff --git a/source4/kdc/db-glue.c b/source4/kdc/db-glue.c
+index a560a1cd84b..c27b6a8ef4c 100644
+--- a/source4/kdc/db-glue.c
++++ b/source4/kdc/db-glue.c
+@@ -916,17 +916,21 @@ static krb5_error_code samba_kdc_message2entry(krb5_context context,
+ 			}
+ 		}
+ 
+-	} else if (ent_type == SAMBA_KDC_ENT_TYPE_ANY && principal == NULL) {
++	} else if (ent_type == SAMBA_KDC_ENT_TYPE_ANY && principal == NULL) { // was this supposed to be || ?
+ 		ret = smb_krb5_make_principal(context, &entry_ex->entry.principal, lpcfg_realm(lp_ctx), samAccountName, NULL);
+ 		if (ret) {
+ 			krb5_clear_error_message(context);
+ 			goto out;
+ 		}
+-	} else if ((flags & SDB_F_CANON) && (flags & SDB_F_FOR_AS_REQ)) {
++	} else if (((flags & SDB_F_CANON) && (flags & SDB_F_FOR_AS_REQ)) || (flags & SDB_F_FORCE_CANON)){
+ 		/*
+ 		 * SDB_F_CANON maps from the canonicalize flag in the
+ 		 * packet, and has a different meaning between AS-REQ
+ 		 * and TGS-REQ.  We only change the principal in the AS-REQ case
++		 *
++		 * The SDB_F_FORCE_CANON if for the new MIT kdc code that wants
++		 * the canonical name in all lookups, and takes care to canonicalize
++		 * only when appropriate.
+ 		 */
+ 		ret = smb_krb5_make_principal(context, &entry_ex->entry.principal, lpcfg_realm(lp_ctx), samAccountName, NULL);
+ 		if (ret) {
+diff --git a/source4/kdc/mit_samba.c b/source4/kdc/mit_samba.c
+index f23327c9613..4084e893cc2 100644
+--- a/source4/kdc/mit_samba.c
++++ b/source4/kdc/mit_samba.c
+@@ -198,6 +198,9 @@ int mit_samba_get_principal(struct mit_samba_context *ctx,
+ 	if (kflags & KRB5_KDB_FLAG_CANONICALIZE) {
+ 		sflags |= SDB_F_CANON;
+ 	}
++#if KRB5_KDB_API_VERSION >= 10
++	sflags |= SDB_F_FORCE_CANON;
++#endif
+ 	if (kflags & (KRB5_KDB_FLAG_CLIENT_REFERRALS_ONLY |
+ 		      KRB5_KDB_FLAG_INCLUDE_PAC)) {
+ 		/*
+diff --git a/source4/kdc/sdb.h b/source4/kdc/sdb.h
+index c929acccce6..a9115ec23d7 100644
+--- a/source4/kdc/sdb.h
++++ b/source4/kdc/sdb.h
+@@ -116,6 +116,7 @@ struct sdb_entry_ex {
+ #define SDB_F_KVNO_SPECIFIED	128	/* we want a particular KVNO */
+ #define SDB_F_FOR_AS_REQ	4096	/* fetch is for a AS REQ */
+ #define SDB_F_FOR_TGS_REQ	8192	/* fetch is for a TGS REQ */
++#define SDB_F_FORCE_CANON	16384	/* force canonicalition */
+ 
+ void sdb_free_entry(struct sdb_entry_ex *e);
+ void free_sdb_entry(struct sdb_entry *s);
+-- 
+2.25.4
+
