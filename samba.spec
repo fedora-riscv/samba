@@ -8,7 +8,7 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%define main_release 11
+%define main_release 12
 
 %define samba_version 4.13.0
 %define talloc_version 2.3.1
@@ -130,6 +130,7 @@ Source13:       pam_winbind.conf
 Source14:       samba.pamd
 
 Source201:      README.downgrade
+Patch1:         samba-s4u.patch
 
 Requires(pre): /usr/sbin/groupadd
 Requires(post): systemd
@@ -3619,6 +3620,10 @@ fi
 %endif
 
 %changelog
+* Thu Oct 22 2020 Alexander Bokovoy <abokovoy@redhat.com> - 4.13.0-12
+- Add preliminary support for S4U operations in Samba AD DC
+  resolves: #1836630 - Samba DC: Remote Desktop cannot access files
+
 * Tue Sep 22 2020 Guenther Deschner <gdeschner@redhat.com> - 4.13.0-11
 - Update to Samba 4.13.0
 
