@@ -10,7 +10,7 @@
 
 %define main_release 0
 
-%define samba_version 4.12.6
+%define samba_version 4.12.7
 %define talloc_version 2.3.1
 %define tdb_version 1.4.3
 %define tevent_version 0.10.2
@@ -3584,6 +3584,10 @@ fi
 %endif
 
 %changelog
+* Fri Sep 18 2020 Guenther Deschner <gdeschner@redhat.com> - 4.12.7-0
+- Update to Samba 4.12.7
+- resolves: #1879822, #1880703 - Security fixes for CVE-2020-1472
+
 * Thu Aug 13 2020 Guenther Deschner <gdeschner@redhat.com> - 4.12.6-0
 - Update to Samba 4.12.6
 
