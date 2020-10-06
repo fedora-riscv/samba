@@ -8,7 +8,7 @@
 
 %define main_release 0
 
-%define samba_version 4.11.13
+%define samba_version 4.11.14
 %define talloc_version 2.2.0
 %define tdb_version 1.4.2
 %define tevent_version 0.10.0
@@ -126,7 +126,6 @@ Source201:      README.downgrade
 Patch100:       0000-use-gnutls-for-des-cbc.patch
 Patch101:       0001-handle-removal-des-enctypes-from-krb5.patch
 Patch102:       0002-samba-tool-create-working-private-krb5.conf.patch
-Patch103:       samba-4.11.13-lib_util_wscript.patch
 
 Requires(pre): /usr/sbin/groupadd
 Requires(post): systemd
@@ -3540,6 +3539,9 @@ fi
 %endif
 
 %changelog
+* Tue Oct 06 2020 Guenther Deschner <gdeschner@redhat.com> - 4.11.14-0
+- Update to Samba 4.11.14
+
 * Fri Sep 18 2020 Guenther Deschner <gdeschner@redhat.com> - 4.11.13-0
 - Update to Samba 4.11.13
 - resolves: #1879822, #1880703 - Security fixes for CVE-2020-1472
