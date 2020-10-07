@@ -10,7 +10,7 @@
 
 %define main_release 0
 
-%define samba_version 4.12.7
+%define samba_version 4.12.8
 %define talloc_version 2.3.1
 %define tdb_version 1.4.3
 %define tevent_version 0.10.2
@@ -128,6 +128,8 @@ Source13:       pam_winbind.conf
 Source14:       samba.pamd
 
 Source201:      README.downgrade
+
+Patch:          samba-winexe-build.patch
 
 Requires(pre): /usr/sbin/groupadd
 Requires(post): systemd
@@ -3581,9 +3583,13 @@ fi
 ### WINEXE
 %files winexe
 %{_bindir}/winexe
+%{_mandir}/man1/winexe.1*
 %endif
 
 %changelog
+* Wed Oct 07 2020 Guenther Deschner <gdeschner@redhat.com> - 4.12.8-0
+- Update to Samba 4.12.8
+
 * Fri Sep 18 2020 Guenther Deschner <gdeschner@redhat.com> - 4.12.7-0
 - Update to Samba 4.12.7
 - resolves: #1879822, #1880703 - Security fixes for CVE-2020-1472
