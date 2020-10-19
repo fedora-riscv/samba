@@ -3,8 +3,12 @@
 # The testsuite is disabled by default. Set --with testsuite or bcond_without
 # to run the Samba torture testsuite.
 %bcond_with testsuite
+
 # ctdb is enabled by default, you can disable it with: --without clustering
 %bcond_without clustering
+
+# Build a libsmbclient package by default
+%bcond_without libsmbclient
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
@@ -34,7 +38,6 @@
 # https://src.fedoraproject.org/rpms/redhat-rpm-config/blob/master/f/buildflags.md
 %undefine _strict_symbol_defs_build
 
-%global with_libsmbclient 1
 %global with_libwbclient 1
 
 %global with_vfs_cephfs 0
@@ -290,7 +293,7 @@ Requires(pre): %{name}-common = %{samba_depver}
 Requires: %{name}-common = %{samba_depver}
 Requires: %{name}-common-libs = %{samba_depver}
 Requires: %{name}-client-libs = %{samba_depver}
-%if %with_libsmbclient
+%if %{with libsmbclient}
 Requires: libsmbclient = %{samba_depver}
 %endif
 %if %with_libwbclient
@@ -515,7 +518,7 @@ The %{name}-libs package contains the libraries needed by programs that link
 against the SMB, RPC and other protocols provided by the Samba suite.
 
 ### LIBSMBCLIENT
-%if %with_libsmbclient
+%if %{with libsmbclient}
 %package -n libsmbclient
 Summary: The SMB client library
 Requires(pre): %{name}-common = %{samba_depver}
@@ -537,7 +540,7 @@ Requires: libsmbclient = %{samba_depver}
 The libsmbclient-devel package contains the header files and libraries needed
 to develop programs that link against the SMB client library in the Samba
 suite.
-#endif with_libsmbclient
+#endif {with libsmbclient}
 %endif
 
 ### LIBWBCLIENT
@@ -575,7 +578,7 @@ Requires: python3-tevent
 Requires: python3-tdb
 Requires: python3-ldb
 Requires: python3-dns
-%if %with_libsmbclient
+%if %{with libsmbclient}
 Requires: libsmbclient = %{samba_depver}
 %endif
 %if %with_libwbclient
@@ -637,7 +640,7 @@ Requires: %{name}-test-libs = %{samba_depver}
 Requires: %{name}-dc-libs = %{samba_depver}
 %endif
 Requires: %{name}-libs = %{samba_depver}
-%if %with_libsmbclient
+%if %{with libsmbclient}
 Requires: libsmbclient = %{samba_depver}
 %endif
 %if %with_libwbclient
@@ -848,7 +851,7 @@ xzcat %{SOURCE0} | gpgv2 --quiet --keyring %{SOURCE2} %{SOURCE1} -
 %global _libsmbclient %nil
 %global _libwbclient %nil
 
-%if ! %with_libsmbclient
+%if %{without libsmbclient}
 %global _libsmbclient smbclient,
 %endif
 
@@ -880,7 +883,7 @@ export LDFLAGS="%{__global_ldflags} -fuse-ld=gold"
         --with-pie \
         --with-relro \
         --without-fam \
-%if (! %with_libsmbclient) || (! %with_libwbclient)
+%if (%{without libsmbclient}) || (! %with_libwbclient)
         --private-libraries=%{_samba_private_libraries} \
 %endif
         --with-system-mitkrb5 \
@@ -1170,7 +1173,7 @@ fi
 
 %ldconfig_scriptlets libs
 
-%if %with_libsmbclient
+%if %{with libsmbclient}
 %ldconfig_scriptlets -n libsmbclient
 %endif
 
@@ -1555,10 +1558,10 @@ fi
 #endif ! with_libwbclient
 %endif
 
-%if ! %with_libsmbclient
+%if %{without libsmbclient}
 %{_libdir}/samba/libsmbclient.so.*
 %{_mandir}/man7/libsmbclient.7*
-#endif ! with_libsmbclient
+#endif without libsmbclient
 %endif
 
 ### COMMON
@@ -1851,9 +1854,9 @@ fi
 %{_libdir}/pkgconfig/dcerpc_server.pc
 %endif
 
-%if ! %with_libsmbclient
+%if %{without libsmbclient}
 %{_includedir}/samba-4.0/libsmbclient.h
-#endif ! with_libsmbclient
+#endif without libsmbclient
 %endif
 
 %if ! %with_libwbclient
@@ -1896,7 +1899,7 @@ fi
 %{_libdir}/samba/libxattr-tdb-samba4.so
 
 ### LIBSMBCLIENT
-%if %with_libsmbclient
+%if %{with libsmbclient}
 %files -n libsmbclient
 %{_libdir}/libsmbclient.so.*
 
@@ -1906,7 +1909,7 @@ fi
 %{_libdir}/libsmbclient.so
 %{_libdir}/pkgconfig/smbclient.pc
 %{_mandir}/man7/libsmbclient.7*
-#endif with_libsmbclient
+#endif {with libsmbclient}
 %endif
 
 ### LIBWBCLIENT
