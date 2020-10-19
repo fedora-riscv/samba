@@ -28,6 +28,21 @@
 #endif fedora
 %endif
 
+# Build vfs_gluster module by default on 64bit Fedora
+%if 0%{?fedora}
+
+%ifarch aarch64 ppc64le s390x x86_64
+%bcond_without vfs_glusterfs
+%else
+%bcond_with vfs_glusterfs
+#endifarch
+%endif
+
+%else
+%bcond_with vfs_glusterfs
+#endif fedora
+%endif
+
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
 %define main_release 13
@@ -55,17 +70,6 @@
 #
 # https://src.fedoraproject.org/rpms/redhat-rpm-config/blob/master/f/buildflags.md
 %undefine _strict_symbol_defs_build
-
-%global with_vfs_glusterfs 1
-%if 0%{?rhel}
-%global with_vfs_glusterfs 0
-# Only enable on x86_64
-%ifarch x86_64
-%global with_vfs_glusterfs 1
-#endif arch
-%endif
-#endif rhel
-%endif
 
 %global libwbc_alternatives_version 0.15
 %global libwbc_alternatives_suffix %nil
@@ -232,7 +236,7 @@ BuildRequires: zlib-devel >= 1.2.3
 
 BuildRequires: pkgconfig(libsystemd)
 
-%if %{with_vfs_glusterfs}
+%if %{with vfs_glusterfs}
 BuildRequires: glusterfs-api-devel >= 3.4.0.16
 BuildRequires: glusterfs-devel >= 3.4.0.16
 %endif
@@ -473,7 +477,7 @@ Samba VFS module for Ceph distributed storage system integration.
 %endif
 
 ### GLUSTER
-%if %{with_vfs_glusterfs}
+%if %{with vfs_glusterfs}
 %package vfs-glusterfs
 Summary: Samba VFS module for GlusterFS
 Requires: glusterfs-api >= 3.4.0.16
@@ -898,7 +902,7 @@ export LDFLAGS="%{__global_ldflags} -fuse-ld=gold"
 %if ! %with_dc
         --without-ad-dc \
 %endif
-%if ! %with_vfs_glusterfs
+%if %{without vfs_glusterfs}
         --disable-glusterfs \
 %endif
 %if %with_clustering_support
@@ -1076,7 +1080,7 @@ for i in \
 done
 %endif
 
-%if ! %{with_vfs_glusterfs}
+%if %{without vfs_glusterfs}
 rm -f %{buildroot}%{_mandir}/man8/vfs_glusterfs.8*
 %endif
 
@@ -1881,7 +1885,7 @@ fi
 %endif
 
 ### VFS-GLUSTERFS
-%if %{with_vfs_glusterfs}
+%if %{with vfs_glusterfs}
 %files vfs-glusterfs
 %{_libdir}/samba/vfs/glusterfs.so
 %{_mandir}/man8/vfs_glusterfs.8*
