@@ -10,6 +10,9 @@
 # Build a libsmbclient package by default
 %bcond_without libsmbclient
 
+# Build a libwbclient package by default
+%bcond_without libwbclient
+
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
 %define main_release 13
@@ -37,8 +40,6 @@
 #
 # https://src.fedoraproject.org/rpms/redhat-rpm-config/blob/master/f/buildflags.md
 %undefine _strict_symbol_defs_build
-
-%global with_libwbclient 1
 
 %global with_vfs_cephfs 0
 %if 0%{?fedora}
@@ -147,7 +148,7 @@ Requires: %{name}-common-libs = %{samba_depver}
 Requires: %{name}-common-tools = %{samba_depver}
 Requires: %{name}-client-libs = %{samba_depver}
 Requires: %{name}-libs = %{samba_depver}
-%if %with_libwbclient
+%if %{with libwbclient}
 Requires: libwbclient = %{samba_depver}
 %endif
 
@@ -296,7 +297,7 @@ Requires: %{name}-client-libs = %{samba_depver}
 %if %{with libsmbclient}
 Requires: libsmbclient = %{samba_depver}
 %endif
-%if %with_libwbclient
+%if %{with libwbclient}
 Requires: libwbclient = %{samba_depver}
 %endif
 
@@ -317,7 +318,7 @@ Summary: Samba client libraries
 Requires(pre): %{name}-common = %{samba_depver}
 Requires: %{name}-common = %{samba_depver}
 Requires: %{name}-common-libs = %{samba_depver}
-%if %with_libwbclient
+%if %{with libwbclient}
 Requires: libwbclient = %{samba_depver}
 %endif
 Requires: krb5-libs >= %{required_mit_krb5}
@@ -353,7 +354,7 @@ Summary: Libraries used by both Samba servers and clients
 Requires(pre): samba-common = %{samba_depver}
 Requires: samba-common = %{samba_depver}
 Requires: %{name}-client-libs = %{samba_depver}
-%if %with_libwbclient
+%if %{with libwbclient}
 Requires: libwbclient = %{samba_depver}
 %endif
 
@@ -367,7 +368,7 @@ Summary: Tools for Samba servers and clients
 Requires: samba-common-libs = %{samba_depver}
 Requires: samba-client-libs = %{samba_depver}
 Requires: samba-libs = %{samba_depver}
-%if %with_libwbclient
+%if %{with libwbclient}
 Requires: libwbclient = %{samba_depver}
 %endif
 
@@ -475,7 +476,7 @@ Requires: %{name} = %{samba_depver}
 Requires: %{name}-common-libs = %{samba_depver}
 Requires: %{name}-client-libs = %{samba_depver}
 Requires: %{name}-libs = %{samba_depver}
-%if %with_libwbclient
+%if %{with libwbclient}
 Requires: libwbclient = %{samba_depver}
 %endif
 
@@ -506,7 +507,7 @@ the Kerberos credentials cache of the user issuing the print job.
 Summary: Samba libraries
 Requires: %{name}-common-libs = %{samba_depver}
 Requires: %{name}-client-libs = %{samba_depver}
-%if %with_libwbclient
+%if %{with libwbclient}
 Requires: libwbclient = %{samba_depver}
 %endif
 
@@ -525,7 +526,7 @@ Requires(pre): %{name}-common = %{samba_depver}
 Requires: %{name}-common = %{samba_depver}
 Requires: %{name}-common-libs = %{samba_depver}
 Requires: %{name}-client-libs = %{samba_depver}
-%if %with_libwbclient
+%if %{with libwbclient}
 Requires: libwbclient = %{samba_depver}
 %endif
 
@@ -544,7 +545,7 @@ suite.
 %endif
 
 ### LIBWBCLIENT
-%if %with_libwbclient
+%if %{with libwbclient}
 %package -n libwbclient
 Summary: The winbind client library
 Requires: %{name}-client-libs = %{samba_depver}
@@ -563,7 +564,7 @@ Obsoletes: samba-winbind-devel < %{samba_depver}
 %description -n libwbclient-devel
 The libwbclient-devel package provides developer tools for the wbclient
 library.
-#endif with_libwbclient
+#endif {with libwbclient}
 %endif
 
 ### PYTHON3
@@ -581,7 +582,7 @@ Requires: python3-dns
 %if %{with libsmbclient}
 Requires: libsmbclient = %{samba_depver}
 %endif
-%if %with_libwbclient
+%if %{with libwbclient}
 Requires: libwbclient = %{samba_depver}
 %endif
 
@@ -643,7 +644,7 @@ Requires: %{name}-libs = %{samba_depver}
 %if %{with libsmbclient}
 Requires: libsmbclient = %{samba_depver}
 %endif
-%if %with_libwbclient
+%if %{with libwbclient}
 Requires: libwbclient = %{samba_depver}
 %endif
 Requires: python3-%{name} = %{samba_depver}
@@ -662,7 +663,7 @@ Summary: Libraries need by the testing tools for Samba servers and clients
 Requires: %{name}-common-libs = %{samba_depver}
 Requires: %{name}-client-libs = %{samba_depver}
 Requires: %{name}-libs = %{samba_depver}
-%if %with_libwbclient
+%if %{with libwbclient}
 Requires: libwbclient = %{samba_depver}
 %endif
 
@@ -703,7 +704,7 @@ Requires: %{name}-common-libs = %{samba_depver}
 Requires: %{name}-client-libs = %{samba_depver}
 Requires: %{name}-libs = %{samba_depver}
 Requires: %{name}-winbind = %{samba_depver}
-%if %with_libwbclient
+%if %{with libwbclient}
 Requires: libwbclient = %{samba_depver}
 %endif
 
@@ -717,7 +718,7 @@ tool.
 ### WINBIND-KRB5-LOCATOR
 %package winbind-krb5-locator
 Summary: Samba winbind krb5 locator
-%if %with_libwbclient
+%if %{with libwbclient}
 Requires: libwbclient = %{samba_depver}
 Requires: %{name}-winbind = %{samba_depver}
 %else
@@ -746,7 +747,7 @@ the local kerberos library to use the same KDC as samba and winbind use
 Summary: Samba winbind modules
 Requires: %{name}-client-libs = %{samba_depver}
 Requires: %{name}-libs = %{samba_depver}
-%if %with_libwbclient
+%if %{with libwbclient}
 Requires: libwbclient = %{samba_depver}
 %endif
 Requires: pam
@@ -855,7 +856,7 @@ xzcat %{SOURCE0} | gpgv2 --quiet --keyring %{SOURCE2} %{SOURCE1} -
 %global _libsmbclient smbclient,
 %endif
 
-%if ! %with_libwbclient
+%if %{without libwbclient}
 %global _libwbclient wbclient,
 %endif
 
@@ -883,7 +884,7 @@ export LDFLAGS="%{__global_ldflags} -fuse-ld=gold"
         --with-pie \
         --with-relro \
         --without-fam \
-%if (%{without libsmbclient}) || (! %with_libwbclient)
+%if (%{without libsmbclient}) || (%{without libwbclient})
         --private-libraries=%{_samba_private_libraries} \
 %endif
         --with-system-mitkrb5 \
@@ -1177,7 +1178,7 @@ fi
 %ldconfig_scriptlets -n libsmbclient
 %endif
 
-%if %with_libwbclient
+%if %{with libwbclient}
 %posttrans -n libwbclient
 # It has to be posttrans here to make sure all files of a previous version
 # without alternatives support are removed
@@ -1224,7 +1225,7 @@ if [ $1 -eq 0 ]; then
     fi
 fi
 
-#endif with_libwbclient
+#endif {with libwbclient}
 %endif
 
 %ldconfig_scriptlets test
@@ -1552,10 +1553,10 @@ fi
 %{_libdir}/samba/libutil-setid-samba4.so
 %{_libdir}/samba/libutil-tdb-samba4.so
 
-%if ! %with_libwbclient
+%if %{without libwbclient}
 %{_libdir}/samba/libwbclient.so.*
 %{_libdir}/samba/libwinbind-client-samba4.so
-#endif ! with_libwbclient
+#endif without libwbclient
 %endif
 
 %if %{without libsmbclient}
@@ -1859,9 +1860,9 @@ fi
 #endif without libsmbclient
 %endif
 
-%if ! %with_libwbclient
+%if %{without libwbclient}
 %{_includedir}/samba-4.0/wbclient.h
-#endif ! with_libwbclient
+#endif without libwbclient
 %endif
 
 ### VFS-CEPHFS
@@ -1913,7 +1914,7 @@ fi
 %endif
 
 ### LIBWBCLIENT
-%if %with_libwbclient
+%if %{with libwbclient}
 %files -n libwbclient
 %{_libdir}/samba/wbclient/libwbclient.so.*
 %{_libdir}/samba/libwinbind-client-samba4.so
@@ -1923,7 +1924,7 @@ fi
 %{_includedir}/samba-4.0/wbclient.h
 %{_libdir}/samba/wbclient/libwbclient.so
 %{_libdir}/pkgconfig/wbclient.pc
-#endif with_libwbclient
+#endif {with libwbclient}
 %endif
 
 ### PIDL
