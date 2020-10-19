@@ -13,6 +13,21 @@
 # Build a libwbclient package by default
 %bcond_without libwbclient
 
+# Build vfs_ceph module by default on 64bit Fedora
+%if 0%{?fedora}
+
+%ifarch aarch64 ppc64le s390x x86_64
+%bcond_without vfs_cephfs
+%else
+%bcond_with vfs_cephfs
+#endifarch
+%endif
+
+%else
+%bcond_with vfs_cephfs
+#endif fedora
+%endif
+
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
 %define main_release 13
@@ -40,15 +55,6 @@
 #
 # https://src.fedoraproject.org/rpms/redhat-rpm-config/blob/master/f/buildflags.md
 %undefine _strict_symbol_defs_build
-
-%global with_vfs_cephfs 0
-%if 0%{?fedora}
-%ifarch aarch64 ppc64le s390x x86_64
-%global with_vfs_cephfs 1
-#endifarch
-%endif
-#endif fedora
-%endif
 
 %global with_vfs_glusterfs 1
 %if 0%{?rhel}
@@ -231,7 +237,7 @@ BuildRequires: glusterfs-api-devel >= 3.4.0.16
 BuildRequires: glusterfs-devel >= 3.4.0.16
 %endif
 
-%if %{with_vfs_cephfs}
+%if %{with vfs_cephfs}
 BuildRequires: libcephfs-devel
 %endif
 
@@ -455,7 +461,7 @@ needed to develop programs that link against the SMB, RPC and other
 libraries in the Samba suite.
 
 ### CEPH
-%if %{with_vfs_cephfs}
+%if %{with vfs_cephfs}
 %package vfs-cephfs
 Summary: Samba VFS module for Ceph distributed storage system
 Requires: %{name} = %{samba_depver}
@@ -463,7 +469,7 @@ Requires: %{name}-libs = %{samba_depver}
 
 %description vfs-cephfs
 Samba VFS module for Ceph distributed storage system integration.
-#endif with_vfs_cephfs
+#endif with vfs_cephfs
 %endif
 
 ### GLUSTER
@@ -1074,7 +1080,7 @@ done
 rm -f %{buildroot}%{_mandir}/man8/vfs_glusterfs.8*
 %endif
 
-%if ! %{with_vfs_cephfs}
+%if %{without vfs_cephfs}
 rm -f %{buildroot}%{_mandir}/man8/vfs_ceph.8*
 rm -f %{buildroot}%{_mandir}/man8/vfs_ceph_snapshots.8*
 %endif
@@ -1866,7 +1872,7 @@ fi
 %endif
 
 ### VFS-CEPHFS
-%if %{with_vfs_cephfs}
+%if %{with vfs_cephfs}
 %files vfs-cephfs
 %{_libdir}/samba/vfs/ceph.so
 %{_libdir}/samba/vfs/ceph_snapshots.so
