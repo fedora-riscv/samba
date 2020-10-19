@@ -37,8 +37,6 @@
 %global with_libsmbclient 1
 %global with_libwbclient 1
 
-%global with_profiling 1
-
 %global with_vfs_cephfs 0
 %if 0%{?fedora}
 %ifarch aarch64 ppc64le s390x x86_64
@@ -895,9 +893,6 @@ export LDFLAGS="%{__global_ldflags} -fuse-ld=gold"
 %endif
 %if %with_clustering_support
         --with-cluster-support \
-%endif
-%if %with_profiling
-        --with-profiling-data \
 %endif
 %if %{with testsuite}
         --enable-selftest \
