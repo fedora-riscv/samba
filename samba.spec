@@ -1,7 +1,9 @@
+# The testsuite is disabled by default.
+#
+# To build and run the tests use:
+#
 # rpmbuild --rebuild --with testsuite --without clustering samba.src.rpm
 #
-# The testsuite is disabled by default. Set --with testsuite or bcond_without
-# to run the Samba torture testsuite.
 %bcond_with testsuite
 
 # ctdb is enabled by default, you can disable it with: --without clustering
