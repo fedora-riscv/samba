@@ -7,6 +7,13 @@
 # ctdb is enabled by default, you can disable it with: --without clustering
 %bcond_without clustering
 
+# Build with Active Directory Domain Controller support by default on Fedora
+%if 0%{?fedora}
+%bcond_without dc
+%else
+%bcond_with dc
+%endif
+
 # Build a libsmbclient package by default
 %bcond_without libsmbclient
 
@@ -75,16 +82,6 @@
 %global libwbc_alternatives_suffix %nil
 %if 0%{?__isa_bits} == 64
 %global libwbc_alternatives_suffix -64
-%endif
-
-%global with_dc 1
-
-%if 0%{?rhel}
-%global with_dc 0
-%endif
-
-%if %{with testsuite}
-%global with_dc 1
 %endif
 
 %global required_mit_krb5 1.18
@@ -249,14 +246,14 @@ BuildRequires: libcephfs-devel
 BuildRequires: liburing-devel >= 0.4
 %endif
 
-%if %{with_dc}
+%if %{with dc} || %{with testsuite}
 # Add python3-iso8601 to avoid that the
 # version in Samba is being packaged
 BuildRequires: python3-iso8601
 
 BuildRequires: bind
 BuildRequires: krb5-server >= %{required_mit_krb5}
-#endif with_dc
+#endif with dc
 %endif
 
 # pidl requirements
@@ -276,16 +273,13 @@ BuildRequires: python3-tdb >= %{tdb_version}
 BuildRequires: libldb-devel >= %{ldb_version}
 BuildRequires: python3-ldb-devel >= %{ldb_version}
 
-%if %{with testsuite} || %{with_dc}
+%if %{with dc} || %{with testsuite}
+BuildRequires: bind
+BuildRequires: krb5-server >= %{required_mit_krb5}
 BuildRequires: ldb-tools
-BuildRequires: tdb-tools
 BuildRequires: python3-gpg
 BuildRequires: python3-markdown
-%endif
-
-%if %{with_dc}
-BuildRequires: krb5-server >= %{required_mit_krb5}
-BuildRequires: bind
+BuildRequires: tdb-tools
 %endif
 
 # filter out perl requirements pulled in from examples in the docdir.
@@ -348,7 +342,7 @@ Recommends:     logrotate
 Provides: samba4-common = %{samba_depver}
 Obsoletes: samba4-common < %{samba_depver}
 
-%if ! %{with_dc}
+%if %{with dc} || %{with testsuite}
 Obsoletes: samba-dc < %{samba_depver}
 Obsoletes: samba-dc-libs < %{samba_depver}
 Obsoletes: samba-dc-bind-dlz < %{samba_depver}
@@ -387,7 +381,7 @@ The samba-common-tools package contains tools for Samba servers and
 SMB/CIFS clients.
 
 ### DC
-%if %{with_dc}
+%if %{with dc} || %{with testsuite}
 %package dc
 Summary: Samba AD Domain Controller
 Requires: %{name} = %{samba_depver}
@@ -447,7 +441,7 @@ Requires: bind
 %description dc-bind-dlz
 The %{name}-dc-bind-dlz package contains the libraries for bind to manage all
 name server related details of Samba AD.
-#endif with_dc
+#endif with dc
 %endif
 
 ### DEVEL
@@ -610,7 +604,7 @@ Requires: %{name}-libs = %{samba_depver}
 The python3-%{name}-test package contains the Python libraries used by the test suite of Samba.
 If you want to run full set of Samba tests, you need to install this package.
 
-%if %{with_dc}
+%if %{with dc} || %{with testsuite}
 %package -n python3-samba-dc
 Summary: Samba Python libraries for Samba AD
 Requires: python3-%{name} = %{samba_depver}
@@ -647,7 +641,7 @@ Requires: %{name}-common-libs = %{samba_depver}
 Requires: %{name}-client-libs = %{samba_depver}
 Requires: %{name}-libs = %{samba_depver}
 Requires: %{name}-test-libs = %{samba_depver}
-%if %with_dc
+%if %{with dc} || %{with testsuite}
 Requires: %{name}-dc-libs = %{samba_depver}
 %endif
 Requires: %{name}-libs = %{samba_depver}
@@ -899,7 +893,7 @@ export LDFLAGS="%{__global_ldflags} -fuse-ld=gold"
 %endif
         --with-system-mitkrb5 \
         --with-experimental-mit-ad-dc \
-%if ! %with_dc
+%if %{without dc} && %{without testsuite}
         --without-ad-dc \
 %endif
 %if %{without vfs_glusterfs}
@@ -1014,7 +1008,7 @@ install -m 0755 packaging/NetworkManager/30-winbind-systemd \
 install -d -m 0755 %{buildroot}%{_libdir}/krb5/plugins/libkrb5
 touch %{buildroot}%{_libdir}/krb5/plugins/libkrb5/winbind_krb5_locator.so
 
-%if ! %with_dc
+%if %{without dc} && %{without testsuite}
 for i in \
     %{_libdir}/samba/libdfs-server-ad-samba4.so \
     %{_libdir}/samba/libdnsserver-common-samba4.so \
@@ -1093,14 +1087,14 @@ rm -f %{buildroot}%{_mandir}/man8/vfs_ceph_snapshots.8*
 # the ldconfig-created links be recorded in the RPM.
 /sbin/ldconfig -N -n %{buildroot}%{_libdir}
 
-%if ! %with_dc
+%if %{without dc} && %{without testsuite}
 for f in samba/libsamba-net-samba4.so \
          samba/libsamba-python-samba4.so \
          libsamba-policy.so* \
          pkgconfig/samba-policy.pc ; do
     rm -f %{buildroot}%{_libdir}/$f
 done
-#endif ! with_dc
+#endif without dc
 %endif
 
 pushd pidl
@@ -1158,7 +1152,7 @@ fi
 
 %ldconfig_scriptlets common-libs
 
-%if %{with_dc}
+%if %{with dc} || %{with testsuite}
 %ldconfig_scriptlets dc-libs
 
 %post dc
@@ -1169,7 +1163,7 @@ fi
 
 %postun dc
 %systemd_postun_with_restart samba.service
-#endif with_dc
+#endif with dc
 %endif
 
 %post krb5-printing
@@ -1294,7 +1288,7 @@ fi
 %{_sbindir}/eventlogadm
 %{_sbindir}/nmbd
 %{_sbindir}/smbd
-%if %{with_dc}
+%if %{with dc} || %{with testsuite}
 # This is only used by vfs_dfs_samba4
 %{_libdir}/samba/libdfs-server-ad-samba4.so
 %endif
@@ -1312,7 +1306,7 @@ fi
 %{_libdir}/samba/vfs/commit.so
 %{_libdir}/samba/vfs/crossrename.so
 %{_libdir}/samba/vfs/default_quota.so
-%if %{with_dc}
+%if %{with dc} || %{with testsuite}
 %{_libdir}/samba/vfs/dfs_samba4.so
 %endif
 %{_libdir}/samba/vfs/dirsort.so
@@ -1625,7 +1619,7 @@ fi
 %{_mandir}/man8/smbpasswd.8*
 
 ### DC
-%if %{with_dc}
+%if %{with dc} || %{with testsuite}
 %files dc
 %{_unitdir}/samba.service
 %{_bindir}/samba-tool
@@ -1742,7 +1736,7 @@ fi
 %{_libdir}/samba/bind9/dlz_bind9_10.so
 %{_libdir}/samba/bind9/dlz_bind9_11.so
 %{_libdir}/samba/bind9/dlz_bind9_12.so
-#endif with_dc
+#endif with dc
 %endif
 
 ### DEVEL
@@ -1859,7 +1853,7 @@ fi
 %{_libdir}/libsamba-passdb.so
 %{_libdir}/libsmbldap.so
 
-%if %with_dc
+%if %{with dc} || %{with testsuite}
 %{_includedir}/samba-4.0/dcerpc_server.h
 %{_libdir}/libdcerpc-server.so
 %{_libdir}/pkgconfig/dcerpc_server.pc
@@ -2226,7 +2220,7 @@ fi
 %{_libdir}/samba/libsamba-net.*-samba4.so
 %{_libdir}/samba/libsamba-python.*-samba4.so
 
-%if %{with_dc}
+%if %{with dc} || %{with testsuite}
 %files -n python3-%{name}-dc
 %{python3_sitearch}/samba/samdb.py
 %{python3_sitearch}/samba/schema.py
@@ -2693,7 +2687,7 @@ fi
 
 ### TEST-LIBS
 %files test-libs
-%if %with_dc
+%if %{with dc} || %{with testsuite}
 %{_libdir}/samba/libdlz-bind9-for-torture-samba4.so
 %else
 %{_libdir}/samba/libdsdb-module-samba4.so
