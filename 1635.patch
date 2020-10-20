@@ -1,0 +1,197 @@
+From 0daa6a2bc688146f4e1d7b5604a6fe231f6d069e Mon Sep 17 00:00:00 2001
+From: Andreas Schneider <asn@samba.org>
+Date: Thu, 22 Oct 2020 11:08:19 +0200
+Subject: [PATCH 1/5] s3:script: Fix test_dfree_quota.sh
+
+source3/script/tests/test_dfree_quota.sh: line 200: [: missing `]'
+
+BUG: https://bugzilla.samba.org/show_bug.cgi?id=14550
+
+Signed-off-by: Andreas Schneider <asn@samba.org>
+---
+ source3/script/tests/test_dfree_quota.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/source3/script/tests/test_dfree_quota.sh b/source3/script/tests/test_dfree_quota.sh
+index e86d431180a..a1403a8c4ba 100755
+--- a/source3/script/tests/test_dfree_quota.sh
++++ b/source3/script/tests/test_dfree_quota.sh
+@@ -197,7 +197,7 @@ test_smbcquotas() {
+ 	return $status
+ }
+ 
+-if [ $protocol != "SMB3" -a $protocol != "NT1"]; then
++if [ $protocol != "SMB3" ] && [ $protocol != "NT1" ]; then
+ 	echo "unsupported protocol $protocol" | subunit_fail_test "Test dfree quota"
+ 	failed=`expr $failed + 1`
+ fi
+-- 
+GitLab
+
+
+From 4867cafe766fa8aa69ce005dc5c4f05a4af676c8 Mon Sep 17 00:00:00 2001
+From: Andreas Schneider <asn@samba.org>
+Date: Thu, 22 Oct 2020 17:40:01 +0200
+Subject: [PATCH 2/5] buildtools: Do not install binaries which are for
+ selftest
+
+BUG: https://bugzilla.samba.org/show_bug.cgi?id=14550
+
+Signed-off-by: Andreas Schneider <asn@samba.org>
+---
+ buildtools/wafsamba/wafsamba.py | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/buildtools/wafsamba/wafsamba.py b/buildtools/wafsamba/wafsamba.py
+index 9f6ee4f5c7f..9dd6d05b91b 100644
+--- a/buildtools/wafsamba/wafsamba.py
++++ b/buildtools/wafsamba/wafsamba.py
+@@ -365,8 +365,10 @@ def SAMBA_BINARY(bld, binname, source,
+                  for_selftest=False):
+     '''define a Samba binary'''
+ 
+-    if for_selftest and not bld.CONFIG_GET('ENABLE_SELFTEST'):
+-        enabled=False
++    if for_selftest:
++        install=False
++        if not bld.CONFIG_GET('ENABLE_SELFTEST'):
++            enabled=False
+ 
+     if not enabled:
+         SET_TARGET_TYPE(bld, binname, 'DISABLED')
+-- 
+GitLab
+
+
+From a4d5a21880b1cc8adfcbebd6940d06e2fdab3f14 Mon Sep 17 00:00:00 2001
+From: Andreas Schneider <asn@samba.org>
+Date: Thu, 22 Oct 2020 17:41:01 +0200
+Subject: [PATCH 3/5] unittests: Mark test binaries for selftest
+
+BUG: https://bugzilla.samba.org/show_bug.cgi?id=14550
+
+Signed-off-by: Andreas Schneider <asn@samba.org>
+---
+ testsuite/unittests/wscript | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/testsuite/unittests/wscript b/testsuite/unittests/wscript
+index 40fcb01ad57..2b4b37b92de 100644
+--- a/testsuite/unittests/wscript
++++ b/testsuite/unittests/wscript
+@@ -9,7 +9,7 @@ def build(bld):
+     bld.SAMBA_BINARY('test_krb5samba',
+                      source='test_krb5_samba.c',
+                      deps='krb5samba cmocka',
+-                     install=False)
++                     for_selftest=True)
+ 
+     bld.SAMBA_BINARY('test_sambafs_srv_pipe',
+                      source='test_sambafs_srv_pipe.c',
+@@ -18,7 +18,7 @@ def build(bld):
+                           RPC_SAMR
+                           cmocka
+                           ''',
+-                     install=False)
++                     for_selftest=True)
+ 
+     bld.SAMBA_BINARY('test_lib_util_modules',
+                      source='test_lib_util_modules.c',
+@@ -26,7 +26,7 @@ def build(bld):
+                           samba-modules
+                           cmocka
+                           ''',
+-                     install=False)
++                     for_selftest=True)
+ 
+     bld.SAMBA_MODULE('rpc_test_dummy_module',
+                      source='rpc_test_dummy_module.c',
+-- 
+GitLab
+
+
+From d399761e8261a4de5ce9449f97ade61388e8a1e2 Mon Sep 17 00:00:00 2001
+From: Andreas Schneider <asn@samba.org>
+Date: Fri, 23 Oct 2020 08:53:43 +0200
+Subject: [PATCH 4/5] s3:modules: Do not install vfs modules only used for
+ testing
+
+BUG: https://bugzilla.samba.org/show_bug.cgi?id=14550
+
+Signed-off-by: Andreas Schneider <asn@samba.org>
+---
+ source3/modules/wscript_build | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/source3/modules/wscript_build b/source3/modules/wscript_build
+index c4f3db22296..36b047ef79b 100644
+--- a/source3/modules/wscript_build
++++ b/source3/modules/wscript_build
+@@ -114,7 +114,8 @@ bld.SAMBA3_MODULE('vfs_fake_acls',
+                  deps='samba-util',
+                  init_function='',
+                  internal_module=bld.SAMBA3_IS_STATIC_MODULE('vfs_fake_acls'),
+-                 enabled=bld.SAMBA3_IS_ENABLED_MODULE('vfs_fake_acls'))
++                 enabled=bld.SAMBA3_IS_ENABLED_MODULE('vfs_fake_acls'),
++                 install=False)
+ 
+ bld.SAMBA3_MODULE('vfs_recycle',
+                  subsystem='vfs',
+@@ -622,21 +623,24 @@ bld.SAMBA3_MODULE('vfs_fake_dfq',
+                  source='vfs_fake_dfq.c',
+                  init_function='',
+                  internal_module=bld.SAMBA3_IS_STATIC_MODULE('vfs_fake_dfq'),
+-                 enabled=bld.SAMBA3_IS_ENABLED_MODULE('vfs_fake_dfq'))
++                 enabled=bld.SAMBA3_IS_ENABLED_MODULE('vfs_fake_dfq'),
++                 install=False)
+ 
+ bld.SAMBA3_MODULE('vfs_error_inject',
+                  subsystem='vfs',
+                  source='vfs_error_inject.c',
+                  init_function='',
+                  internal_module=bld.SAMBA3_IS_STATIC_MODULE('vfs_error_inject'),
+-                 enabled=bld.SAMBA3_IS_ENABLED_MODULE('vfs_error_inject'))
++                 enabled=bld.SAMBA3_IS_ENABLED_MODULE('vfs_error_inject'),
++                 install=False)
+ 
+ bld.SAMBA3_MODULE('vfs_delay_inject',
+                  subsystem='vfs',
+                  source='vfs_delay_inject.c',
+                  init_function='',
+                  internal_module=bld.SAMBA3_IS_STATIC_MODULE('vfs_delay_inject'),
+-                 enabled=bld.SAMBA3_IS_ENABLED_MODULE('vfs_delay_inject'))
++                 enabled=bld.SAMBA3_IS_ENABLED_MODULE('vfs_delay_inject'),
++                 install=False)
+ 
+ bld.SAMBA3_MODULE('vfs_widelinks',
+                  subsystem='vfs',
+-- 
+GitLab
+
+
+From 58e412ac6d9822aa65639d7c1171a2723ca3ee8a Mon Sep 17 00:00:00 2001
+From: Andreas Schneider <asn@samba.org>
+Date: Fri, 23 Oct 2020 08:57:12 +0200
+Subject: [PATCH 5/5] examples:auth: Do not install example plugin
+
+BUG: https://bugzilla.samba.org/show_bug.cgi?id=14550
+
+Signed-off-by: Andreas Schneider <asn@samba.org>
+---
+ examples/auth/wscript_build | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/examples/auth/wscript_build b/examples/auth/wscript_build
+index 91f5302918b..03221238e5f 100644
+--- a/examples/auth/wscript_build
++++ b/examples/auth/wscript_build
+@@ -6,4 +6,5 @@ bld.SAMBA3_MODULE('auth_skel',
+                  deps='samba-util',
+                  init_function='',
+                  internal_module=bld.SAMBA3_IS_STATIC_MODULE('auth_skel'),
+-                 enabled=bld.SAMBA3_IS_ENABLED_MODULE('auth_skel'))
++                 enabled=bld.SAMBA3_IS_ENABLED_MODULE('auth_skel'),
++                 install=False)
+-- 
+GitLab
+

@@ -2,9 +2,15 @@
 #
 # To build and run the tests use:
 #
-# rpmbuild --rebuild --with testsuite --without clustering samba.src.rpm
+# rpmbuild --rebuild --with testsuite samba.src.rpm
 #
 %bcond_with testsuite
+
+# Build with internal talloc, tevent, tdb and ldb.
+#
+# rpmbuild --rebuild --with=testsuite --with=includelibs samba.src.rpm
+#
+%bcond_with includelibs
 
 # ctdb is enabled by default, you can disable it with: --without clustering
 %bcond_without clustering
@@ -149,6 +155,8 @@ Patch4:         samba-systemd-notification.patch
 Patch5:         https://gitlab.com/samba-team/samba/-/merge_requests/1624.patch
 # Update resolv_wrapper to version 1.1.7
 Patch6:         https://gitlab.com/samba-team/samba/-/merge_requests/1528.patch
+# Do not install test binaries for selftest
+Patch7:         https://gitlab.com/samba-team/samba/-/merge_requests/1635.patch
 
 Requires(pre): /usr/sbin/groupadd
 Requires(post): systemd
@@ -267,6 +275,7 @@ BuildRequires: perl(ExtUtils::MakeMaker)
 BuildRequires: perl(FindBin)
 BuildRequires: perl(Parse::Yapp)
 
+%if %{without testsuite}
 BuildRequires: libtalloc-devel >= %{talloc_version}
 BuildRequires: python3-talloc-devel >= %{talloc_version}
 
@@ -278,6 +287,10 @@ BuildRequires: python3-tdb >= %{tdb_version}
 
 BuildRequires: libldb-devel >= %{ldb_version}
 BuildRequires: python3-ldb-devel >= %{ldb_version}
+%else
+BuildRequires: lmdb-devel
+#endif without testsuite
+%endif
 
 %if %{with dc} || %{with testsuite}
 BuildRequires: bind
@@ -840,22 +853,31 @@ xzcat %{SOURCE0} | gpgv2 --quiet --keyring %{SOURCE2} %{SOURCE1} -
 %autosetup -n samba-%{version}%{pre_release} -p1
 
 %build
+%if %{with includelibs}
 %global _talloc_lib ,talloc,pytalloc,pytalloc-util
 %global _tevent_lib ,tevent,pytevent
 %global _tdb_lib ,tdb,pytdb
 %global _ldb_lib ,ldb,pyldb,pyldb-util
-
+%else
 %global _talloc_lib ,!talloc,!pytalloc,!pytalloc-util
 %global _tevent_lib ,!tevent,!pytevent
 %global _tdb_lib ,!tdb,!pytdb
 %global _ldb_lib ,!ldb,!pyldb,!pyldb-util
+#endif with includelibs
+%endif
 
 %global _samba_libraries !zlib,!popt%{_talloc_lib}%{_tevent_lib}%{_tdb_lib}%{_ldb_lib}
 
 %global _samba_idmap_modules idmap_ad,idmap_rid,idmap_ldap,idmap_hash,idmap_tdb2
 %global _samba_pdb_modules pdb_tdbsam,pdb_ldap,pdb_smbpasswd,pdb_wbc_sam,pdb_samba4
+
+%if %{with testsuite}
+%global _samba_auth_modules auth_wbc,auth_unix,auth_server,auth_samba4,auth_skel
+%global _samba_vfs_modules vfs_dfs_samba4,vfs_fake_dfq
+%else
 %global _samba_auth_modules auth_wbc,auth_unix,auth_server,auth_samba4
 %global _samba_vfs_modules vfs_dfs_samba4
+%endif
 
 %global _samba_modules %{_samba_idmap_modules},%{_samba_pdb_modules},%{_samba_auth_modules},%{_samba_vfs_modules}
 
@@ -1104,6 +1126,11 @@ done
 #endif without dc
 %endif
 
+%if %{with testsuite}
+rm -f %{buildroot}%{_mandir}/man8/vfs_nfs4acl_xattr.8*
+#endif with testsuite
+%endif
+
 pushd pidl
 make DESTDIR=%{buildroot} install_vendor
 
@@ -1116,7 +1143,26 @@ popd
 
 %if %{with testsuite}
 %check
-TDB_NO_FSYNC=1 %make_build test FAIL_IMMEDIATELY=1
+#
+# samba3.smb2.timestamps.*:
+#
+# The test fails on ext4 as it uses two high-order bits
+# in the timestamp so the year 2038 problem is deferred till 2446.
+# https://bugzilla.samba.org/show_bug.cgi?id=14546
+#
+for t in samba3.smb2.timestamps.time_t_15032385535 \
+         samba3.smb2.timestamps.time_t_10000000000 \
+         samba3.smb2.timestamps.time_t_4294967295 \
+         ; do
+    echo "^$t" >> selftest/knownfail.d/fedora.%{dist}
+done
+cat selftest/knownfail.d/fedora.%{dist}
+
+export TDB_NO_FSYNC=1
+export NMBD_DONT_LOG_STDOUT=1
+export SMBD_DONT_LOG_STDOUT=1
+export WINBINDD_DONT_LOG_STDOUT=1
+make %{?_smp_mflags} test FAIL_IMMEDIATELY=1
 #endif with testsuite
 %endif
 
@@ -1349,6 +1395,10 @@ fi
 %{_libdir}/samba/vfs/worm.so
 %{_libdir}/samba/vfs/xattr_tdb.so
 
+%if %{with testsuite}
+%{_libdir}/samba/vfs/nfs4acl_xattr.so
+%endif
+
 %dir %{_datadir}/samba
 %dir %{_datadir}/samba/mdssvc
 %{_datadir}/samba/mdssvc/elasticsearch_mappings.json
@@ -1462,6 +1512,31 @@ fi
 %{_mandir}/man8/samba-regedit.8*
 %{_mandir}/man8/smbspool.8*
 
+%if %{with includelibs}
+%{_bindir}/ldbadd
+%{_bindir}/ldbdel
+%{_bindir}/ldbedit
+%{_bindir}/ldbmodify
+%{_bindir}/ldbrename
+%{_bindir}/ldbsearch
+%{_bindir}/tdbbackup
+%{_bindir}/tdbdump
+%{_bindir}/tdbrestore
+%{_bindir}/tdbtool
+
+%{_mandir}/man1/ldbadd.1.gz
+%{_mandir}/man1/ldbdel.1.gz
+%{_mandir}/man1/ldbedit.1.gz
+%{_mandir}/man1/ldbmodify.1.gz
+%{_mandir}/man1/ldbrename.1.gz
+%{_mandir}/man1/ldbsearch.1.gz
+%{_mandir}/man8/tdbbackup.8.gz
+%{_mandir}/man8/tdbdump.8.gz
+%{_mandir}/man8/tdbrestore.8.gz
+%{_mandir}/man8/tdbtool.8.gz
+#endif with includelibs
+%endif
+
 ### CLIENT-LIBS
 %files client-libs
 %{_libdir}/libdcerpc-binding.so.*
@@ -1574,6 +1649,18 @@ fi
 %{_libdir}/samba/libsmbclient.so.*
 %{_mandir}/man7/libsmbclient.7*
 #endif without libsmbclient
+%endif
+
+%if %{with includelibs}
+%{_libdir}/samba/libldb-*.so
+%{_libdir}/samba/libldb.so.*
+%{_libdir}/samba/libtalloc.so.*
+%{_libdir}/samba/libtdb.so.*
+%{_libdir}/samba/libtevent.so.*
+
+%{_mandir}/man3/ldb.3.gz
+%{_mandir}/man3/talloc.3.gz
+#endif with includelibs
 %endif
 
 ### COMMON
@@ -1691,6 +1778,20 @@ fi
 %{_libdir}/samba/ldb/update_keytab.so
 %{_libdir}/samba/ldb/vlv.so
 %{_libdir}/samba/ldb/wins_ldb.so
+
+%if %{with includelibs}
+%{_libdir}/samba/ldb/asq.so
+%{_libdir}/samba/ldb/ldb.so
+%{_libdir}/samba/ldb/mdb.so
+%{_libdir}/samba/ldb/paged_searches.so
+%{_libdir}/samba/ldb/rdn_name.so
+%{_libdir}/samba/ldb/sample.so
+%{_libdir}/samba/ldb/server_sort.so
+%{_libdir}/samba/ldb/skel.so
+%{_libdir}/samba/ldb/tdb.so
+#endif with includelibs
+%endif
+
 %{_libdir}/samba/vfs/posix_eadb.so
 %dir /var/lib/samba/sysvol
 %{_mandir}/man8/samba.8*
@@ -1711,6 +1812,11 @@ fi
 %{_libdir}/samba/libdb-glue-samba4.so
 %{_libdir}/samba/libprocess-model-samba4.so
 %{_libdir}/samba/libservice-samba4.so
+
+%if %{with testsuite}
+%{_libdir}/samba/libntvfs-samba4.so
+%endif
+
 %dir %{_libdir}/samba/process_model
 %{_libdir}/samba/process_model/prefork.so
 %{_libdir}/samba/process_model/standard.so
@@ -1728,6 +1834,11 @@ fi
 %{_libdir}/samba/service/s3fs.so
 %{_libdir}/samba/service/winbindd.so
 %{_libdir}/samba/service/wrepl.so
+
+%if %{with testsuite}
+%{_libdir}/samba/service/smb.so
+%endif
+
 %{_libdir}/libdcerpc-server.so.*
 %{_libdir}/samba/libdnsserver-common-samba4.so
 %{_libdir}/samba/libdsdb-module-samba4.so
@@ -2226,6 +2337,21 @@ fi
 # /usr/lib64/samba/libsamba-python.cpython-36m-x86-64-linux-gnu-samba4.so
 %{_libdir}/samba/libsamba-net.*-samba4.so
 %{_libdir}/samba/libsamba-python.*-samba4.so
+
+%if %{with testsuite}
+%{_libdir}/samba/libpyldb-util.*.so.*
+
+%{python3_sitearch}/__pycache__/_ldb_text*.pyc
+%{python3_sitearch}/__pycache__/_tdb_text*.pyc
+%{python3_sitearch}/__pycache__/tevent*.pyc
+%{python3_sitearch}/_ldb_text.py
+%{python3_sitearch}/_tdb_text.py
+%{python3_sitearch}/_tevent.cpython*.so
+%{python3_sitearch}/ldb.cpython*.so
+%{python3_sitearch}/tdb.cpython*.so
+%{python3_sitearch}/tevent.py
+#endif with testsuite
+%endif
 
 %if %{with dc} || %{with testsuite}
 %files -n python3-%{name}-dc
