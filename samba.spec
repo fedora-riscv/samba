@@ -914,7 +914,8 @@ export LDFLAGS="%{__global_ldflags} -fuse-ld=gold"
         --systemd-winbind-extra=%{_systemd_extra} \
         --systemd-samba-extra=%{_systemd_extra}
 
-%make_build
+# Do not use %%make_build, make is just a wrapper around waf in Samba!
+%{__make} %{?_smp_mflags} %{_make_verbose}
 
 pushd pidl
 %__perl Makefile.PL PREFIX=%{_prefix}
