@@ -72,20 +72,19 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%define main_release 13
+%global main_release 13
 
-%define samba_version 4.13.0
-%define talloc_version 2.3.1
-%define tdb_version 1.4.3
-%define tevent_version 0.10.2
-%define ldb_version 2.2.0
+%global samba_version 4.13.0
+%global talloc_version 2.3.1
+%global tdb_version 1.4.3
+%global tevent_version 0.10.2
+%global ldb_version 2.2.0
 # This should be rc1 or nil
-%define pre_release %nil
+%global pre_release %nil
 
+%global samba_release %{main_release}%{?dist}
 %if "x%{?pre_release}" != "x"
-%define samba_release 0.%{main_release}.%{pre_release}%{?dist}
-%else
-%define samba_release %{main_release}%{?dist}
+%global samba_release 0.%{main_release}.%{pre_release}%{?dist}
 %endif
 
 # This is a network daemon, do a hardened build
@@ -119,9 +118,9 @@ Epoch:          2
 %endif
 
 %if 0%{?epoch} > 0
-%define samba_depver %{epoch}:%{version}-%{release}
+%global samba_depver %{epoch}:%{version}-%{release}
 %else
-%define samba_depver %{version}-%{release}
+%global samba_depver %{version}-%{release}
 %endif
 
 Summary:        Server and Client software to interoperate with Windows machines
