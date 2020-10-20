@@ -53,6 +53,21 @@
 #endif fedora
 %endif
 
+# Build vfs_io_uring module by default on 64bit Fedora
+%if 0%{?fedora}
+
+%ifarch aarch64 ppc64le s390x x86_64
+%bcond_without vfs_io_uring
+%else
+%bcond_with vfs_io_uring
+#endifarch
+%endif
+
+%else
+%bcond_with vfs_io_uring
+#endif fedora
+%endif
+
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
 %define main_release 13
@@ -88,15 +103,6 @@
 %endif
 
 %global required_mit_krb5 1.18
-
-%global with_vfs_io_uring 0
-# We need liburing >= 0.4 which is not available in RHEL yet
-%if 0%{?fedora}
-%ifarch aarch64 ppc64le s390x x86_64 i686
-%global with_vfs_io_uring 1
-%endif
-# /fedora
-%endif
 
 %global _systemd_extra "Environment=KRB5CCNAME=FILE:/run/samba/krb5cc_samba"
 
@@ -236,7 +242,7 @@ BuildRequires: glusterfs-devel >= 3.4.0.16
 BuildRequires: libcephfs-devel
 %endif
 
-%if %{with_vfs_io_uring}
+%if %{with vfs_io_uring}
 BuildRequires: liburing-devel >= 0.4
 %endif
 
@@ -1312,7 +1318,7 @@ fi
 %{_libdir}/samba/vfs/full_audit.so
 %{_libdir}/samba/vfs/gpfs.so
 %{_libdir}/samba/vfs/glusterfs_fuse.so
-%if %{with_vfs_io_uring}
+%if %{with vfs_io_uring}
 %{_libdir}/samba/vfs/io_uring.so
 %endif
 %{_libdir}/samba/vfs/linux_xfs_sgid.so
@@ -1369,7 +1375,7 @@ fi
 %{_mandir}/man8/vfs_full_audit.8*
 %{_mandir}/man8/vfs_gpfs.8*
 %{_mandir}/man8/vfs_glusterfs_fuse.8*
-%if %{with_vfs_io_uring}
+%if %{with vfs_io_uring}
 %{_mandir}/man8/vfs_io_uring.8*
 %endif
 %{_mandir}/man8/vfs_linux_xfs_sgid.8*
