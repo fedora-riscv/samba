@@ -20,6 +20,9 @@
 # Build a libwbclient package by default
 %bcond_without libwbclient
 
+# Build with winexe by default
+%bcond_without winexe
+
 # Build vfs_ceph module by default on 64bit Fedora
 %if 0%{?fedora}
 
@@ -85,9 +88,6 @@
 %endif
 
 %global required_mit_krb5 1.18
-
-# Enable winexe by default
-%bcond_without winexe
 
 %global with_vfs_io_uring 0
 # We need liburing >= 0.4 which is not available in RHEL yet
