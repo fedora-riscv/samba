@@ -86,12 +86,6 @@
 
 %global required_mit_krb5 1.18
 
-%global with_clustering_support 0
-
-%if %{with clustering}
-%global with_clustering_support 1
-%endif
-
 # Enable winexe by default
 %bcond_without winexe
 
@@ -771,7 +765,7 @@ Winexe is a Remote Windows®-command executor
 %endif
 
 ### CTDB
-%if %with_clustering_support
+%if %{with clustering}
 %package -n ctdb
 Summary: A Clustered Database based on Samba's Trivial Database (TDB)
 
@@ -824,7 +818,7 @@ CTDB is a cluster implementation of the TDB database used by Samba and other
 projects to store temporary data. If an application is already using TDB for
 temporary data it is very easy to convert that application to be cluster aware
 and use CTDB instead.
-#endif with_clustering_support
+#endif with clustering
 %endif
 
 
@@ -899,7 +893,7 @@ export LDFLAGS="%{__global_ldflags} -fuse-ld=gold"
 %if %{without vfs_glusterfs}
         --disable-glusterfs \
 %endif
-%if %with_clustering_support
+%if %{with clustering}
         --with-cluster-support \
 %endif
 %if %{with testsuite}
@@ -978,13 +972,13 @@ install -m 0744 packaging/printing/smbprint %{buildroot}%{_bindir}/smbprint
 install -d -m 0755 %{buildroot}%{_tmpfilesdir}
 # Create /run/samba.
 echo "d /run/samba  755 root root" > %{buildroot}%{_tmpfilesdir}/samba.conf
-%if %with_clustering_support
+%if %{with clustering}
 echo "d /run/ctdb 755 root root" > %{buildroot}%{_tmpfilesdir}/ctdb.conf
 %endif
 
 install -d -m 0755 %{buildroot}%{_sysconfdir}/sysconfig
 install -m 0644 packaging/systemd/samba.sysconfig %{buildroot}%{_sysconfdir}/sysconfig/samba
-%if %with_clustering_support
+%if %{with clustering}
 cat > %{buildroot}%{_sysconfdir}/sysconfig/ctdb <<EOF
 # CTDB configuration is now in %%{_sysconfdir}/ctdb/ctdb.conf
 EOF
@@ -995,7 +989,7 @@ install -m 0644 ctdb/config/ctdb.conf %{buildroot}%{_sysconfdir}/ctdb/ctdb.conf
 
 install -m 0644 %{SOURCE201} packaging/README.downgrade
 
-%if %with_clustering_support
+%if %{with clustering}
 install -m 0644 ctdb/config/ctdb.service %{buildroot}%{_unitdir}
 %endif
 
@@ -1264,7 +1258,7 @@ fi
 
 %ldconfig_scriptlets winbind-modules
 
-%if %with_clustering_support
+%if %{with clustering}
 %post -n ctdb
 /usr/bin/systemd-tmpfiles --create %{_tmpfilesdir}/ctdb.conf
 %systemd_post ctdb.service
@@ -2731,7 +2725,7 @@ fi
 %{_mandir}/man5/pam_winbind.conf.5*
 %{_mandir}/man8/pam_winbind.8*
 
-%if %with_clustering_support
+%if %{with clustering}
 %files -n ctdb
 %doc ctdb/README
 %doc ctdb/doc/examples
@@ -3617,7 +3611,7 @@ fi
 %dir %{_datadir}/ctdb/tests/UNIT/tool/scripts
 %{_datadir}/ctdb/tests/UNIT/tool/scripts/local.sh
 
-#endif with_clustering_support
+#endif with clustering
 %endif
 
 %if %{with winexe}
