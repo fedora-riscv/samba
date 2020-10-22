@@ -1,0 +1,210 @@
+From 81d6949acdad70ecfb130d3286eeab1b3a51937f Mon Sep 17 00:00:00 2001
+From: Alexander Bokovoy <ab@samba.org>
+Date: Wed, 7 Oct 2020 19:25:24 +0300
+Subject: [PATCH 1/2] cli_credentials_parse_string: fix parsing of principals
+
+When parsing a principal-like name, user name was left with full
+principal instead of taking only the left part before '@' sign.
+
+>>> from samba import credentials
+>>> t = credentials.Credentials()
+>>> t.parse_string('admin@realm.test', credentials.SPECIFIED)
+>>> t.get_username()
+'admin@realm.test'
+
+The issue is that cli_credentials_set_username() does a talloc_strdup()
+of the argument, so we need to change order of assignment to allow
+talloc_strdup() to copy the right part of the string.
+
+Signed-off-by: Alexander Bokovoy <ab@samba.org>
+---
+ auth/credentials/credentials.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/auth/credentials/credentials.c b/auth/credentials/credentials.c
+index 77c35dd104b..06ac79058f9 100644
+--- a/auth/credentials/credentials.c
++++ b/auth/credentials/credentials.c
+@@ -840,11 +840,10 @@ _PUBLIC_ void cli_credentials_parse_string(struct cli_credentials *credentials,
+ 		 * in order to undo the effect of
+ 		 * cli_credentials_guess().
+ 		 */
+-		cli_credentials_set_username(credentials, uname, obtained);
+-		cli_credentials_set_domain(credentials, "", obtained);
+-
+ 		cli_credentials_set_principal(credentials, uname, obtained);
+ 		*p = 0;
++		cli_credentials_set_username(credentials, uname, obtained);
++		cli_credentials_set_domain(credentials, "", obtained);
+ 		cli_credentials_set_realm(credentials, p+1, obtained);
+ 		return;
+ 	} else if ((p = strchr_m(uname,'\\'))
+-- 
+2.28.0
+
+
+From fa38bebb993011428612d51819530218d8358f5e Mon Sep 17 00:00:00 2001
+From: Alexander Bokovoy <ab@samba.org>
+Date: Mon, 13 Jan 2020 16:04:20 +0200
+Subject: [PATCH 2/2] lookup_name: allow lookup for own realm
+
+When using security tab in Windows Explorer, a lookup over a trusted
+forest might come as realm\name instead of NetBIOS domain name:
+
+--------------------------------------------------------------------
+[2020/01/13 11:12:39.859134,  1, pid=33253, effective(1732401004, 1732401004), real(1732401004, 0), class=rpc_parse] ../../librpc/ndr/ndr.c:471(ndr_print_function_debug)
+       lsa_LookupNames3: struct lsa_LookupNames3
+          in: struct lsa_LookupNames3
+              handle                   : *
+                  handle: struct policy_handle
+                      handle_type              : 0x00000000 (0)
+                      uuid                     : 0000000e-0000-0000-1c5e-a750e5810000
+              num_names                : 0x00000001 (1)
+              names: ARRAY(1)
+                  names: struct lsa_String
+                      length                   : 0x001e (30)
+                      size                     : 0x0020 (32)
+                      string                   : *
+                          string                   : 'ipa.test\admins'
+              sids                     : *
+                  sids: struct lsa_TransSidArray3
+                      count                    : 0x00000000 (0)
+                      sids                     : NULL
+              level                    : LSA_LOOKUP_NAMES_UPLEVEL_TRUSTS_ONLY2 (6)
+              count                    : *
+                  count                    : 0x00000000 (0)
+              lookup_options           : LSA_LOOKUP_OPTION_SEARCH_ISOLATED_NAMES (0)
+              client_revision          : LSA_CLIENT_REVISION_2 (2)
+--------------------------------------------------------------------
+
+Allow this lookup using realm to be done against primary domain.
+
+Refactor user name parsing code to reuse cli_credentials_* API to be
+consistent with other places. cli_credentials_parse_string() handles
+both domain and realm-based user name variants.
+
+Signed-off-by: Alexander Bokovoy <ab@samba.org>
+---
+ source3/passdb/lookup_sid.c | 75 ++++++++++++++++++++++++++-----------
+ 1 file changed, 53 insertions(+), 22 deletions(-)
+
+diff --git a/source3/passdb/lookup_sid.c b/source3/passdb/lookup_sid.c
+index 82c47b3145b..39d599fed27 100644
+--- a/source3/passdb/lookup_sid.c
++++ b/source3/passdb/lookup_sid.c
+@@ -29,6 +29,7 @@
+ #include "../libcli/security/security.h"
+ #include "lib/winbind_util.h"
+ #include "../librpc/gen_ndr/idmap.h"
++#include "auth/credentials/credentials.h"
+ 
+ static bool lookup_unix_user_name(const char *name, struct dom_sid *sid)
+ {
+@@ -78,52 +79,82 @@ bool lookup_name(TALLOC_CTX *mem_ctx,
+ 		 const char **ret_domain, const char **ret_name,
+ 		 struct dom_sid *ret_sid, enum lsa_SidType *ret_type)
+ {
+-	char *p;
+ 	const char *tmp;
+ 	const char *domain = NULL;
+ 	const char *name = NULL;
++	const char *realm = NULL;
+ 	uint32_t rid;
+ 	struct dom_sid sid;
+ 	enum lsa_SidType type;
+ 	TALLOC_CTX *tmp_ctx = talloc_new(mem_ctx);
++	struct cli_credentials *creds = NULL;
+ 
+ 	if (tmp_ctx == NULL) {
+ 		DEBUG(0, ("talloc_new failed\n"));
+ 		return false;
+ 	}
+ 
+-	p = strchr_m(full_name, '\\');
+-
+-	if (p != NULL) {
+-		domain = talloc_strndup(tmp_ctx, full_name,
+-					PTR_DIFF(p, full_name));
+-		name = talloc_strdup(tmp_ctx, p+1);
+-	} else {
+-		domain = talloc_strdup(tmp_ctx, "");
+-		name = talloc_strdup(tmp_ctx, full_name);
++	creds = cli_credentials_init(tmp_ctx);
++	if (creds == NULL) {
++		DEBUG(0, ("cli_credentials_init failed\n"));
++		return false;
+ 	}
+ 
+-	if ((domain == NULL) || (name == NULL)) {
+-		DEBUG(0, ("talloc failed\n"));
+-		TALLOC_FREE(tmp_ctx);
++	cli_credentials_parse_string(creds, full_name, CRED_SPECIFIED);
++	name = cli_credentials_get_username(creds);
++	domain = cli_credentials_get_domain(creds);
++	realm = cli_credentials_get_realm(creds);
++
++	/* At this point we have:
++	 * - name -- normal name or empty string
++	 * - domain -- either NULL or domain name
++	 * - realm -- either NULL or realm name
++	 *
++	 * domain and realm are exclusive to each other
++	 * the code below in lookup_name assumes domain
++	 * to be at least empty string, not NULL
++	*/
++
++	if ((name == NULL) || (name[0] == '\0')) {
++		DEBUG(0, ("lookup_name with empty name, exit\n"));
+ 		return false;
+ 	}
+ 
++	if ((domain == NULL) && (realm == NULL)) {
++		domain = talloc_strdup(creds, "");
++	}
++
+ 	DEBUG(10,("lookup_name: %s => domain=[%s], name=[%s]\n",
+ 		full_name, domain, name));
+ 	DEBUG(10, ("lookup_name: flags = 0x0%x\n", flags));
+ 
+-	if (((flags & LOOKUP_NAME_DOMAIN) || (flags == 0)) &&
+-	    strequal(domain, get_global_sam_name()))
+-	{
++	/* Windows clients may send a LookupNames request with both NetBIOS
++	 * domain name- and realm-qualified user names. Thus, we need to check
++	 * both against both of the SAM domain name and realm, if set. Since
++	 * domain name and realm in the request are exclusive, test the one
++	 * that is specified.  cli_credentials_parse_string() will either set
++	 * realm or wouldn't so we can use it to detect if realm was specified.
++	 */
++	if ((flags & LOOKUP_NAME_DOMAIN) || (flags == 0)) {
++		const char *domain_name = realm ? realm : domain;
++		bool check_global_sam = false;
++
++		if (domain_name[0] != '\0') {
++			check_global_sam = strequal(domain_name, get_global_sam_name());
++			if (!check_global_sam && lp_realm() != NULL) {
++				check_global_sam = strequal(domain_name, lp_realm());
++			}
++		}
+ 
+-		/* It's our own domain, lookup the name in passdb */
+-		if (lookup_global_sam_name(name, flags, &rid, &type)) {
+-			sid_compose(&sid, get_global_sam_sid(), rid);
+-			goto ok;
++		if (check_global_sam) {
++			/* It's our own domain, lookup the name in passdb */
++			if (lookup_global_sam_name(name, flags, &rid, &type)) {
++				sid_compose(&sid, get_global_sam_sid(), rid);
++				goto ok;
++			}
++			TALLOC_FREE(tmp_ctx);
++			return false;
+ 		}
+-		TALLOC_FREE(tmp_ctx);
+-		return false;
+ 	}
+ 
+ 	if ((flags & LOOKUP_NAME_BUILTIN) &&
+-- 
+2.28.0
+

@@ -131,6 +131,7 @@ Source201:      README.downgrade
 
 Patch:          samba-winexe-build.patch
 Patch1:         samba-s4u.patch
+Patch2:         samba-gc-lookup_unix_user_name-allow-lookup-for-own-realm.patch
 
 Requires(pre): /usr/sbin/groupadd
 Requires(post): systemd
@@ -3591,6 +3592,8 @@ fi
 * Thu Oct 22 2020 Alexander Bokovoy <abokovoy@redhat.com> - 4.12.8-1
 - Add preliminary support for S4U operations in Samba AD DC
   resolves: #1836630 - Samba DC: Remote Desktop cannot access files
+- Fix lookup_unix_user_name to allow lookup of realm-qualified users and groups
+  required for upcoming FreeIPA Global Catalog support
 
 * Wed Oct 07 2020 Guenther Deschner <gdeschner@redhat.com> - 4.12.8-0
 - Update to Samba 4.12.8
