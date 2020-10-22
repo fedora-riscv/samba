@@ -1,0 +1,1389 @@
+From 9cf2118afce0b1534c0daea4ab97f29225f7fcb1 Mon Sep 17 00:00:00 2001
+From: Andreas Schneider <asn@samba.org>
+Date: Wed, 21 Oct 2020 07:43:08 +0200
+Subject: [PATCH 1/9] python: Create targetdir recursively
+
+This fixes `make test` in a release tarball.
+
+BUG: https://bugzilla.samba.org/show_bug.cgi?id=14542
+
+Signed-off-by: Andreas Schneider <asn@samba.org>
+---
+ python/samba/netcmd/domain.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/python/samba/netcmd/domain.py b/python/samba/netcmd/domain.py
+index 000688f4e7a..5f08ddf6007 100644
+--- a/python/samba/netcmd/domain.py
++++ b/python/samba/netcmd/domain.py
+@@ -445,7 +445,7 @@ class cmd_domain_provision(Command):
+ 
+         if targetdir is not None:
+             if not os.path.isdir(targetdir):
+-                os.mkdir(targetdir)
++                os.makedirs(targetdir)
+ 
+         eadb = True
+ 
+-- 
+GitLab
+
+
+From f69a5a15550a2330710ba09e06daf826deedeb34 Mon Sep 17 00:00:00 2001
+From: Andreas Schneider <asn@samba.org>
+Date: Thu, 22 Oct 2020 11:39:04 +0200
+Subject: [PATCH 2/9] testprogs: Add remove_directory to common test functions
+
+BUG: https://bugzilla.samba.org/show_bug.cgi?id=14542
+
+Signed-off-by: Andreas Schneider <asn@samba.org>
+---
+ testprogs/blackbox/common_test_fns.inc | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/testprogs/blackbox/common_test_fns.inc b/testprogs/blackbox/common_test_fns.inc
+index a5611c63fa0..7b421e9eb08 100755
+--- a/testprogs/blackbox/common_test_fns.inc
++++ b/testprogs/blackbox/common_test_fns.inc
+@@ -107,3 +107,14 @@ kerberos_kinit() {
+ 	fi
+ 	return $status
+ }
++
++remove_directory() {
++	local xdir=${1}
++	shift
++
++	if [ "$xdir" == "/" ] || [ ! -d "$xdir" ] || [ ! $(ls -A "$xdir") ]; then
++		return
++	fi
++
++	rm -rf "$xdir"
++}
+-- 
+GitLab
+
+
+From 5c65e1a9e99d9dcfadb90433b2465db277814666 Mon Sep 17 00:00:00 2001
+From: Andreas Schneider <asn@samba.org>
+Date: Tue, 20 Oct 2020 20:47:43 +0200
+Subject: [PATCH 3/9] testprogs: Fix and improve demote-saveddb test
+
+This fixes running `make test` in a release tarball!
+
+BUG: https://bugzilla.samba.org/show_bug.cgi?id=14542
+
+Signed-off-by: Andreas Schneider <asn@samba.org>
+---
+ testprogs/blackbox/demote-saveddb.sh | 75 ++++++++++++++++------------
+ 1 file changed, 43 insertions(+), 32 deletions(-)
+
+diff --git a/testprogs/blackbox/demote-saveddb.sh b/testprogs/blackbox/demote-saveddb.sh
+index 3d5fabd72e3..d8fccf32011 100755
+--- a/testprogs/blackbox/demote-saveddb.sh
++++ b/testprogs/blackbox/demote-saveddb.sh
+@@ -10,58 +10,69 @@ fi
+ PREFIX_ABS="$1"
+ shift 1
+ 
+-. `dirname $0`/subunit.sh
++failed=0
+ 
+-tree_dir=`dirname $0`/../../source4/selftest/provisions/multi-dc-samba-master-c596ac6
++. `dirname $0`/subunit.sh
++. `dirname $0`/common_test_fns.inc
+ 
+-undump() {
+-       if test -x $BINDIR/tdbrestore;
+-       then
+-	`dirname $0`/../../source4/selftest/provisions/undump.sh $tree_dir $PREFIX_ABS $BINDIR/tdbrestore
+-       else
+-	`dirname $0`/../../source4/selftest/provisions/undump.sh $tree_dir $PREFIX_ABS
+-       fi
+-}
++samba_tree_dir="$SRCDIR_ABS/source4/selftest/provisions/multi-dc-samba-master-c596ac6"
+ 
+-demote() {
+-       $PYTHON $BINDIR/samba-tool domain demote -H tdb://$PREFIX_ABS/private/sam.ldb --remove-other-dead-server=$1
+-}
++samba_tdbrestore="tdbrestore"
++if [ -x $BINDIR/tdbrestore ]; then
++    samba_tdbrestore="$BINDIR/tdbrestore"
++fi
+ 
++# The undump script and the provision data is not part of release tarballs,
++# skip the tests in this case!
++samba_undump="$SRCDIR_ABS/source4/selftest/provisions/undump.sh"
++if [ ! -x $samba_undump ] || [ ! -d $samba_tree_dir ]; then
++    subunit_start_test "undump"
++    subunit_skip_test "undump" <<EOF
++EOF
+ 
+-if [ -d $tree_dir ]; then
+-    testit "undump" undump
+-    testit "demote-q-0-0" demote "q-0-0"
+-    # The database was copied of q-0-1 so this will fail
+-    # as we can't remove our own name
+-    testit_expect_failure "demote-q-0-1" demote "q-0-1"
+-    testit "demote-q-1-0" demote "q-1-0"
+-    testit "demote-q-1-1" demote "q-1-1"
+-else
+     subunit_start_test "undump"
+     subunit_skip_test "undump" <<EOF
+-no test provision
++Skipping tests - no provision!
+ EOF
+ 
+     subunit_start_test "demote-q-0-0"
+     subunit_skip_test "demote-q-0-0" <<EOF
+-no test provision
++Skipping tests - no provision!
+ EOF
+     subunit_start_test "demote-q-0-1"
+     subunit_skip_test "demote-q-0-1" <<EOF
+-no test provision
++Skipping tests - no provision!
+ EOF
+-    subunit_start_test "demote-q-1-1"
+-    subunit_skip_test "demote-q-0-1" <<EOF
+-no test provision
++    subunit_start_test "demote-q-1-0"
++    subunit_skip_test "demote-q-1-0" <<EOF
++Skipping tests - no provision!
+ EOF
+     subunit_start_test "demote-q-1-1"
+     subunit_skip_test "demote-q-1-1" <<EOF
+-no test provision
++Skipping tests - no provision!
+ EOF
+-fi
+ 
+-if [ -d $PREFIX_ABS ]; then
+-    rm -fr $PREFIX_ABS
++    exit 0
+ fi
+ 
++undump() {
++    $SRCDIR_ABS/source4/selftest/provisions/undump.sh $samba_tree_dir $PREFIX_ABS $samba_tdbrestore
++}
++
++demote() {
++       $PYTHON $BINDIR/samba-tool domain demote -H tdb://$PREFIX_ABS/private/sam.ldb --remove-other-dead-server=$1
++}
++
++remove_directory $PREFIX_ABS
++
++testit "undump" undump || failed=`expr $failed + 1`
++testit "demote-q-0-0" demote "q-0-0" || failed=`expr $failed + 1`
++# The database was copied of q-0-1 so this will fail
++# as we can't remove our own name
++testit_expect_failure "demote-q-0-1" demote "q-0-1" || failed=`expr $failed + 1`
++testit "demote-q-1-0" demote "q-1-0" || failed=`expr $failed + 1`
++testit "demote-q-1-1" demote "q-1-1" || failed=`expr $failed + 1`
++
++remove_directory $PREFIX_ABS
++
+ exit $failed
+-- 
+GitLab
+
+
+From 92f644016136496cf1e1ee8a94343a775828b789 Mon Sep 17 00:00:00 2001
+From: Andreas Schneider <asn@samba.org>
+Date: Wed, 21 Oct 2020 17:04:12 +0200
+Subject: [PATCH 4/9] testprogs: Fix and improve tombstones-expunge test
+
+This fixes running `make test` in a release tarball!
+
+BUG: https://bugzilla.samba.org/show_bug.cgi?id=14542
+
+Signed-off-by: Andreas Schneider <asn@samba.org>
+---
+ testprogs/blackbox/tombstones-expunge.sh | 94 +++++++++++++-----------
+ 1 file changed, 50 insertions(+), 44 deletions(-)
+
+diff --git a/testprogs/blackbox/tombstones-expunge.sh b/testprogs/blackbox/tombstones-expunge.sh
+index aa37cfe278f..9e0588377d7 100755
+--- a/testprogs/blackbox/tombstones-expunge.sh
++++ b/testprogs/blackbox/tombstones-expunge.sh
+@@ -11,9 +11,12 @@ PREFIX_ABS="$1"
+ RELEASE="$2"
+ shift 2
+ 
++failed=0
++
+ . `dirname $0`/subunit.sh
++. `dirname $0`/common_test_fns.inc
+ 
+-release_dir=`dirname $0`/../../source4/selftest/provisions/$RELEASE
++release_dir="$SRCDIR_ABS/source4/selftest/provisions/$RELEASE"
+ 
+ ldbadd="ldbadd"
+ if [ -x "$BINDIR/ldbadd" ]; then
+@@ -35,13 +38,28 @@ if [ -x "$BINDIR/ldbsearch" ]; then
+     ldbsearch="$BINDIR/ldbsearch"
+ fi
+ 
++samba_tdbrestore="tdbrestore"
++if [ -x "$BINDIR/tdbrestore" ]; then
++    samba_tdbrestore="$BINDIR/tdbrestore"
++fi
++
++samba_undump="$SRCDIR_ABS/source4/selftest/provisions/undump.sh"
++if [ ! -x $samba_undump ] || [ ! -d $release_dir ]; then
++    subunit_start_test $RELEASE
++    subunit_skip_test $RELEASE <<EOF
++no test provision
++EOF
++
++    subunit_start_test "tombstones_expunge"
++    subunit_skip_test "tombstones_expunge" <<EOF
++no test provision
++EOF
++
++    exit 0
++fi
++
+ undump() {
+-       if test -x $BINDIR/tdbrestore;
+-       then
+-	`dirname $0`/../../source4/selftest/provisions/undump.sh $release_dir $PREFIX_ABS/$RELEASE $BINDIR/tdbrestore
+-       else
+-	`dirname $0`/../../source4/selftest/provisions/undump.sh $release_dir $PREFIX_ABS/$RELEASE
+-       fi
++    $samba_undump $release_dir $PREFIX_ABS/$RELEASE $samba_tdbrestore
+ }
+ 
+ tombstones_expunge() {
+@@ -198,42 +216,30 @@ check_expected_unsorted_links() {
+     fi
+ }
+ 
+-if [ -d $release_dir ]; then
+-    testit $RELEASE undump
+-    testit "add_two_more_users" add_two_more_users
+-    testit "add_four_more_links" add_four_more_links
+-    testit "add_dangling_link" add_dangling_link
+-    testit "remove_one_link" remove_one_link
+-    testit "remove_one_user" remove_one_user
+-    testit "check_match_rule_links" check_match_rule_links
+-    testit_expect_failure "check_match_rule_links_negative" check_match_rule_links_negative
+-    testit_expect_failure "check_match_rule_links_overflow" check_match_rule_links_overflow
+-    testit_expect_failure "check_match_rule_links_null" check_match_rule_links_null
+-    testit_expect_failure "check_match_rule_links_hex" check_match_rule_links_hex
+-    testit_expect_failure "check_match_rule_links_hex2" check_match_rule_links_hex2
+-    testit_expect_failure "check_match_rule_links_decimal" check_match_rule_links_decimal
+-    testit_expect_failure "check_match_rule_links_backlink" check_match_rule_links_backlink
+-    testit_expect_failure "check_match_rule_links_notlink" check_match_rule_links_notlink
+-    testit "add_unsorted_links" add_unsorted_links
+-    testit "tombstones_expunge" tombstones_expunge
+-    testit "check_expected_after_deleted_links" check_expected_after_deleted_links
+-    testit "check_expected_after_links" check_expected_after_links
+-    testit "check_expected_after_objects" check_expected_after_objects
+-    testit "check_expected_unsorted_links" check_expected_unsorted_links
+-else
+-    subunit_start_test $RELEASE
+-    subunit_skip_test $RELEASE <<EOF
+-no test provision
+-EOF
+-
+-    subunit_start_test "tombstones_expunge"
+-    subunit_skip_test "tombstones_expunge" <<EOF
+-no test provision
+-EOF
+-fi
+-
+-if [ -d $PREFIX_ABS/${RELEASE} ]; then
+-    rm -fr $PREFIX_ABS/${RELEASE}
+-fi
++remove_directory $PREFIX_ABS/${RELEASE}
++
++testit $RELEASE undump || failed=`expr $failed + 1`
++testit "add_two_more_users" add_two_more_users || failed=`expr $failed + 1`
++testit "add_four_more_links" add_four_more_links || failed=`expr $failed + 1`
++testit "add_dangling_link" add_dangling_link || failed=`expr $failed + 1`
++testit "remove_one_link" remove_one_link || failed=`expr $failed + 1`
++testit "remove_one_user" remove_one_user || failed=`expr $failed + 1`
++testit "check_match_rule_links" check_match_rule_links || failed=`expr $failed + 1`
++testit_expect_failure "check_match_rule_links_negative" check_match_rule_links_negative || failed=`expr $failed + 1`
++testit_expect_failure "check_match_rule_links_overflow" check_match_rule_links_overflow || failed=`expr $failed + 1`
++testit_expect_failure "check_match_rule_links_null" check_match_rule_links_null || failed=`expr $failed + 1`
++testit_expect_failure "check_match_rule_links_hex" check_match_rule_links_hex || failed=`expr $failed + 1`
++testit_expect_failure "check_match_rule_links_hex2" check_match_rule_links_hex2 || failed=`expr $failed + 1`
++testit_expect_failure "check_match_rule_links_decimal" check_match_rule_links_decimal || failed=`expr $failed + 1`
++testit_expect_failure "check_match_rule_links_backlink" check_match_rule_links_backlink || failed=`expr $failed + 1`
++testit_expect_failure "check_match_rule_links_notlink" check_match_rule_links_notlink || failed=`expr $failed + 1`
++testit "add_unsorted_links" add_unsorted_links || failed=`expr $failed + 1`
++testit "tombstones_expunge" tombstones_expunge || failed=`expr $failed + 1`
++testit "check_expected_after_deleted_links" check_expected_after_deleted_links || failed=`expr $failed + 1`
++testit "check_expected_after_links" check_expected_after_links || failed=`expr $failed + 1`
++testit "check_expected_after_objects" check_expected_after_objects || failed=`expr $failed + 1`
++testit "check_expected_unsorted_links" check_expected_unsorted_links || failed=`expr $failed + 1`
++
++remove_directory $PREFIX_ABS/${RELEASE}
+ 
+ exit $failed
+-- 
+GitLab
+
+
+From 58aed0fbaee5584577c23491ae341c48b8286ca7 Mon Sep 17 00:00:00 2001
+From: Andreas Schneider <asn@samba.org>
+Date: Wed, 21 Oct 2020 17:35:34 +0200
+Subject: [PATCH 5/9] testprogs: Fix and improve runtime-links test
+
+This fixes running `make test` in a release tarball!
+
+BUG: https://bugzilla.samba.org/show_bug.cgi?id=14542
+
+Signed-off-by: Andreas Schneider <asn@samba.org>
+---
+ testprogs/blackbox/common-links.sh  | 16 +++----
+ testprogs/blackbox/runtime-links.sh | 65 ++++++++++++++++-------------
+ 2 files changed, 44 insertions(+), 37 deletions(-)
+
+diff --git a/testprogs/blackbox/common-links.sh b/testprogs/blackbox/common-links.sh
+index ee7310b5108..363234ae11c 100644
+--- a/testprogs/blackbox/common-links.sh
++++ b/testprogs/blackbox/common-links.sh
+@@ -1,4 +1,4 @@
+-release_dir=`dirname $0`/../../source4/selftest/provisions/$RELEASE
++release_dir=$SRCDIR_ABS/source4/selftest/provisions/$RELEASE
+ 
+ ldbadd="ldbadd"
+ if [ -x "$BINDIR/ldbadd" ]; then
+@@ -25,13 +25,15 @@ if [ -x "$BINDIR/ldbrename" ]; then
+     ldbrename="$BINDIR/ldbrename"
+ fi
+ 
++samba_tdbrestore="tdbrestore"
++if [ -x "$BINDIR/tdbrestore" ]; then
++    samba_tdbrestore="$BINDIR/tdbrestore"
++fi
++
++samba_undump="$SRCDIR_ABS/source4/selftest/provisions/undump.sh"
++
+ undump() {
+-       if test -x $BINDIR/tdbrestore;
+-       then
+-	`dirname $0`/../../source4/selftest/provisions/undump.sh $release_dir $PREFIX_ABS/$RELEASE $BINDIR/tdbrestore
+-       else
+-	`dirname $0`/../../source4/selftest/provisions/undump.sh $release_dir $PREFIX_ABS/$RELEASE
+-       fi
++    $samba_undump $release_dir $PREFIX_ABS/$RELEASE $samba_tdbrestore
+ }
+ 
+ add_dangling_link() {
+diff --git a/testprogs/blackbox/runtime-links.sh b/testprogs/blackbox/runtime-links.sh
+index 344b822f07e..f8de66c60e7 100755
+--- a/testprogs/blackbox/runtime-links.sh
++++ b/testprogs/blackbox/runtime-links.sh
+@@ -11,10 +11,28 @@ PREFIX_ABS="$1"
+ RELEASE="$2"
+ shift 2
+ 
++failed=0
++
+ . `dirname $0`/subunit.sh
+ 
+ . `dirname $0`/common-links.sh
+ 
++. `dirname $0`/common_test_fns.inc
++
++if [ ! -x $samba_undump ] || [ ! -d $release_dir ]; then
++    subunit_start_test $RELEASE
++    subunit_skip_test $RELEASE <<EOF
++no test provision
++EOF
++
++    subunit_start_test "tombstones_expunge"
++    subunit_skip_test "tombstones_expunge" <<EOF
++no test provision
++EOF
++
++    exit 0
++fi
++
+ delete_member_of_deleted_group() {
+     TZ=UTC $ldbdel -H tdb://$PREFIX_ABS/${RELEASE}/private/sam.ldb 'CN=User1 UT. Tester,CN=Users,DC=release-4-5-0-pre1,DC=samba,DC=corp'
+     if [ "$?" != "0" ]; then
+@@ -36,39 +54,26 @@ delete_dangling_backlink_memberof_group() {
+     fi
+ }
+ 
++remove_directory $PREFIX_ABS/${RELEASE}
+ 
+-if [ -d $release_dir ]; then
+-    testit $RELEASE undump
+-    testit "add_dangling_link" add_dangling_link
+-    testit "add_dangling_backlink" add_dangling_backlink
+-    testit "add_deleted_dangling_backlink" add_deleted_dangling_backlink
+-    testit "revive_links_on_deleted_group" revive_links_on_deleted_group
+-    testit "revive_backlink_on_deleted_group" revive_backlink_on_deleted_group
+-    testit "add_deleted_target_link" add_deleted_target_link
+-    testit "add_deleted_target_backlink" add_deleted_target_backlink
+-    testit "dangling_one_way_link" dangling_one_way_link
+-    testit "dangling_one_way_dn" dangling_one_way_dn
+-    testit "deleted_one_way_dn" deleted_one_way_dn
+-    testit "add_dangling_multi_valued" add_dangling_multi_valued
++testit $RELEASE undump || failed=`expr $failed + 1`
++testit "add_dangling_link" add_dangling_link || failed=`expr $failed + 1`
++testit "add_dangling_backlink" add_dangling_backlink || failed=`expr $failed + 1`
++testit "add_deleted_dangling_backlink" add_deleted_dangling_backlink || failed=`expr $failed + 1`
++testit "revive_links_on_deleted_group" revive_links_on_deleted_group || failed=`expr $failed + 1`
++testit "revive_backlink_on_deleted_group" revive_backlink_on_deleted_group || failed=`expr $failed + 1`
++testit "add_deleted_target_link" add_deleted_target_link || failed=`expr $failed + 1`
++testit "add_deleted_target_backlink" add_deleted_target_backlink || failed=`expr $failed + 1`
++testit "dangling_one_way_link" dangling_one_way_link || failed=`expr $failed + 1`
++testit "dangling_one_way_dn" dangling_one_way_dn || failed=`expr $failed + 1`
++testit "deleted_one_way_dn" deleted_one_way_dn || failed=`expr $failed + 1`
++testit "add_dangling_multi_valued" add_dangling_multi_valued || failed=`expr $failed + 1`
+ 
+ #Now things are set up, work with the DB
+-    testit "delete_member_of_deleted_group" delete_member_of_deleted_group
+-    testit "delete_backlink_memberof_deleted_group" delete_backlink_memberof_deleted_group
+-    testit "delete_dangling_backlink_memberof_group" delete_dangling_backlink_memberof_group
+-else
+-    subunit_start_test $RELEASE
+-    subunit_skip_test $RELEASE <<EOF
+-no test provision
+-EOF
+-
+-    subunit_start_test "tombstones_expunge"
+-    subunit_skip_test "tombstones_expunge" <<EOF
+-no test provision
+-EOF
+-fi
++testit "delete_member_of_deleted_group" delete_member_of_deleted_group || failed=`expr $failed + 1`
++testit "delete_backlink_memberof_deleted_group" delete_backlink_memberof_deleted_group || failed=`expr $failed + 1`
++testit "delete_dangling_backlink_memberof_group" delete_dangling_backlink_memberof_group || failed=`expr $failed + 1`
+ 
+-if [ -d $PREFIX_ABS/${RELEASE} ]; then
+-    rm -fr $PREFIX_ABS/${RELEASE}
+-fi
++remove_directory $PREFIX_ABS/${RELEASE}
+ 
+ exit $failed
+-- 
+GitLab
+
+
+From 9cf89dfc88bbd5b665d1e45565d225edfa683f5d Mon Sep 17 00:00:00 2001
+From: Andreas Schneider <asn@samba.org>
+Date: Wed, 21 Oct 2020 17:41:27 +0200
+Subject: [PATCH 6/9] testprogs: Fix and improve dbcheck-links test
+
+This fixes running `make test` in a release tarball!
+
+BUG: https://bugzilla.samba.org/show_bug.cgi?id=14542
+
+Signed-off-by: Andreas Schneider <asn@samba.org>
+---
+ testprogs/blackbox/dbcheck-links.sh | 160 ++++++++++++++--------------
+ 1 file changed, 82 insertions(+), 78 deletions(-)
+
+diff --git a/testprogs/blackbox/dbcheck-links.sh b/testprogs/blackbox/dbcheck-links.sh
+index eb0e0b3163f..ead59d691e0 100755
+--- a/testprogs/blackbox/dbcheck-links.sh
++++ b/testprogs/blackbox/dbcheck-links.sh
+@@ -14,6 +14,23 @@ shift 2
+ . `dirname $0`/subunit.sh
+ 
+ . `dirname $0`/common-links.sh
++. `dirname $0`/common_test_fns.inc
++
++failed=0
++
++if [ ! -x $samba_undump ] || [ ! -d $release_dir ]; then
++    subunit_start_test $RELEASE
++    subunit_skip_test $RELEASE <<EOF
++no test provision
++EOF
++
++    subunit_start_test "tombstones_expunge"
++    subunit_skip_test "tombstones_expunge" <<EOF
++no test provision
++EOF
++
++    exit 0
++fi
+ 
+ dbcheck() {
+     tmpfile=$PREFIX_ABS/$RELEASE/expected-dbcheck-link-output${1}.txt.tmp
+@@ -873,83 +890,70 @@ EOF
+     fi
+ }
+ 
+-if [ -d $release_dir ]; then
+-    testit $RELEASE undump
+-    testit "add_two_more_users" add_two_more_users
+-    testit "add_four_more_links" add_four_more_links
+-    testit "remove_one_link" remove_one_link
+-    testit "remove_one_user" remove_one_user
+-    testit "move_one_user" move_one_user
+-    testit "add_dangling_link" add_dangling_link
+-    testit "add_dangling_backlink" add_dangling_backlink
+-    testit "add_deleted_dangling_backlink" add_deleted_dangling_backlink
+-    testit "revive_links_on_deleted_group" revive_links_on_deleted_group
+-    testit "revive_backlink_on_deleted_group" revive_backlink_on_deleted_group
+-    testit "add_deleted_target_link" add_deleted_target_link
+-    testit "add_deleted_target_backlink" add_deleted_target_backlink
+-    testit "dbcheck_dangling" dbcheck_dangling
+-    testit "dbcheck_clean" dbcheck_clean
+-    testit "check_expected_after_deleted_links" check_expected_after_deleted_links
+-    testit "check_expected_after_links" check_expected_after_links
+-    testit "check_expected_after_objects" check_expected_after_objects
+-    testit "duplicate_member" duplicate_member
+-    testit "dbcheck_duplicate_member" dbcheck_duplicate_member
+-    testit "check_expected_after_duplicate_links" check_expected_after_duplicate_links
+-    testit "duplicate_clean" dbcheck_clean
+-    testit "forward_link_corruption" forward_link_corruption
+-    testit "dbcheck_forward_link_corruption" dbcheck_forward_link_corruption
+-    testit "check_expected_after_dbcheck_forward_link_corruption" check_expected_after_dbcheck_forward_link_corruption
+-    testit "forward_link_corruption_clean" dbcheck_clean
+-    testit "oneway_link_corruption" oneway_link_corruption
+-    testit "dbcheck_oneway_link_corruption" dbcheck_oneway_link_corruption
+-    testit "check_expected_after_dbcheck_oneway_link_corruption" check_expected_after_dbcheck_oneway_link_corruption
+-    testit "oneway_link_corruption_clean" dbcheck_clean
+-    testit "dangling_one_way_link" dangling_one_way_link
+-    testit "dbcheck_one_way" dbcheck_one_way
+-    testit "dbcheck_clean2" dbcheck_clean
+-    testit "missing_link_sid_corruption" missing_link_sid_corruption
+-    testit "dbcheck_missing_link_sid_corruption" dbcheck_missing_link_sid_corruption
+-    testit "missing_link_sid_clean" dbcheck_clean
+-    testit "add_lost_deleted_user1" add_lost_deleted_user1
+-    testit "dbcheck_lost_deleted_user1" dbcheck_lost_deleted_user1
+-    testit "lost_deleted_user1_clean_A" dbcheck_clean
+-    testit "remove_lost_deleted_user1" remove_lost_deleted_user1
+-    testit "lost_deleted_user1_clean_B" dbcheck_clean
+-    testit "add_lost_deleted_user2" add_lost_deleted_user2
+-    testit "dbcheck_lost_deleted_user2" dbcheck_lost_deleted_user2
+-    testit "lost_deleted_user2_clean" dbcheck_clean
+-    testit "add_lost_deleted_user3" add_lost_deleted_user3
+-    testit "dbcheck_lost_deleted_user3" dbcheck_lost_deleted_user3
+-    testit "lost_deleted_user3_clean_A" dbcheck_clean
+-    testit "remove_lost_deleted_user3" remove_lost_deleted_user3
+-    testit "lost_deleted_user3_clean_B" dbcheck_clean
+-    testit "dangling_one_way_dn" dangling_one_way_dn
+-    testit "deleted_one_way_dn" deleted_one_way_dn
+-    testit "dbcheck_clean3" dbcheck_clean
+-    testit "add_dangling_multi_valued" add_dangling_multi_valued
+-    testit "dbcheck_dangling_multi_valued" dbcheck_dangling_multi_valued
+-    testit "dangling_multi_valued_check_missing" dangling_multi_valued_check_missing
+-    testit "dangling_multi_valued_check_equal_or_too_many" dangling_multi_valued_check_equal_or_too_many
+-    # Currently this cannot pass
+-    testit "dbcheck_dangling_multi_valued_clean" dbcheck_clean
+-    testit "dangling_link_does_not_prevent_delete" dangling_link_does_not_prevent_delete
+-    testit "dangling_link_to_unknown_does_not_prevent_delete" dangling_link_to_unknown_does_not_prevent_delete
+-    testit "dangling_link_to_known_and_unknown_does_not_prevent_delete" dangling_link_to_known_and_unknown_does_not_prevent_delete
+-
+-else
+-    subunit_start_test $RELEASE
+-    subunit_skip_test $RELEASE <<EOF
+-no test provision
+-EOF
+-
+-    subunit_start_test "tombstones_expunge"
+-    subunit_skip_test "tombstones_expunge" <<EOF
+-no test provision
+-EOF
+-fi
+-
+-if [ -d $PREFIX_ABS/${RELEASE} ]; then
+-    rm -fr $PREFIX_ABS/${RELEASE}
+-fi
++remove_directory $PREFIX_ABS/${RELEASE}
++
++testit $RELEASE undump || failed=`expr $failed + 1`
++testit "add_two_more_users" add_two_more_users || failed=`expr $failed + 1`
++testit "add_four_more_links" add_four_more_links || failed=`expr $failed + 1`
++testit "remove_one_link" remove_one_link || failed=`expr $failed + 1`
++testit "remove_one_user" remove_one_user || failed=`expr $failed + 1`
++testit "move_one_user" move_one_user || failed=`expr $failed + 1`
++testit "add_dangling_link" add_dangling_link || failed=`expr $failed + 1`
++testit "add_dangling_backlink" add_dangling_backlink || failed=`expr $failed + 1`
++testit "add_deleted_dangling_backlink" add_deleted_dangling_backlink || failed=`expr $failed + 1`
++testit "revive_links_on_deleted_group" revive_links_on_deleted_group || failed=`expr $failed + 1`
++testit "revive_backlink_on_deleted_group" revive_backlink_on_deleted_group || failed=`expr $failed + 1`
++testit "add_deleted_target_link" add_deleted_target_link || failed=`expr $failed + 1`
++testit "add_deleted_target_backlink" add_deleted_target_backlink || failed=`expr $failed + 1`
++testit "dbcheck_dangling" dbcheck_dangling || failed=`expr $failed + 1`
++testit "dbcheck_clean" dbcheck_clean || failed=`expr $failed + 1`
++testit "check_expected_after_deleted_links" check_expected_after_deleted_links || failed=`expr $failed + 1`
++testit "check_expected_after_links" check_expected_after_links || failed=`expr $failed + 1`
++testit "check_expected_after_objects" check_expected_after_objects || failed=`expr $failed + 1`
++testit "duplicate_member" duplicate_member || failed=`expr $failed + 1`
++testit "dbcheck_duplicate_member" dbcheck_duplicate_member || failed=`expr $failed + 1`
++testit "check_expected_after_duplicate_links" check_expected_after_duplicate_links || failed=`expr $failed + 1`
++testit "duplicate_clean" dbcheck_clean || failed=`expr $failed + 1`
++testit "forward_link_corruption" forward_link_corruption || failed=`expr $failed + 1`
++testit "dbcheck_forward_link_corruption" dbcheck_forward_link_corruption || failed=`expr $failed + 1`
++testit "check_expected_after_dbcheck_forward_link_corruption" check_expected_after_dbcheck_forward_link_corruption || failed=`expr $failed + 1`
++testit "forward_link_corruption_clean" dbcheck_clean || failed=`expr $failed + 1`
++testit "oneway_link_corruption" oneway_link_corruption || failed=`expr $failed + 1`
++testit "dbcheck_oneway_link_corruption" dbcheck_oneway_link_corruption || failed=`expr $failed + 1`
++testit "check_expected_after_dbcheck_oneway_link_corruption" check_expected_after_dbcheck_oneway_link_corruption || failed=`expr $failed + 1`
++testit "oneway_link_corruption_clean" dbcheck_clean || failed=`expr $failed + 1`
++testit "dangling_one_way_link" dangling_one_way_link || failed=`expr $failed + 1`
++testit "dbcheck_one_way" dbcheck_one_way || failed=`expr $failed + 1`
++testit "dbcheck_clean2" dbcheck_clean || failed=`expr $failed + 1`
++testit "missing_link_sid_corruption" missing_link_sid_corruption || failed=`expr $failed + 1`
++testit "dbcheck_missing_link_sid_corruption" dbcheck_missing_link_sid_corruption || failed=`expr $failed + 1`
++testit "missing_link_sid_clean" dbcheck_clean || failed=`expr $failed + 1`
++testit "add_lost_deleted_user1" add_lost_deleted_user1 || failed=`expr $failed + 1`
++testit "dbcheck_lost_deleted_user1" dbcheck_lost_deleted_user1 || failed=`expr $failed + 1`
++testit "lost_deleted_user1_clean_A" dbcheck_clean || failed=`expr $failed + 1`
++testit "remove_lost_deleted_user1" remove_lost_deleted_user1 || failed=`expr $failed + 1`
++testit "lost_deleted_user1_clean_B" dbcheck_clean || failed=`expr $failed + 1`
++testit "add_lost_deleted_user2" add_lost_deleted_user2 || failed=`expr $failed + 1`
++testit "dbcheck_lost_deleted_user2" dbcheck_lost_deleted_user2 || failed=`expr $failed + 1`
++testit "lost_deleted_user2_clean" dbcheck_clean || failed=`expr $failed + 1`
++testit "add_lost_deleted_user3" add_lost_deleted_user3 || failed=`expr $failed + 1`
++testit "dbcheck_lost_deleted_user3" dbcheck_lost_deleted_user3 || failed=`expr $failed + 1`
++testit "lost_deleted_user3_clean_A" dbcheck_clean || failed=`expr $failed + 1`
++testit "remove_lost_deleted_user3" remove_lost_deleted_user3 || failed=`expr $failed + 1`
++testit "lost_deleted_user3_clean_B" dbcheck_clean || failed=`expr $failed + 1`
++testit "dangling_one_way_dn" dangling_one_way_dn || failed=`expr $failed + 1`
++testit "deleted_one_way_dn" deleted_one_way_dn || failed=`expr $failed + 1`
++testit "dbcheck_clean3" dbcheck_clean || failed=`expr $failed + 1`
++testit "add_dangling_multi_valued" add_dangling_multi_valued || failed=`expr $failed + 1`
++testit "dbcheck_dangling_multi_valued" dbcheck_dangling_multi_valued || failed=`expr $failed + 1`
++testit "dangling_multi_valued_check_missing" dangling_multi_valued_check_missing || failed=`expr $failed + 1`
++testit "dangling_multi_valued_check_equal_or_too_many" dangling_multi_valued_check_equal_or_too_many || failed=`expr $failed + 1`
++# Currently this cannot pass
++testit "dbcheck_dangling_multi_valued_clean" dbcheck_clean || failed=`expr $failed + 1`
++testit "dangling_link_does_not_prevent_delete" dangling_link_does_not_prevent_delete || failed=`expr $failed + 1`
++testit "dangling_link_to_unknown_does_not_prevent_delete" dangling_link_to_unknown_does_not_prevent_delete || failed=`expr $failed + 1`
++testit "dangling_link_to_known_and_unknown_does_not_prevent_delete" dangling_link_to_known_and_unknown_does_not_prevent_delete || failed=`expr $failed + 1`
++
++remove_directory $PREFIX_ABS/${RELEASE}
+ 
+ exit $failed
+-- 
+GitLab
+
+
+From a1c6bb29b0c2f1037fe32fa14e8b6038cdb4b08c Mon Sep 17 00:00:00 2001
+From: Andreas Schneider <asn@samba.org>
+Date: Wed, 21 Oct 2020 17:54:54 +0200
+Subject: [PATCH 7/9] testprogs: Fix and improve functionalprep test
+
+This fixes running `make test` in a release tarball!
+
+BUG: https://bugzilla.samba.org/show_bug.cgi?id=14542
+
+Signed-off-by: Andreas Schneider <asn@samba.org>
+---
+ testprogs/blackbox/functionalprep.sh | 77 ++++++++++++++++------------
+ 1 file changed, 44 insertions(+), 33 deletions(-)
+
+diff --git a/testprogs/blackbox/functionalprep.sh b/testprogs/blackbox/functionalprep.sh
+index 1d37611ef7a..a5ac4b8bc7f 100755
+--- a/testprogs/blackbox/functionalprep.sh
++++ b/testprogs/blackbox/functionalprep.sh
+@@ -10,45 +10,56 @@ fi
+ PREFIX_ABS="$1"
+ shift 1
+ 
++failed=0
++
+ . `dirname $0`/subunit.sh
++. `dirname $0`/common_test_fns.inc
+ 
+ RELEASE="release-4-8-0-pre1"
+-release_dir=`dirname $0`/../../source4/selftest/provisions/$RELEASE
++release_dir="$SRCDIR_ABS/source4/selftest/provisions/$RELEASE"
+ 
+ OLD_RELEASE="release-4-1-0rc3"
+-old_release_dir=`dirname $0`/../../source4/selftest/provisions/$OLD_RELEASE
++old_release_dir="$SRCDIR_ABS/source4/selftest/provisions/$OLD_RELEASE"
+ 
+-cleanup_output_directories()
+-{
+-    if [ -d $PREFIX_ABS/2012R2_schema ]; then
+-        rm -fr $PREFIX_ABS/2012R2_schema
+-    fi
++samba_tdbrestore="tdbrestore"
++if [ -x "$BINDIR/tdbrestore" ]; then
++    samba_tdbrestore="$BINDIR/tdbrestore"
++fi
++
++samba_undump="$SRCDIR_ABS/source4/selftest/provisions/undump.sh"
++
++if [ ! -x $samba_undump ] || [ ! -d $release_dir ] || [ ! -d $old_release_dir ]; then
++    subunit_start_test $RELEASE
++    subunit_skip_test $RELEASE <<EOF
++no test provision
++EOF
+ 
+-    if [ -d $PREFIX_ABS/$RELEASE ]; then
+-        rm -fr $PREFIX_ABS/$RELEASE
+-    fi
++    subunit_start_test "functional_prep"
++    subunit_skip_test "functional_prep" <<EOF
++no test provision
++EOF
++
++    subunit_start_test "functional_prep_old"
++    subunit_skip_test "functional_prep_old" <<EOF
++no test provision
++EOF
+ 
+-    if [ -d $PREFIX_ABS/$OLD_RELEASE ]; then
+-        rm -fr $PREFIX_ABS/$OLD_RELEASE
+-    fi
++    exit 0
++fi
++
++cleanup_output_directories()
++{
++    remove_directory $PREFIX_ABS/2012R2_schema
++    remove_directory $PREFIX_ABS/$RELEASE
++    remove_directory $PREFIX_ABS/$OLD_RELEASE
+ }
+ 
+ undump() {
+-   if test -x $BINDIR/tdbrestore;
+-   then
+-       `dirname $0`/../../source4/selftest/provisions/undump.sh $release_dir $PREFIX_ABS/$RELEASE $BINDIR/tdbrestore
+-   else
+-       `dirname $0`/../../source4/selftest/provisions/undump.sh $release_dir $PREFIX_ABS/$RELEASE
+-   fi
++    $samba_undump $release_dir $PREFIX_ABS/$RELEASE $samba_tdbrestore
+ }
+ 
+ undump_old() {
+-   if test -x $BINDIR/tdbrestore;
+-   then
+-       `dirname $0`/../../source4/selftest/provisions/undump.sh $old_release_dir $PREFIX_ABS/$OLD_RELEASE $BINDIR/tdbrestore
+-   else
+-       `dirname $0`/../../source4/selftest/provisions/undump.sh $old_release_dir $PREFIX_ABS/$OLD_RELEASE
+-   fi
++    $samba_undump $old_release_dir $PREFIX_ABS/$OLD_RELEASE $samba_tdbrestore
+ }
+ 
+ 
+@@ -91,24 +102,24 @@ schema_upgrade() {
+ # double-check we cleaned up from the last test run
+ cleanup_output_directories
+ 
+-testit $RELEASE undump
++testit $RELEASE undump || failed=`expr $failed + 1`
+ 
+ # Provision a DC based on 2012R2 schema
+-testit "provision_2012R2_schema" provision_2012r2
++testit "provision_2012R2_schema" provision_2012r2 || failed=`expr $failed + 1`
+ 
+ # Perform functional prep up to 2012 R2 level
+-testit "functional_prep" functional_prep
++testit "functional_prep" functional_prep || failed=`expr $failed + 1`
+ 
+ # check that the databases are now the same
+-testit "check_databases_same" ldapcmp
++testit "check_databases_same" ldapcmp || failed=`expr $failed + 1`
+ 
+-testit $OLD_RELEASE undump_old
++testit $OLD_RELEASE undump_old || failed=`expr $failed + 1`
+ 
+-testit "steal_roles" steal_roles
++testit "steal_roles" steal_roles || failed=`expr $failed + 1`
+ 
+-testit "schema_upgrade" schema_upgrade
++testit "schema_upgrade" schema_upgrade || failed=`expr $failed + 1`
+ 
+-testit "functional_prep_old" functional_prep_old
++testit "functional_prep_old" functional_prep_old || failed=`expr $failed + 1`
+ 
+ cleanup_output_directories
+ 
+-- 
+GitLab
+
+
+From 0ec2f2c2a3d2f05169537af3c8a74207f49797d3 Mon Sep 17 00:00:00 2001
+From: Andreas Schneider <asn@samba.org>
+Date: Wed, 21 Oct 2020 18:03:25 +0200
+Subject: [PATCH 8/9] testprogs: Fix and improve dbcheck-oldrelease test
+
+This fixes running `make test` in a release tarball!
+
+BUG: https://bugzilla.samba.org/show_bug.cgi?id=14542
+
+Signed-off-by: Andreas Schneider <asn@samba.org>
+---
+ testprogs/blackbox/dbcheck-oldrelease.sh | 240 ++++++++++++-----------
+ 1 file changed, 123 insertions(+), 117 deletions(-)
+
+diff --git a/testprogs/blackbox/dbcheck-oldrelease.sh b/testprogs/blackbox/dbcheck-oldrelease.sh
+index 41c55178d4e..9e9924654be 100755
+--- a/testprogs/blackbox/dbcheck-oldrelease.sh
++++ b/testprogs/blackbox/dbcheck-oldrelease.sh
+@@ -11,7 +11,10 @@ PREFIX_ABS="$1"
+ RELEASE="$2"
+ shift 2
+ 
++failed=0
++
+ . `dirname $0`/subunit.sh
++. `dirname $0`/common_test_fns.inc
+ 
+ release_dir=`dirname $0`/../../source4/selftest/provisions/$RELEASE
+ 
+@@ -30,13 +33,94 @@ if [ -x "$BINDIR/ldbsearch" ]; then
+     ldbsearch="$BINDIR/ldbsearch"
+ fi
+ 
++samba_tdbrestore="tdbrestore"
++if [ -x "$BINDIR/tdbrestore" ]; then
++    samba_tdbrestore="$BINDIR/tdbrestore"
++fi
++
++samba_undump="$SRCDIR_ABS/source4/selftest/provisions/undump.sh"
++if [ ! -x $samba_undump ] || [ ! -d $release_dir ]; then
++    subunit_start_test $RELEASE
++    subunit_skip_test $RELEASE <<EOF
++no test provision
++EOF
++
++    subunit_start_test "reindex"
++    subunit_skip_test "reindex" <<EOF
++no test provision
++EOF
++    subunit_start_test check_expected_before_values
++    subunit_skip_test check_expected_before_values<<EOF
++no test provision
++EOF
++    subunit_start_test "dbcheck"
++    subunit_skip_test "dbcheck" <<EOF
++no test provision
++EOF
++    subunit_start_test "dbcheck_clean"
++    subunit_skip_test "dbcheck_clean" <<EOF
++no test provision
++EOF
++    subunit_start_test check_expected_after_values
++    subunit_skip_test check_expected_after_values<<EOF
++no test provision
++EOF
++    subunit_start_test "dbcheck_acl_reset"
++    subunit_skip_test "dbcheck_acl_reset" <<EOF
++no test provision
++EOF
++    subunit_start_test "dbcheck_clean_acl_reset"
++    subunit_skip_test "dbcheck_clean_acl_reset" <<EOF
++no test provision
++EOF
++    subunit_start_test add_userparameters0
++    subunit_skip_test add_userparameters0<<EOF
++no test provision
++EOF
++
++    subunit_start_test add_userparameters1
++    subunit_skip_test add_userparameters1<<EOF
++no test provision
++EOF
++
++    subunit_start_test add_userparameters2
++    subunit_skip_test add_userparameters2<<EOF
++no test provision
++EOF
++
++    subunit_start_test add_userparameters3
++    subunit_skip_test add_userparameters3<<EOF
++no test provision
++EOF
++
++    subunit_start_test check_expected_before_values
++    subunit_skip_test check_expected_before_values<<EOF
++no test provision
++EOF
++
++    subunit_start_test "dbcheck2"
++    subunit_skip_test "dbcheck2" <<EOF
++no test provision
++EOF
++
++    subunit_start_test "referenceprovision"
++    subunit_skip_test "referenceprovision" <<EOF
++no test provision
++EOF
++    subunit_start_test "ldapcmp"
++    subunit_skip_test "ldapcmp" <<EOF
++no test provision
++EOF
++    subunit_start_test "ldapcmp_sd"
++    subunit_skip_test "ldapcmp_sd" <<EOF
++no test provision
++EOF
++
++    exit 0
++fi
++
+ undump() {
+-       if test -x $BINDIR/tdbrestore;
+-       then
+-	`dirname $0`/../../source4/selftest/provisions/undump.sh $release_dir $PREFIX_ABS/$RELEASE $BINDIR/tdbrestore
+-       else
+-	`dirname $0`/../../source4/selftest/provisions/undump.sh $release_dir $PREFIX_ABS/$RELEASE
+-       fi
++    $samba_undump $release_dir $PREFIX_ABS/$RELEASE $samba_tdbrestore
+ }
+ 
+ add_userparameters0() {
+@@ -398,121 +482,43 @@ ldapcmp_sd() {
+     fi
+ }
+ 
+-if [ -d $release_dir ]; then
+-    testit $RELEASE undump
+-    testit "reindex" reindex
+-    testit "current_version_mod" do_current_version_mod
+-    testit "check_expected_before_values" check_expected_before_values
+-    testit_expect_failure "dbcheck_objectclass" dbcheck_objectclass
+-    testit_expect_failure "dbcheck" dbcheck
+-    testit "check_expected_after_values" check_expected_after_values
+-    testit "check_forced_duplicate_values" check_forced_duplicate_values
+-    testit_expect_failure "dbcheck_after_dup" dbcheck_after_dup
+-    testit "check_expected_after_dup_values" check_expected_after_dup_values
+-    testit "dbcheck_clean" dbcheck_clean
+-    testit_expect_failure "dbcheck_acl_reset" dbcheck_acl_reset
+-    testit "dbcheck_acl_reset_clean" dbcheck_acl_reset_clean
+-    testit "add_userparameters0" add_userparameters1
+-    testit "add_userparameters1" add_userparameters1
+-    testit "add_userparameters2" add_userparameters2
+-    testit "add_userparameters3" add_userparameters3
+-    testit_expect_failure "dbcheck2" dbcheck2
+-    testit "dbcheck_clean2" dbcheck_clean2
+-    testit "check_expected_userparameters" check_expected_userparameters
+-    testit "rm_deleted_objects" rm_deleted_objects
+-    # We must re-index again because rm_deleted_objects went behind
+-    # the back of the main sam.ldb.
+-    testit "reindex2" reindex
+-    testit_expect_failure "dbcheck3" dbcheck3
+-    testit "dbcheck_clean3" dbcheck_clean3
+-    testit "check_expected_after_deleted_objects" check_expected_after_deleted_objects
+-    testit "referenceprovision" referenceprovision
+-    testit "ldapcmp" ldapcmp
+-    testit "ldapcmp_sd" ldapcmp_sd
+-else
+-    subunit_start_test $RELEASE
+-    subunit_skip_test $RELEASE <<EOF
+-no test provision
+-EOF
+-
+-    subunit_start_test "reindex"
+-    subunit_skip_test "reindex" <<EOF
+-no test provision
+-EOF
+-    subunit_start_test check_expected_before_values
+-    subunit_skip_test check_expected_before_values<<EOF
+-no test provision
+-EOF
+-    subunit_start_test "dbcheck"
+-    subunit_skip_test "dbcheck" <<EOF
+-no test provision
+-EOF
+-    subunit_start_test "dbcheck_clean"
+-    subunit_skip_test "dbcheck_clean" <<EOF
+-no test provision
+-EOF
+-    subunit_start_test check_expected_after_values
+-    subunit_skip_test check_expected_after_values<<EOF
+-no test provision
+-EOF
+-    subunit_start_test "dbcheck_acl_reset"
+-    subunit_skip_test "dbcheck_acl_reset" <<EOF
+-no test provision
+-EOF
+-    subunit_start_test "dbcheck_clean_acl_reset"
+-    subunit_skip_test "dbcheck_clean_acl_reset" <<EOF
+-no test provision
+-EOF
+-    subunit_start_test add_userparameters0
+-    subunit_skip_test add_userparameters0<<EOF
+-no test provision
+-EOF
+-
+-    subunit_start_test add_userparameters1
+-    subunit_skip_test add_userparameters1<<EOF
+-no test provision
+-EOF
+-
+-    subunit_start_test add_userparameters2
+-    subunit_skip_test add_userparameters2<<EOF
+-no test provision
+-EOF
+-
+-    subunit_start_test add_userparameters3
+-    subunit_skip_test add_userparameters3<<EOF
+-no test provision
+-EOF
+-
+-    subunit_start_test check_expected_before_values
+-    subunit_skip_test check_expected_before_values<<EOF
+-no test provision
+-EOF
+-
+-    subunit_start_test "dbcheck2"
+-    subunit_skip_test "dbcheck2" <<EOF
+-no test provision
+-EOF
+-
+-    subunit_start_test "referenceprovision"
+-    subunit_skip_test "referenceprovision" <<EOF
+-no test provision
+-EOF
+-    subunit_start_test "ldapcmp"
+-    subunit_skip_test "ldapcmp" <<EOF
+-no test provision
+-EOF
+-    subunit_start_test "ldapcmp_sd"
+-    subunit_skip_test "ldapcmp_sd" <<EOF
+-no test provision
+-EOF
+-fi
++remove_directory $PREFIX_ABS/${RELEASE}_reference
++
++testit $RELEASE undump || failed=`expr $failed + 1`
++testit "reindex" reindex || failed=`expr $failed + 1`
++testit "current_version_mod" do_current_version_mod || failed=`expr $failed + 1`
++testit "check_expected_before_values" check_expected_before_values || failed=`expr $failed + 1`
++testit_expect_failure "dbcheck_objectclass" dbcheck_objectclass || failed=`expr $failed + 1`
++testit_expect_failure "dbcheck" dbcheck || failed=`expr $failed + 1`
++testit "check_expected_after_values" check_expected_after_values || failed=`expr $failed + 1`
++testit "check_forced_duplicate_values" check_forced_duplicate_values || failed=`expr $failed + 1`
++testit_expect_failure "dbcheck_after_dup" dbcheck_after_dup || failed=`expr $failed + 1`
++testit "check_expected_after_dup_values" check_expected_after_dup_values || failed=`expr $failed + 1`
++testit "dbcheck_clean" dbcheck_clean || failed=`expr $failed + 1`
++testit_expect_failure "dbcheck_acl_reset" dbcheck_acl_reset || failed=`expr $failed + 1`
++testit "dbcheck_acl_reset_clean" dbcheck_acl_reset_clean || failed=`expr $failed + 1`
++testit "add_userparameters0" add_userparameters1 || failed=`expr $failed + 1`
++testit "add_userparameters1" add_userparameters1 || failed=`expr $failed + 1`
++testit "add_userparameters2" add_userparameters2 || failed=`expr $failed + 1`
++testit "add_userparameters3" add_userparameters3 || failed=`expr $failed + 1`
++testit_expect_failure "dbcheck2" dbcheck2 || failed=`expr $failed + 1`
++testit "dbcheck_clean2" dbcheck_clean2 || failed=`expr $failed + 1`
++testit "check_expected_userparameters" check_expected_userparameters || failed=`expr $failed + 1`
++testit "rm_deleted_objects" rm_deleted_objects || failed=`expr $failed + 1`
++# We must re-index again because rm_deleted_objects went behind
++# the back of the main sam.ldb.
++testit "reindex2" reindex || failed=`expr $failed + 1`
++testit_expect_failure "dbcheck3" dbcheck3 || failed=`expr $failed + 1`
++testit "dbcheck_clean3" dbcheck_clean3 || failed=`expr $failed + 1`
++testit "check_expected_after_deleted_objects" check_expected_after_deleted_objects || failed=`expr $failed + 1`
++testit "referenceprovision" referenceprovision || failed=`expr $failed + 1`
++testit "ldapcmp" ldapcmp || failed=`expr $failed + 1`
++testit "ldapcmp_sd" ldapcmp_sd || failed=`expr $failed + 1`
+ 
+ if [ -d $PREFIX_ABS/${RELEASE} ]; then
+     rm -fr $PREFIX_ABS/${RELEASE}
+ fi
+ 
+-if [ -d $PREFIX_ABS/${RELEASE}_reference ]; then
+-  rm -fr $PREFIX_ABS/${RELEASE}_reference
+-fi
++remove_directory $PREFIX_ABS/${RELEASE}_reference
+ 
+ exit $failed
+-- 
+GitLab
+
+
+From eda90ce8758071ef819120afeee055f8d889ba1a Mon Sep 17 00:00:00 2001
+From: Andreas Schneider <asn@samba.org>
+Date: Wed, 21 Oct 2020 19:14:32 +0200
+Subject: [PATCH 9/9] testprogs: Fix and improve upgradeprovision-oldrelease
+ test
+
+This fixes running `make test` in a release tarball!
+
+BUG: https://bugzilla.samba.org/show_bug.cgi?id=14542
+
+Signed-off-by: Andreas Schneider <asn@samba.org>
+---
+ .../blackbox/upgradeprovision-oldrelease.sh   | 254 +++++++++---------
+ 1 file changed, 121 insertions(+), 133 deletions(-)
+
+diff --git a/testprogs/blackbox/upgradeprovision-oldrelease.sh b/testprogs/blackbox/upgradeprovision-oldrelease.sh
+index 208baa54a02..5b095fca05e 100755
+--- a/testprogs/blackbox/upgradeprovision-oldrelease.sh
++++ b/testprogs/blackbox/upgradeprovision-oldrelease.sh
+@@ -11,37 +11,113 @@ PREFIX_ABS="$1"
+ RELEASE="$2"
+ shift 2
+ 
++failed=0
++
+ . `dirname $0`/subunit.sh
++. `dirname $0`/common_test_fns.inc
+ 
+-release_dir=`dirname $0`/../../source4/selftest/provisions/${RELEASE}
++release_dir="$SRCDIR_ABS/source4/selftest/provisions/${RELEASE}"
+ 
+ LDBDEL_BIN=ldbdel
+ if [ -x "$BINDIR/ldbdel" ]; then
+ 	LDBDEL_BIN=$BINDIR/ldbdel
+ fi
+ 
++samba_tdbrestore="tdbrestore"
++if [ -x "$BINDIR/tdbrestore" ]; then
++    samba_tdbrestore="$BINDIR/tdbrestore"
++fi
++
++samba_undump="$SRCDIR_ABS/source4/selftest/provisions/undump.sh"
++if [ ! -x $samba_undump ] || [ ! -d $release_dir ]; then
++    subunit_start_test "${RELEASE}"
++    subunit_skip_test "${RELEASE}" <<EOF
++no test provision
++EOF
++
++    subunit_start_test "remove_dns_user"
++    subunit_skip_test "remove_dns_user" <<EOF
++no test provision
++EOF
++
++    subunit_start_test "upgradeprovision"
++    subunit_skip_test "upgradeprovision" <<EOF
++no test provision
++EOF
++    subunit_start_test "upgradeprovision_full"
++    subunit_skip_test "upgradeprovision_full" <<EOF
++no test provision
++EOF
++    subunit_start_test "reindex"
++    subunit_skip_test "reindex" <<EOF
++no test provision
++EOF
++    subunit_start_test "dbcheck"
++    subunit_skip_test "dbcheck" <<EOF
++no test provision
++EOF
++    subunit_start_test "dbcheck_clean"
++    subunit_skip_test "dbcheck_clean" <<EOF
++no test provision
++EOF
++    # So far, only releases before 4.0.0rc6 need a dbcheck if upgradeprovision has already been run
++    if [ x$RELEASE != x"release-4-0-0" ]; then
++	subunit_start_test "dbcheck_full"
++	subunit_skip_test "dbcheck_full" <<EOF
++no test provision
++EOF
++    fi
++    subunit_start_test "dbcheck_full_clean"
++    subunit_skip_test "dbcheck_full_clean" <<EOF
++no test provision
++EOF
++    subunit_start_test "dbcheck_full_clean_well_known_acls"
++    subunit_skip_test "dbcheck_full_clean_well_known_acls" <<EOF
++no test provision
++EOF
++    subunit_start_test "samba_dnsupgrade"
++    subunit_skip_test "samba_dnsupgrade" <<EOF
++no test provision
++EOF
++    subunit_start_test "referenceprovision"
++    subunit_skip_test "referenceprovision" <<EOF
++no test provision
++EOF
++    subunit_start_test "ldapcmp"
++    subunit_skip_test "ldapcmp" <<EOF
++no test provision
++EOF
++    subunit_start_test "ldapcmp_full"
++    subunit_skip_test "ldapcmp_full" <<EOF
++no test provision
++EOF
++    subunit_start_test "ldapcmp_sd"
++    subunit_skip_test "ldapcmp_sd" <<EOF
++no test provision
++EOF
++    subunit_start_test "ldapcmp_full_sd"
++    subunit_skip_test "ldapcmp_full_sd" <<EOF
++no test provision
++EOF
++
++    exit 0
++fi
++
+ undump() {
+-       if test -x $BINDIR/tdbrestore;
+-       then
+-	`dirname $0`/../../source4/selftest/provisions/undump.sh $release_dir $PREFIX_ABS/${RELEASE}_upgrade $BINDIR/tdbrestore
+-	`dirname $0`/../../source4/selftest/provisions/undump.sh $release_dir $PREFIX_ABS/${RELEASE}_upgrade_full $BINDIR/tdbrestore
+-       else
+-	`dirname $0`/../../source4/selftest/provisions/undump.sh $release_dir $PREFIX_ABS/${RELEASE}_upgrade
+-	`dirname $0`/../../source4/selftest/provisions/undump.sh $release_dir $PREFIX_ABS/${RELEASE}_upgrade_full
+-       fi
+-       cp -a $release_dir/private/*.keytab $PREFIX_ABS/${RELEASE}_upgrade/private/
+-       cp -a $release_dir/sysvol $PREFIX_ABS/${RELEASE}_upgrade/
+-       mkdir $PREFIX_ABS/${RELEASE}_upgrade/etc/
+-       cat $release_dir/etc/smb.conf.template | \
+-              sed "s|@@PREFIX@@|$PREFIX_ABS/${RELEASE}_upgrade|g" \
+-        >  $PREFIX_ABS/${RELEASE}_upgrade/etc/smb.conf
+-
+-       cp -a $release_dir/private/*.keytab $PREFIX_ABS/${RELEASE}_upgrade_full/private/
+-       cp -a $release_dir/sysvol $PREFIX_ABS/${RELEASE}_upgrade_full/
+-       mkdir $PREFIX_ABS/${RELEASE}_upgrade_full/etc/
+-       cat $release_dir/etc/smb.conf.template | \
+-              sed "s|@@PREFIX@@|$PREFIX_ABS/${RELEASE}_upgrade_full|g" \
+-        >  $PREFIX_ABS/${RELEASE}_upgrade_full/etc/smb.conf
++    $samba_undump $release_dir $PREFIX_ABS/${RELEASE}_upgrade $samba_tdbrestore
++    $samba_undump $release_dir $PREFIX_ABS/${RELEASE}_upgrade_full $samba_tdbrestore
++
++    cp -a $release_dir/private/*.keytab $PREFIX_ABS/${RELEASE}_upgrade/private/
++    cp -a $release_dir/sysvol $PREFIX_ABS/${RELEASE}_upgrade/
++    mkdir $PREFIX_ABS/${RELEASE}_upgrade/etc/
++    sed -e "s|@@PREFIX@@|$PREFIX_ABS/${RELEASE}_upgrade|g" $release_dir/etc/smb.conf.template \
++     >  $PREFIX_ABS/${RELEASE}_upgrade/etc/smb.conf
++
++    cp -a $release_dir/private/*.keytab $PREFIX_ABS/${RELEASE}_upgrade_full/private/
++    cp -a $release_dir/sysvol $PREFIX_ABS/${RELEASE}_upgrade_full/
++    mkdir $PREFIX_ABS/${RELEASE}_upgrade_full/etc/
++    sed -e "s|@@PREFIX@@|$PREFIX_ABS/${RELEASE}_upgrade_full|g" $release_dir/etc/smb.conf.template \
++     >  $PREFIX_ABS/${RELEASE}_upgrade_full/etc/smb.conf
+ }
+ 
+ remove_dns_user() {
+@@ -122,116 +198,28 @@ ldapcmp_full_sd() {
+         $PYTHON $BINDIR/samba-tool ldapcmp tdb://$PREFIX_ABS/${RELEASE}_upgrade_reference/private/sam.ldb tdb://$PREFIX_ABS/${RELEASE}_upgrade_full/private/sam.ldb --two --sd --skip-missing-dn
+ }
+ 
+-if [ -d $PREFIX_ABS/${RELEASE}_upgrade ]; then
+-  rm -fr $PREFIX_ABS/${RELEASE}_upgrade
+-fi
+-
+-if [ -d $PREFIX_ABS/${RELEASE}_upgrade_full ]; then
+-  rm -fr $PREFIX_ABS/${RELEASE}_upgrade_full
+-fi
+-
+-if [ -d $PREFIX_ABS/${RELEASE}_upgrade_reference ]; then
+-  rm -fr $PREFIX_ABS/${RELEASE}_upgrade_reference
+-fi
+-
+-if [ -d $release_dir ]; then
+-    testit $RELEASE undump
+-    testit "remove_dns_user" remove_dns_user
+-    testit "upgradeprovision" upgradeprovision
+-    testit "upgradeprovision_full" upgradeprovision_full
+-    testit "reindex" reindex
+-    testit_expect_failure "dbcheck" dbcheck
+-    testit_expect_failure "dbcheck_full" dbcheck_full
+-    testit "dbcheck_clean" dbcheck_clean
+-    testit "dbcheck_full_clean" dbcheck_full_clean
+-    testit "dbcheck_full_clean_well_known_acls" dbcheck_full_clean_well_known_acls
+-    testit "referenceprovision" referenceprovision
+-    testit "samba_upgradedns" samba_upgradedns
+-    testit "ldapcmp" ldapcmp
+-    testit "ldapcmp_sd" ldapcmp_sd
+-    testit "ldapcmp_full_sd" ldapcmp_full_sd
+-else
+-    subunit_start_test "${RELEASE}"
+-    subunit_skip_test "${RELEASE}" <<EOF
+-no test provision
+-EOF
+-
+-    subunit_start_test "remove_dns_user"
+-    subunit_skip_test "remove_dns_user" <<EOF
+-no test provision
+-EOF
+-
+-    subunit_start_test "upgradeprovision"
+-    subunit_skip_test "upgradeprovision" <<EOF
+-no test provision
+-EOF
+-    subunit_start_test "upgradeprovision_full"
+-    subunit_skip_test "upgradeprovision_full" <<EOF
+-no test provision
+-EOF
+-    subunit_start_test "reindex"
+-    subunit_skip_test "reindex" <<EOF
+-no test provision
+-EOF
+-    subunit_start_test "dbcheck"
+-    subunit_skip_test "dbcheck" <<EOF
+-no test provision
+-EOF
+-    subunit_start_test "dbcheck_clean"
+-    subunit_skip_test "dbcheck_clean" <<EOF
+-no test provision
+-EOF
+-    # So far, only releases before 4.0.0rc6 need a dbcheck if upgradeprovision has already been run
+-    if [ x$RELEASE != x"release-4-0-0" ]; then
+-	subunit_start_test "dbcheck_full"
+-	subunit_skip_test "dbcheck_full" <<EOF
+-no test provision
+-EOF
+-    fi
+-    subunit_start_test "dbcheck_full_clean"
+-    subunit_skip_test "dbcheck_full_clean" <<EOF
+-no test provision
+-EOF
+-    subunit_start_test "dbcheck_full_clean_well_known_acls"
+-    subunit_skip_test "dbcheck_full_clean_well_known_acls" <<EOF
+-no test provision
+-EOF
+-    subunit_start_test "samba_dnsupgrade"
+-    subunit_skip_test "samba_dnsupgrade" <<EOF
+-no test provision
+-EOF
+-    subunit_start_test "referenceprovision"
+-    subunit_skip_test "referenceprovision" <<EOF
+-no test provision
+-EOF
+-    subunit_start_test "ldapcmp"
+-    subunit_skip_test "ldapcmp" <<EOF
+-no test provision
+-EOF
+-    subunit_start_test "ldapcmp_full"
+-    subunit_skip_test "ldapcmp_full" <<EOF
+-no test provision
+-EOF
+-    subunit_start_test "ldapcmp_sd"
+-    subunit_skip_test "ldapcmp_sd" <<EOF
+-no test provision
+-EOF
+-    subunit_start_test "ldapcmp_full_sd"
+-    subunit_skip_test "ldapcmp_full_sd" <<EOF
+-no test provision
+-EOF
+-fi
+-
+-if [ -d $PREFIX_ABS/${RELEASE}_upgrade ]; then
+-  rm -fr $PREFIX_ABS/${RELEASE}_upgrade
+-fi
+-
+-if [ -d $PREFIX_ABS/${RELEASE}_upgrade_full ]; then
+-  rm -fr $PREFIX_ABS/${RELEASE}_upgrade_full
+-fi
+-
+-if [ -d $PREFIX_ABS/${RELEASE}_upgrade_reference ]; then
+-  rm -fr $PREFIX_ABS/${RELEASE}_upgrade_reference
+-fi
++remove_directory $PREFIX_ABS/${RELEASE}_upgrade
++remove_directory $PREFIX_ABS/${RELEASE}_upgrade_full
++remove_directory $PREFIX_ABS/${RELEASE}_upgrade_reference
++
++testit $RELEASE undump || failed=`expr $failed + 1`
++testit "remove_dns_user" remove_dns_user || failed=`expr $failed + 1`
++testit "upgradeprovision" upgradeprovision || failed=`expr $failed + 1`
++testit "upgradeprovision_full" upgradeprovision_full || failed=`expr $failed + 1`
++testit "reindex" reindex || failed=`expr $failed + 1`
++testit_expect_failure "dbcheck" dbcheck || failed=`expr $failed + 1`
++testit_expect_failure "dbcheck_full" dbcheck_full || failed=`expr $failed + 1`
++testit "dbcheck_clean" dbcheck_clean || failed=`expr $failed + 1`
++testit "dbcheck_full_clean" dbcheck_full_clean || failed=`expr $failed + 1`
++testit "dbcheck_full_clean_well_known_acls" dbcheck_full_clean_well_known_acls || failed=`expr $failed + 1`
++testit "referenceprovision" referenceprovision || failed=`expr $failed + 1`
++testit "samba_upgradedns" samba_upgradedns || failed=`expr $failed + 1`
++testit "ldapcmp" ldapcmp || failed=`expr $failed + 1`
++testit "ldapcmp_sd" ldapcmp_sd || failed=`expr $failed + 1`
++testit "ldapcmp_full_sd" ldapcmp_full_sd || failed=`expr $failed + 1`
++
++remove_directory $PREFIX_ABS/${RELEASE}_upgrade
++remove_directory $PREFIX_ABS/${RELEASE}_upgrade_full
++remove_directory $PREFIX_ABS/${RELEASE}_upgrade_reference
+ 
+ exit $failed
+-- 
+GitLab
+

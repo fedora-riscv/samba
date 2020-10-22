@@ -72,7 +72,7 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%global main_release 13
+%global main_release 14
 
 %global samba_version 4.13.0
 %global talloc_version 2.3.1
@@ -144,6 +144,9 @@ Patch1:         samba-s4u.patch
 Patch2:         samba-gc-lookup_unix_user_name-allow-lookup-for-own-realm.patch
 Patch3:         samba-dnspython-2.0.0-v4.13.patch
 Patch4:         samba-systemd-notification.patch
+
+# Fix `make test` in release tarballs
+Patch5:         https://gitlab.com/samba-team/samba/-/merge_requests/1624.patch
 
 Requires(pre): /usr/sbin/groupadd
 Requires(post): systemd
@@ -3630,6 +3633,9 @@ fi
 %endif
 
 %changelog
+* Mon Oct 26 2020 Andreas Schneider <asn@redhat.com> - 4.13.0-14
+- Fixed dbcheck running in a release tarball
+
 * Sun Oct 25 2020 Alexander Bokovoy <abokovoy@redhat.com> - 4.13.0-13
 - Report 'samba' daemon status back to systemd
 - Support dnspython 2.0.0 or later in samba_dnsupdate
