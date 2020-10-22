@@ -1,0 +1,66 @@
+From e3629a3924107507be9ddb2c001f9843854ddf3b Mon Sep 17 00:00:00 2001
+From: Andreas Schneider <asn@samba.org>
+Date: Tue, 25 Aug 2020 17:39:18 +0200
+Subject: [PATCH] third_party: Update resolv_wrapper to version 1.1.7
+
+This fixes some Samba tests which redirect stderr to stdout and then get
+more messages than expected.
+
+Signed-off-by: Andreas Schneider <asn@samba.org>
+---
+ buildtools/wafsamba/samba_third_party.py    | 2 +-
+ third_party/resolv_wrapper/resolv_wrapper.c | 4 ++--
+ third_party/resolv_wrapper/wscript          | 2 +-
+ 3 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/buildtools/wafsamba/samba_third_party.py b/buildtools/wafsamba/samba_third_party.py
+index 318da4f4eff..bc2b21f2a55 100644
+--- a/buildtools/wafsamba/samba_third_party.py
++++ b/buildtools/wafsamba/samba_third_party.py
+@@ -34,7 +34,7 @@ Build.BuildContext.CHECK_NSS_WRAPPER = CHECK_NSS_WRAPPER
+ 
+ @conf
+ def CHECK_RESOLV_WRAPPER(conf):
+-    return conf.CHECK_BUNDLED_SYSTEM_PKG('resolv_wrapper', minversion='1.1.6')
++    return conf.CHECK_BUNDLED_SYSTEM_PKG('resolv_wrapper', minversion='1.1.7')
+ Build.BuildContext.CHECK_RESOLV_WRAPPER = CHECK_RESOLV_WRAPPER
+ 
+ @conf
+diff --git a/third_party/resolv_wrapper/resolv_wrapper.c b/third_party/resolv_wrapper/resolv_wrapper.c
+index 0d3f34ce591..b69a55a80e0 100644
+--- a/third_party/resolv_wrapper/resolv_wrapper.c
++++ b/third_party/resolv_wrapper/resolv_wrapper.c
+@@ -1844,7 +1844,7 @@ static int rwrap_parse_resolv_conf(struct __res_state *state,
+ 
+ 	fp = fopen(resolv_conf, "r");
+ 	if (fp == NULL) {
+-		RWRAP_LOG(RWRAP_LOG_ERROR,
++		RWRAP_LOG(RWRAP_LOG_WARN,
+ 			  "Opening %s failed: %s",
+ 			  resolv_conf, strerror(errno));
+ 		return -1;
+@@ -1930,7 +1930,7 @@ static int rwrap_parse_resolv_conf(struct __res_state *state,
+ 	fclose(fp);
+ 
+ 	if (nserv == 0) {
+-		RWRAP_LOG(RWRAP_LOG_ERROR,
++		RWRAP_LOG(RWRAP_LOG_WARN,
+ 			  "No usable nameservers found in %s",
+ 			  resolv_conf);
+ 		errno = ESRCH;
+diff --git a/third_party/resolv_wrapper/wscript b/third_party/resolv_wrapper/wscript
+index ea3df498a6e..a7f18389b0f 100644
+--- a/third_party/resolv_wrapper/wscript
++++ b/third_party/resolv_wrapper/wscript
+@@ -2,7 +2,7 @@
+ 
+ import os
+ 
+-VERSION="1.1.6"
++VERSION="1.1.7"
+ 
+ def configure(conf):
+     if conf.CHECK_RESOLV_WRAPPER():
+-- 
+GitLab
+

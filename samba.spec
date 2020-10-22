@@ -147,6 +147,8 @@ Patch4:         samba-systemd-notification.patch
 
 # Fix `make test` in release tarballs
 Patch5:         https://gitlab.com/samba-team/samba/-/merge_requests/1624.patch
+# Update resolv_wrapper to version 1.1.7
+Patch6:         https://gitlab.com/samba-team/samba/-/merge_requests/1528.patch
 
 Requires(pre): /usr/sbin/groupadd
 Requires(post): systemd
@@ -3635,6 +3637,7 @@ fi
 %changelog
 * Mon Oct 26 2020 Andreas Schneider <asn@redhat.com> - 4.13.0-14
 - Fixed dbcheck running in a release tarball
+- Updated internal resolv_wrapper copy to verison 1.1.7
 
 * Sun Oct 25 2020 Alexander Bokovoy <abokovoy@redhat.com> - 4.13.0-13
 - Report 'samba' daemon status back to systemd
