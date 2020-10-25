@@ -8,7 +8,7 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%define main_release 12
+%define main_release 13
 
 %define samba_version 4.13.0
 %define talloc_version 2.3.1
@@ -132,6 +132,8 @@ Source14:       samba.pamd
 Source201:      README.downgrade
 Patch1:         samba-s4u.patch
 Patch2:         samba-gc-lookup_unix_user_name-allow-lookup-for-own-realm.patch
+Patch3:         samba-dnspython-2.0.0-v4.13.patch
+Patch4:         samba-systemd-notification.patch
 
 Requires(pre): /usr/sbin/groupadd
 Requires(post): systemd
@@ -1984,6 +1986,7 @@ fi
 %{python3_sitearch}/samba/__pycache__/compat.*.pyc
 %{python3_sitearch}/samba/__pycache__/dbchecker.*.pyc
 %{python3_sitearch}/samba/__pycache__/descriptor.*.pyc
+%{python3_sitearch}/samba/__pycache__/dnsresolver.*.pyc
 %{python3_sitearch}/samba/__pycache__/drs_utils.*.pyc
 %{python3_sitearch}/samba/__pycache__/getopt.*.pyc
 %{python3_sitearch}/samba/__pycache__/gpclass.*.pyc
@@ -2061,6 +2064,7 @@ fi
 %{python3_sitearch}/samba/dcerpc/wkssvc.*.so
 %{python3_sitearch}/samba/dcerpc/xattr.*.so
 %{python3_sitearch}/samba/descriptor.py
+%{python3_sitearch}/samba/dnsresolver.py
 %{python3_sitearch}/samba/drs_utils.py
 %{python3_sitearch}/samba/gensec.*.so
 %{python3_sitearch}/samba/getopt.py
@@ -3621,6 +3625,10 @@ fi
 %endif
 
 %changelog
+* Sun Oct 25 2020 Alexander Bokovoy <abokovoy@redhat.com> - 4.13.0-13
+- Report 'samba' daemon status back to systemd
+- Support dnspython 2.0.0 or later in samba_dnsupdate
+
 * Thu Oct 22 2020 Alexander Bokovoy <abokovoy@redhat.com> - 4.13.0-12
 - Add preliminary support for S4U operations in Samba AD DC
   resolves: #1836630 - Samba DC: Remote Desktop cannot access files

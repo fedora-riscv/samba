@@ -1,0 +1,143 @@
+From 12b51be8633689763080f2eb1e0b13487e3e71e1 Mon Sep 17 00:00:00 2001
+From: Alexander Bokovoy <ab@samba.org>
+Date: Sat, 24 Oct 2020 12:17:44 +0300
+Subject: [PATCH] DNS Resolver: support both dnspython before and after 2.0.0
+
+`dnspython` 2.0.0 has many changes and several deprecations like:
+
+```
+> dns.resolver.resolve() has been added, allowing control of whether
+search lists are used. dns.resolver.query() is retained for backwards
+compatibility, but deprecated. The default for search list behavior can
+be set at in the resolver object with the use_search_by_default
+parameter. The default is False.
+
+> dns.resolver.resolve_address() has been added, allowing easy
+address-to-name lookups.
+```
+
+The new class `DNSResolver`:
+- provides the compatibility layer
+- defaults the previous behavior (the search list configured in the
+  system's resolver configuration is used for relative names)
+- defaults lifetime to 15sec (determines the number of seconds
+  to spend trying to get an answer to the question)
+
+The compatibility shim was developed by Stanislav Levin for FreeIPA and
+adopted for Samba by Alexander Bokovoy.
+
+Signed-off-by: Stanislav Levin <slev@altlinux.org>
+Signed-off-by: Alexander Bokovoy <ab@samba.org>
+---
+ python/samba/dnsresolver.py           | 68 +++++++++++++++++++++++++++
+ source4/scripting/bin/samba_dnsupdate |  5 +-
+ 2 files changed, 71 insertions(+), 2 deletions(-)
+ create mode 100644 python/samba/dnsresolver.py
+
+diff --git a/python/samba/dnsresolver.py b/python/samba/dnsresolver.py
+new file mode 100644
+index 00000000000..a627555a855
+--- /dev/null
++++ b/python/samba/dnsresolver.py
+@@ -0,0 +1,68 @@
++# Samba wrapper for DNS resolvers
++#
++# Copyright (C) Stanislav Levin <slev@altlinux.org>
++# Copyright (C) Alexander Bokovoy <ab@samba.org>
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 3 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
++
++import dns.resolver
++import dns.rdatatype
++import dns.reversename
++
++class DNSResolver(dns.resolver.Resolver):
++    """DNS stub resolver compatible with both dnspython < 2.0.0
++    and dnspython >= 2.0.0.
++
++    Set `use_search_by_default` attribute to `True`, which
++    determines the default for whether the search list configured
++    in the system's resolver configuration is used for relative
++    names, and whether the resolver's domain may be added to relative
++    names.
++
++    Increase the default lifetime which determines the number of seconds
++    to spend trying to get an answer to the question. dnspython 2.0.0
++    changes this to 5sec, while the previous one was 30sec.
++    """
++    def __init__(self, *args, **kwargs):
++        super().__init__(*args, **kwargs)
++        self.reset_defaults()
++        self.resolve = getattr(super(), "resolve", self.query)
++        self.resolve_address = getattr(
++            super(),
++            "resolve_address",
++            self._resolve_address
++        )
++
++    def reset_defaults(self):
++        self.use_search_by_default = True
++        # the default is 5sec
++        self.lifetime = 15
++
++    def reset(self):
++        super().reset()
++        self.reset_defaults()
++
++    def _resolve_address(self, ip_address, *args, **kwargs):
++        """Query nameservers for PTR records.
++
++        :param ip_address: IPv4 or IPv6 address
++        :type ip_address: str
++        """
++        return self.resolve(
++            dns.reversename.from_address(ip_address),
++            rdtype=dns.rdatatype.PTR,
++            *args,
++            **kwargs,
++        )
+diff --git a/source4/scripting/bin/samba_dnsupdate b/source4/scripting/bin/samba_dnsupdate
+index 44eb1cadd27..fe04ce71338 100755
+--- a/source4/scripting/bin/samba_dnsupdate
++++ b/source4/scripting/bin/samba_dnsupdate
+@@ -53,6 +53,7 @@ from samba.compat import get_string
+ from samba.compat import text_type
+ import ldb
+ 
++from samba.dnsresolver import DNSResolver
+ import dns.resolver
+ import dns.exception
+ 
+@@ -259,7 +260,7 @@ def hostname_match(h1, h2):
+ 
+ def get_resolver(d=None):
+     resolv_conf = os.getenv('RESOLV_CONF', default='/etc/resolv.conf')
+-    resolver = dns.resolver.Resolver(filename=resolv_conf, configure=True)
++    resolver = DNSResolver(filename=resolv_conf, configure=True)
+ 
+     if d is not None and d.nameservers != []:
+         resolver.nameservers = d.nameservers
+@@ -271,7 +272,7 @@ def check_one_dns_name(name, name_type, d=None):
+     if d and not d.nameservers:
+         d.nameservers = resolver.nameservers
+     # dns.resolver.Answer
+-    return resolver.query(name, name_type)
++    return resolver.resolve(name, name_type)
+ 
+ def check_dns_name(d):
+     """check that a DNS entry exists."""
+-- 
+2.28.0
+
