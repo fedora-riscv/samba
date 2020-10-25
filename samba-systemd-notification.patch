@@ -1,0 +1,118 @@
+From 9dd1a4809b1b6d65bfb2258b443b0fe36e0a32f7 Mon Sep 17 00:00:00 2001
+From: Alexander Bokovoy <ab@samba.org>
+Date: Sat, 24 Oct 2020 16:52:43 +0300
+Subject: [PATCH] daemons: report status to systemd even when running in
+ foreground
+
+When systemd launches samba services, the configuration we have in
+systemd service files expects that the main process (/usr/sbin/*)
+would use sd_notify() to report back its status. However, we only use
+sd_notify() when running become_daemon().
+
+As a result, samba/smbd/winbindd/nmbd processes never report back its
+status and the status updates from other childs (smbd, winbindd, etc)
+are not accepted as we now have implied NotifyAccess=main since commit
+d1740fb3d5a72cb49e30b330bb0b01e7ef3e09cc
+
+This leads to a timeout and killing samba process by systemd. Situation
+is reproducible in Fedora 33, for example.
+
+Make sure that we have required status updates for all daemons in case
+we aren't runnning in interactive mode.
+
+BUG: https://bugzilla.samba.org/show_bug.cgi?id=14552
+
+Signed-off-by: Alexander Bokovoy <ab@samba.org>
+---
+ source3/nmbd/nmbd.c         | 4 +++-
+ source3/smbd/server.c       | 4 +++-
+ source3/winbindd/winbindd.c | 5 ++++-
+ source4/smbd/server.c       | 4 +++-
+ 4 files changed, 13 insertions(+), 4 deletions(-)
+
+diff --git a/source3/nmbd/nmbd.c b/source3/nmbd/nmbd.c
+index 0b881d13f7b..f6aeba1f714 100644
+--- a/source3/nmbd/nmbd.c
++++ b/source3/nmbd/nmbd.c
+@@ -1009,6 +1009,8 @@ static bool open_sockets(bool isdaemon, int port)
+ 	if (is_daemon && !opt_interactive) {
+ 		DEBUG(3, ("Becoming a daemon.\n"));
+ 		become_daemon(Fork, no_process_group, log_stdout);
++	} else if (!opt_interactive) {
++		daemon_status("nmbd", "Starting process...");
+ 	}
+ 
+ #ifdef HAVE_SETPGID
+@@ -1135,7 +1137,7 @@ static bool open_sockets(bool isdaemon, int port)
+ 		exit_daemon( "NMBD failed to setup packet server.", EACCES);
+ 	}
+ 
+-	if (is_daemon && !opt_interactive) {
++	if (!opt_interactive) {
+ 		daemon_ready("nmbd");
+ 	}
+ 
+diff --git a/source3/smbd/server.c b/source3/smbd/server.c
+index 153dd3c9323..3d9db5d8407 100644
+--- a/source3/smbd/server.c
++++ b/source3/smbd/server.c
+@@ -1893,6 +1893,8 @@ extern void build_options(bool screen);
+ 	if (is_daemon && !interactive) {
+ 		DEBUG(3, ("Becoming a daemon.\n"));
+ 		become_daemon(Fork, no_process_group, log_stdout);
++	} else {
++		daemon_status("smbd", "Starting process ...");
+ 	}
+ 
+ #ifdef HAVE_SETPGID
+@@ -2100,7 +2102,7 @@ extern void build_options(bool screen);
+ 		exit_daemon("Samba cannot setup ep pipe", EACCES);
+ 	}
+ 
+-	if (is_daemon && !interactive) {
++	if (!interactive) {
+ 		daemon_ready("smbd");
+ 	}
+ 
+diff --git a/source3/winbindd/winbindd.c b/source3/winbindd/winbindd.c
+index 4397a1bc0d1..1e08237905a 100644
+--- a/source3/winbindd/winbindd.c
++++ b/source3/winbindd/winbindd.c
+@@ -1880,8 +1880,11 @@ int main(int argc, const char **argv)
+ 	BlockSignals(False, SIGHUP);
+ 	BlockSignals(False, SIGCHLD);
+ 
+-	if (!interactive)
++	if (!interactive) {
+ 		become_daemon(Fork, no_process_group, log_stdout);
++	} else {
++		daemon_status("winbindd", "Starting process ...");
++	}
+ 
+ 	pidfile_create(lp_pid_directory(), "winbindd");
+ 
+diff --git a/source4/smbd/server.c b/source4/smbd/server.c
+index 95acb99b86c..ee2e7508bb3 100644
+--- a/source4/smbd/server.c
++++ b/source4/smbd/server.c
+@@ -648,6 +648,8 @@ static int binary_smbd_main(const char *binary_name,
+ 	if (opt_daemon) {
+ 		DBG_NOTICE("Becoming a daemon.\n");
+ 		become_daemon(opt_fork, opt_no_process_group, false);
++	} else if (!opt_interactive) {
++		daemon_status("samba", "Starting process...");
+ 	}
+ 
+ 	/* Create the memory context to hang everything off. */
+@@ -931,7 +933,7 @@ static int binary_smbd_main(const char *binary_name,
+ 		}
+ 	}
+ 
+-	if (opt_daemon) {
++	if (!opt_interactive) {
+ 		daemon_ready("samba");
+ 	}
+ 
+-- 
+2.28.0
+
