@@ -8,9 +8,9 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%define main_release 1
+%define main_release 0
 
-%define samba_version 4.12.8
+%define samba_version 4.12.9
 %define talloc_version 2.3.1
 %define tdb_version 1.4.3
 %define tevent_version 0.10.2
@@ -3589,6 +3589,12 @@ fi
 %endif
 
 %changelog
+* Thu Oct 29 2020 Guenther Deschner <gdeschner@redhat.com> - 4.12.9-0
+- Update to Samba 4.12.9
+- resolves: #1892631, #1892634 - Security fixes for CVE-2020-14318
+- resolves: #1891685, #1892628 - Security fixes for CVE-2020-14323
+- resolves: #1892636, #1892640 - Security fixes for CVE-2020-14383
+
 * Thu Oct 22 2020 Alexander Bokovoy <abokovoy@redhat.com> - 4.12.8-1
 - Add preliminary support for S4U operations in Samba AD DC
   resolves: #1836630 - Samba DC: Remote Desktop cannot access files
