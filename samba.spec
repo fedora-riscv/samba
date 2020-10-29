@@ -78,9 +78,9 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%global main_release 14
+%global main_release 0
 
-%global samba_version 4.13.0
+%global samba_version 4.13.1
 %global talloc_version 2.3.1
 %global tdb_version 1.4.3
 %global tevent_version 0.10.2
@@ -3761,6 +3761,12 @@ fi
 %endif
 
 %changelog
+* Thu Oct 29 2020 Guenther Deschner <gdeschner@redhat.com> - 4.13.1-0
+- Update to Samba 4.13.1
+- resolves: #1892631, #1892634 - Security fixes for CVE-2020-14318
+- resolves: #1891685, #1892628 - Security fixes for CVE-2020-14323
+- resolves: #1892636, #1892640 - Security fixes for CVE-2020-14383
+
 * Mon Oct 26 2020 Andreas Schneider <asn@redhat.com> - 4.13.0-14
 - Fixed dbcheck running in a release tarball
 - Updated internal resolv_wrapper copy to verison 1.1.7
