@@ -8,7 +8,7 @@
 
 %define main_release 0
 
-%define samba_version 4.11.14
+%define samba_version 4.11.15
 %define talloc_version 2.2.0
 %define tdb_version 1.4.2
 %define tevent_version 0.10.0
@@ -3539,6 +3539,12 @@ fi
 %endif
 
 %changelog
+* Thu Oct 29 2020 Guenther Deschner <gdeschner@redhat.com> - 4.11.15-0
+- Update to Samba 4.11.15
+- resolves: #1892631, #1892634 - Security fixes for CVE-2020-14318
+- resolves: #1891685, #1892628 - Security fixes for CVE-2020-14323
+- resolves: #1892636, #1892640 - Security fixes for CVE-2020-14383
+
 * Tue Oct 06 2020 Guenther Deschner <gdeschner@redhat.com> - 4.11.14-0
 - Update to Samba 4.11.14
 
