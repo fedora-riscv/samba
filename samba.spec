@@ -266,7 +266,7 @@ BuildRequires: perl(ExtUtils::MakeMaker)
 BuildRequires: perl(FindBin)
 BuildRequires: perl(Parse::Yapp)
 
-%if %{without testsuite}
+%if %{without includelibs}
 BuildRequires: libtalloc-devel >= %{talloc_version}
 BuildRequires: python3-talloc-devel >= %{talloc_version}
 
@@ -1656,6 +1656,16 @@ fi
 %{_libdir}/samba/libtdb.so.*
 %{_libdir}/samba/libtevent.so.*
 
+%{_libdir}/samba/ldb/asq.so
+%{_libdir}/samba/ldb/ldb.so
+#%%{_libdir}/samba/ldb/mdb.so
+%{_libdir}/samba/ldb/paged_searches.so
+%{_libdir}/samba/ldb/rdn_name.so
+%{_libdir}/samba/ldb/sample.so
+%{_libdir}/samba/ldb/server_sort.so
+%{_libdir}/samba/ldb/skel.so
+%{_libdir}/samba/ldb/tdb.so
+
 %{_mandir}/man3/ldb.3.gz
 %{_mandir}/man3/talloc.3.gz
 #endif with includelibs
@@ -1776,19 +1786,6 @@ fi
 %{_libdir}/samba/ldb/update_keytab.so
 %{_libdir}/samba/ldb/vlv.so
 %{_libdir}/samba/ldb/wins_ldb.so
-
-%if %{with includelibs}
-%{_libdir}/samba/ldb/asq.so
-%{_libdir}/samba/ldb/ldb.so
-%{_libdir}/samba/ldb/mdb.so
-%{_libdir}/samba/ldb/paged_searches.so
-%{_libdir}/samba/ldb/rdn_name.so
-%{_libdir}/samba/ldb/sample.so
-%{_libdir}/samba/ldb/server_sort.so
-%{_libdir}/samba/ldb/skel.so
-%{_libdir}/samba/ldb/tdb.so
-#endif with includelibs
-%endif
 
 %{_libdir}/samba/vfs/posix_eadb.so
 %dir /var/lib/samba/sysvol
@@ -2324,12 +2321,13 @@ fi
 %{python3_sitearch}/samba/xattr.py
 %{python3_sitearch}/samba/xattr_native.*.so
 %{python3_sitearch}/samba/xattr_tdb.*.so
-%{_libdir}/libsamba-policy.*.so.*
-%{_libdir}/samba/libsamba-net.*-samba4.so
-%{_libdir}/samba/libsamba-python.*-samba4.so
+%{_libdir}/libsamba-policy.cpython*.so.*
+%{_libdir}/samba/libsamba-net.cpython*.so
+%{_libdir}/samba/libsamba-python.cpython*.so
 
-%if %{with testsuite}
-%{_libdir}/samba/libpyldb-util.*.so.*
+%if %{with includelibs}
+%{_libdir}/samba/libpyldb-util.cpython*.so.*
+%{_libdir}/samba/libpytalloc-util.cpython*.so.*
 
 %{python3_sitearch}/__pycache__/_ldb_text*.pyc
 %{python3_sitearch}/__pycache__/_tdb_text*.pyc
@@ -2338,9 +2336,10 @@ fi
 %{python3_sitearch}/_tdb_text.py
 %{python3_sitearch}/_tevent.cpython*.so
 %{python3_sitearch}/ldb.cpython*.so
+%{python3_sitearch}/talloc.cpython*.so
 %{python3_sitearch}/tdb.cpython*.so
 %{python3_sitearch}/tevent.py
-#endif with testsuite
+#endif with includelibs
 %endif
 
 %files -n python3-%{name}-devel
