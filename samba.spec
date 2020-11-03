@@ -132,8 +132,6 @@ Source14:       samba.pamd
 Source201:      README.downgrade
 Patch1:         samba-s4u.patch
 Patch2:         samba-gc-lookup_unix_user_name-allow-lookup-for-own-realm.patch
-Patch3:         samba-dnspython-2.0.0-v4.13.patch
-Patch4:         samba-systemd-notification.patch
 
 Requires(pre): /usr/sbin/groupadd
 Requires(post): systemd
