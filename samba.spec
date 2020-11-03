@@ -148,15 +148,6 @@ Source14:       samba.pamd
 Source201:      README.downgrade
 Patch1:         samba-s4u.patch
 Patch2:         samba-gc-lookup_unix_user_name-allow-lookup-for-own-realm.patch
-Patch3:         samba-dnspython-2.0.0-v4.13.patch
-Patch4:         samba-systemd-notification.patch
-
-# Fix `make test` in release tarballs
-Patch5:         https://gitlab.com/samba-team/samba/-/merge_requests/1624.patch
-# Update resolv_wrapper to version 1.1.7
-Patch6:         https://gitlab.com/samba-team/samba/-/merge_requests/1528.patch
-# Do not install test binaries for selftest
-Patch7:         https://gitlab.com/samba-team/samba/-/merge_requests/1635.patch
 
 Requires(pre): /usr/sbin/groupadd
 Requires(post): systemd
