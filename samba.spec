@@ -8,7 +8,7 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%define main_release 0
+%define main_release 1
 
 %define samba_version 4.13.2
 %define talloc_version 2.3.1
@@ -586,6 +586,13 @@ Requires: libwbclient = %{samba_depver}
 The python3-%{name} package contains the Python 3 libraries needed by programs
 that use SMB, RPC and other Samba provided protocols in Python 3 programs.
 
+%package -n python3-%{name}-devel
+Summary: Samba python devel files
+Requires: python3-%{name} = %{samba_depver}
+
+%description -n python3-%{name}-devel
+The python3-%{name}-devel package contains the Python 3 defel files.
+
 %package -n python3-samba-test
 Summary: Samba Python libraries
 Requires: python3-%{name} = %{samba_depver}
@@ -1081,16 +1088,6 @@ rm -f %{buildroot}%{_mandir}/man8/vfs_ceph_snapshots.8*
 # This makes the right links, as rpmlint requires that
 # the ldconfig-created links be recorded in the RPM.
 /sbin/ldconfig -N -n %{buildroot}%{_libdir}
-
-%if ! %with_dc
-for f in samba/libsamba-net-samba4.so \
-         samba/libsamba-python-samba4.so \
-         libsamba-policy.so* \
-         pkgconfig/samba-policy.pc ; do
-    rm -f %{buildroot}%{_libdir}/$f
-done
-#endif ! with_dc
-%endif
 
 pushd pidl
 make DESTDIR=%{buildroot} install_vendor
@@ -2203,19 +2200,13 @@ fi
 %{python3_sitearch}/samba/xattr.py
 %{python3_sitearch}/samba/xattr_native.*.so
 %{python3_sitearch}/samba/xattr_tdb.*.so
-# FIXME:
-# /usr/lib64/libsamba-policy.cpython-36m-x86-64-linux-gnu.so
-# /usr/lib64/libsamba-policy.cpython-36m-x86-64-linux-gnu.so.0
-# /usr/lib64/libsamba-policy.cpython-36m-x86-64-linux-gnu.so.0.0.1
-%{_libdir}/libsamba-policy.*.so*
-# FIXME:
-# /usr/lib64/pkgconfig/samba-policy.cpython-36m-x86_64-linux-gnu.pc
+%{_libdir}/libsamba-policy.cpython*.so.*
+%{_libdir}/samba/libsamba-net.cpython*.so
+%{_libdir}/samba/libsamba-python.cpython*.so
+
+%files -n python3-%{name}-devel
+%{_libdir}/libsamba-policy.cpython*.so
 %{_libdir}/pkgconfig/samba-policy.*.pc
-# FIXME:
-# /usr/lib64/samba/libsamba-net.cpython-36m-x86-64-linux-gnu-samba4.so
-# /usr/lib64/samba/libsamba-python.cpython-36m-x86-64-linux-gnu-samba4.so
-%{_libdir}/samba/libsamba-net.*-samba4.so
-%{_libdir}/samba/libsamba-python.*-samba4.so
 
 %if %{with_dc}
 %files -n python3-%{name}-dc
@@ -3625,6 +3616,9 @@ fi
 %endif
 
 %changelog
+* Tue Nov 03 2020 Andreas Schneider <asn@redhat.com> - 4.13.2-1
+- Create a python3-samba-devel package to avoid unnessary dependencies
+
 * Tue Nov 03 2020 Guenther Deschner <gdeschner@redhat.com> - 4.13.2-0
 - Update to Samba 4.13.2
 
