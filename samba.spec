@@ -78,7 +78,7 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%global main_release 0
+%global main_release 1
 
 %global samba_version 4.13.2
 %global talloc_version 2.3.1
@@ -603,6 +603,13 @@ Requires: libwbclient = %{samba_depver}
 %description -n python3-%{name}
 The python3-%{name} package contains the Python 3 libraries needed by programs
 that use SMB, RPC and other Samba provided protocols in Python 3 programs.
+
+%package -n python3-%{name}-devel
+Summary: Samba python devel files
+Requires: python3-%{name} = %{samba_depver}
+
+%description -n python3-%{name}-devel
+The python3-%{name}-devel package contains the Python 3 defel files.
 
 %package -n python3-samba-test
 Summary: Samba Python libraries
@@ -2317,17 +2324,7 @@ fi
 %{python3_sitearch}/samba/xattr.py
 %{python3_sitearch}/samba/xattr_native.*.so
 %{python3_sitearch}/samba/xattr_tdb.*.so
-# FIXME:
-# /usr/lib64/libsamba-policy.cpython-36m-x86-64-linux-gnu.so
-# /usr/lib64/libsamba-policy.cpython-36m-x86-64-linux-gnu.so.0
-# /usr/lib64/libsamba-policy.cpython-36m-x86-64-linux-gnu.so.0.0.1
-%{_libdir}/libsamba-policy.*.so*
-# FIXME:
-# /usr/lib64/pkgconfig/samba-policy.cpython-36m-x86_64-linux-gnu.pc
-%{_libdir}/pkgconfig/samba-policy.*.pc
-# FIXME:
-# /usr/lib64/samba/libsamba-net.cpython-36m-x86-64-linux-gnu-samba4.so
-# /usr/lib64/samba/libsamba-python.cpython-36m-x86-64-linux-gnu-samba4.so
+%{_libdir}/libsamba-policy.*.so.*
 %{_libdir}/samba/libsamba-net.*-samba4.so
 %{_libdir}/samba/libsamba-python.*-samba4.so
 
@@ -2345,6 +2342,10 @@ fi
 %{python3_sitearch}/tevent.py
 #endif with testsuite
 %endif
+
+%files -n python3-%{name}-devel
+%{_libdir}/libsamba-policy.*.so
+%{_libdir}/pkgconfig/samba-policy.*.pc
 
 %if %{with dc} || %{with testsuite}
 %files -n python3-%{name}-dc
@@ -3754,6 +3755,9 @@ fi
 %endif
 
 %changelog
+* Tue Nov 03 2020 Andreas Schneider <asn@redhat.com> - 4.13.2-1
+- Create a python3-samba-devel package to avoid unnessary dependencies
+
 * Tue Nov 03 2020 Guenther Deschner <gdeschner@redhat.com> - 4.13.2-0
 - Update to Samba 4.13.2
 
