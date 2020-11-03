@@ -80,7 +80,7 @@
 
 %global main_release 0
 
-%global samba_version 4.13.1
+%global samba_version 4.13.2
 %global talloc_version 2.3.1
 %global tdb_version 1.4.3
 %global tevent_version 0.10.2
@@ -3761,6 +3761,9 @@ fi
 %endif
 
 %changelog
+* Tue Nov 03 2020 Guenther Deschner <gdeschner@redhat.com> - 4.13.2-0
+- Update to Samba 4.13.2
+
 * Thu Oct 29 2020 Guenther Deschner <gdeschner@redhat.com> - 4.13.1-0
 - Update to Samba 4.13.1
 - resolves: #1892631, #1892634 - Security fixes for CVE-2020-14318
