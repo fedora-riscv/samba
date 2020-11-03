@@ -1123,7 +1123,7 @@ rm -f %{buildroot}%{_mandir}/man8/vfs_nfs4acl_xattr.8*
 %endif
 
 pushd pidl
-make DESTDIR=%{buildroot} install_vendor
+%{__make} DESTDIR=%{buildroot} install_vendor
 
 rm -f %{buildroot}%{perl_archlib}/perllocal.pod
 rm -f %{buildroot}%{perl_archlib}/vendor_perl/auto/Parse/Pidl/.packlist
@@ -1153,7 +1153,7 @@ export TDB_NO_FSYNC=1
 export NMBD_DONT_LOG_STDOUT=1
 export SMBD_DONT_LOG_STDOUT=1
 export WINBINDD_DONT_LOG_STDOUT=1
-make %{?_smp_mflags} test FAIL_IMMEDIATELY=1
+%{__make} %{?_smp_mflags} test FAIL_IMMEDIATELY=1
 #endif with testsuite
 %endif
 
