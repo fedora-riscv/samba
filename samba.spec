@@ -10,7 +10,7 @@
 
 %define main_release 0
 
-%define samba_version 4.12.9
+%define samba_version 4.12.10
 %define talloc_version 2.3.1
 %define tdb_version 1.4.3
 %define tevent_version 0.10.2
@@ -129,7 +129,6 @@ Source14:       samba.pamd
 
 Source201:      README.downgrade
 
-Patch:          samba-winexe-build.patch
 Patch1:         samba-s4u.patch
 Patch2:         samba-gc-lookup_unix_user_name-allow-lookup-for-own-realm.patch
 
@@ -1729,6 +1728,8 @@ fi
 %{_libdir}/samba/bind9/dlz_bind9_10.so
 %{_libdir}/samba/bind9/dlz_bind9_11.so
 %{_libdir}/samba/bind9/dlz_bind9_12.so
+%{_libdir}/samba/bind9/dlz_bind9_14.so
+%{_libdir}/samba/bind9/dlz_bind9_16.so
 #endif with_dc
 %endif
 
@@ -3589,6 +3590,9 @@ fi
 %endif
 
 %changelog
+* Thu Nov 05 2020 Guenther Deschner <gdeschner@redhat.com> - 4.12.10-0
+- Update to Samba 4.12.10
+
 * Thu Oct 29 2020 Guenther Deschner <gdeschner@redhat.com> - 4.12.9-0
 - Update to Samba 4.12.9
 - resolves: #1892631, #1892634 - Security fixes for CVE-2020-14318
