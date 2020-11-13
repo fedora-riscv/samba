@@ -29,7 +29,18 @@
 %bcond_without libwbclient
 
 # Build with winexe by default
+%if 0%{?rhel}
+
+%ifarch x86_64
 %bcond_without winexe
+%else
+%bcond_with winexe
+#endifarch
+%endif
+
+%else
+%bcond_without winexe
+%endif
 
 # Build vfs_ceph module by default on 64bit Fedora
 %if 0%{?fedora}
@@ -56,8 +67,15 @@
 #endifarch
 %endif
 
+#else rhel
+%else
+# Enable on rhel x86_64
+%ifarch x86_64
+%bcond_without vfs_glusterfs
 %else
 %bcond_with vfs_glusterfs
+#endifarch
+%endif
 #endif fedora
 %endif
 
