@@ -1558,21 +1558,22 @@ fi
 ### CLIENT-LIBS
 %files client-libs
 %{_libdir}/libdcerpc-binding.so.*
-%{_libdir}/libndr.so.*
+%{_libdir}/libdcerpc-server-core.so.*
+%{_libdir}/libdcerpc.so.*
 %{_libdir}/libndr-krb5pac.so.*
 %{_libdir}/libndr-nbt.so.*
 %{_libdir}/libndr-standard.so.*
+%{_libdir}/libndr.so.*
 %{_libdir}/libnetapi.so.*
 %{_libdir}/libsamba-credentials.so.*
 %{_libdir}/libsamba-errors.so.*
+%{_libdir}/libsamba-hostconfig.so.*
 %{_libdir}/libsamba-passdb.so.*
 %{_libdir}/libsamba-util.so.*
-%{_libdir}/libsamba-hostconfig.so.*
 %{_libdir}/libsamdb.so.*
 %{_libdir}/libsmbconf.so.*
 %{_libdir}/libsmbldap.so.*
 %{_libdir}/libtevent-util.so.*
-%{_libdir}/libdcerpc.so.*
 
 %dir %{_libdir}/samba
 %{_libdir}/samba/libCHARSET3-samba4.so
@@ -2028,7 +2029,6 @@ fi
 ### LIBS
 %files libs
 %{_libdir}/libdcerpc-samr.so.*
-%{_libdir}/libdcerpc-server-core.so.*
 
 %{_libdir}/samba/libLIBWBCLIENT-OLD-samba4.so
 %{_libdir}/samba/libauth4-samba4.so
