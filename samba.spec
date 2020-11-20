@@ -800,6 +800,7 @@ necessary to communicate to the Winbind Daemon
 %package winexe
 Summary: Samba Winexe Windows Binary
 License: GPLv3
+Requires: %{name}-client-libs = %{samba_depver}
 
 %description winexe
 Winexe is a Remote Windows®-command executor
