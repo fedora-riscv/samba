@@ -950,6 +950,7 @@ export LDFLAGS="%{__global_ldflags} -fuse-ld=gold"
 %if %{with testsuite}
         --enable-selftest \
 %endif
+        --with-profiling-data \
         --with-systemd \
         --systemd-install-services \
         --with-systemddir=/usr/lib/systemd/system \
