@@ -58,6 +58,11 @@
 %endif
 
 # Build vfs_gluster module by default on 64bit Fedora
+%global is_rhgs 0
+%if "%{dist}" == ".el8rhgs" || "%{dist}" == ".el9rhgs" 
+%global is_rhgs 1
+%endif
+
 %if 0%{?fedora}
 
 %ifarch aarch64 ppc64le s390x x86_64
@@ -69,13 +74,20 @@
 
 #else rhel
 %else
-# Enable on rhel x86_64
+
+%if 0%{?is_rhgs}
+# Enable on rhgs x86_64
 %ifarch x86_64
 %bcond_without vfs_glusterfs
 %else
 %bcond_with vfs_glusterfs
 #endifarch
 %endif
+%else
+%bcond_with vfs_glusterfs
+#endif is_rhgs
+%endif
+
 #endif fedora
 %endif
 
