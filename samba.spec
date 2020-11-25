@@ -3789,6 +3789,9 @@ fi
 %changelog
 * Wed Nov 25 2020 Alexander Bokovoy <abokovoy@redhat.com> - 4.13.2-2
 - rhbz#1892745, rhbz#1900232: smbclient mget crashes (upstream bug 14517)
+- Merge RHEL 8.4 patches:
+  - FIPS-related enhancements
+  - FreeIPA Global Catalog patches
 
 * Tue Nov 03 2020 Andreas Schneider <asn@redhat.com> - 4.13.2-1
 - Create a python3-samba-devel package to avoid unnessary dependencies
