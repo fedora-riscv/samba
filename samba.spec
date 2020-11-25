@@ -8,7 +8,7 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%define main_release 1
+%define main_release 2
 
 %define samba_version 4.13.2
 %define talloc_version 2.3.1
@@ -131,7 +131,7 @@ Source14:       samba.pamd
 
 Source201:      README.downgrade
 Patch1:         samba-s4u.patch
-Patch2:         samba-gc-lookup_unix_user_name-allow-lookup-for-own-realm.patch
+Patch2:         samba-4.13-redhat.patch
 
 Requires(pre): /usr/sbin/groupadd
 Requires(post): systemd
@@ -3616,6 +3616,11 @@ fi
 %endif
 
 %changelog
+* Wed Nov 25 2020 Alexander Bokovoy <abokovoy@redhat.com> - 4.13.2-2
+- Merge RHEL 8.4 patches:
+  - FIPS-related enhancements
+  - FreeIPA Global Catalog patches
+
 * Tue Nov 03 2020 Andreas Schneider <asn@redhat.com> - 4.13.2-1
 - Create a python3-samba-devel package to avoid unnessary dependencies
 
