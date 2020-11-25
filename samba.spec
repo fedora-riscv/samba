@@ -2009,6 +2009,7 @@ fi
 %{python3_sitearch}/samba/__pycache__/sites.*.pyc
 %{python3_sitearch}/samba/__pycache__/subnets.*.pyc
 %{python3_sitearch}/samba/__pycache__/tdb_util.*.pyc
+%{python3_sitearch}/samba/__pycache__/trust_utils.*.pyc
 %{python3_sitearch}/samba/__pycache__/upgrade.*.pyc
 %{python3_sitearch}/samba/__pycache__/upgradehelpers.*.pyc
 %{python3_sitearch}/samba/__pycache__/xattr.*.pyc
@@ -2199,6 +2200,7 @@ fi
 %{python3_sitearch}/samba/third_party/__init__.py
 %dir %{python3_sitearch}/samba/third_party/__pycache__
 %{python3_sitearch}/samba/third_party/__pycache__/__init__.*.pyc
+%{python3_sitearch}/samba/trust_utils.py
 %{python3_sitearch}/samba/upgrade.py
 %{python3_sitearch}/samba/upgradehelpers.py
 %{python3_sitearch}/samba/werror.*.so
@@ -2433,6 +2435,7 @@ fi
 %{python3_sitearch}/samba/tests/dcerpc/__pycache__/__init__.*.pyc
 %{python3_sitearch}/samba/tests/dcerpc/__pycache__/array.*.pyc
 %{python3_sitearch}/samba/tests/dcerpc/__pycache__/bare.*.pyc
+%{python3_sitearch}/samba/tests/dcerpc/__pycache__/createtrustrelax.*.pyc
 %{python3_sitearch}/samba/tests/dcerpc/__pycache__/binding.*.pyc
 %{python3_sitearch}/samba/tests/dcerpc/__pycache__/dnsserver.*.pyc
 %{python3_sitearch}/samba/tests/dcerpc/__pycache__/integer.*.pyc
@@ -2452,6 +2455,7 @@ fi
 %{python3_sitearch}/samba/tests/dcerpc/array.py
 %{python3_sitearch}/samba/tests/dcerpc/bare.py
 %{python3_sitearch}/samba/tests/dcerpc/binding.py
+%{python3_sitearch}/samba/tests/dcerpc/createtrustrelax.py
 %{python3_sitearch}/samba/tests/dcerpc/dnsserver.py
 %{python3_sitearch}/samba/tests/dcerpc/integer.py
 %{python3_sitearch}/samba/tests/dcerpc/mdssvc.py
