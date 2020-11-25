@@ -108,7 +108,7 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%global main_release 1
+%global main_release 2
 
 %global samba_version 4.13.2
 %global talloc_version 2.3.1
@@ -177,7 +177,8 @@ Source14:       samba.pamd
 
 Source201:      README.downgrade
 Patch1:         samba-s4u.patch
-Patch2:         samba-gc-lookup_unix_user_name-allow-lookup-for-own-realm.patch
+Patch2:         samba-4.13-redhat.patch
+Patch3:         samba-smbclient-mget-bug-14517.patch
 
 Requires(pre): /usr/sbin/groupadd
 Requires(post): systemd
@@ -3786,6 +3787,9 @@ fi
 %endif
 
 %changelog
+* Wed Nov 25 2020 Alexander Bokovoy <abokovoy@redhat.com> - 4.13.2-2
+- rhbz#1892745, rhbz#1900232: smbclient mget crashes (upstream bug 14517)
+
 * Tue Nov 03 2020 Andreas Schneider <asn@redhat.com> - 4.13.2-1
 - Create a python3-samba-devel package to avoid unnessary dependencies
 
