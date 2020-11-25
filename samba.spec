@@ -132,6 +132,7 @@ Source14:       samba.pamd
 Source201:      README.downgrade
 Patch1:         samba-s4u.patch
 Patch2:         samba-4.13-redhat.patch
+Patch3:         samba-smbclient-mget-bug-14517.patch
 
 Requires(pre): /usr/sbin/groupadd
 Requires(post): systemd
@@ -3617,6 +3618,7 @@ fi
 
 %changelog
 * Wed Nov 25 2020 Alexander Bokovoy <abokovoy@redhat.com> - 4.13.2-2
+- rhbz#1892745, rhbz#1900232: smbclient mget crashes (upstream bug 14517)
 - Merge RHEL 8.4 patches:
   - FIPS-related enhancements
   - FreeIPA Global Catalog patches
