@@ -8,9 +8,9 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%define main_release 2
+%define main_release 0
 
-%define samba_version 4.13.2
+%define samba_version 4.13.3
 %define talloc_version 2.3.1
 %define tdb_version 1.4.3
 %define tevent_version 0.10.2
@@ -136,7 +136,6 @@ Patch1:         samba-s4u.patch
 #
 # Generate the patchset using: git format-patch -l1 --stdout -N > samba-4.13-redhat.patch
 Patch2:         samba-4.13-redhat.patch
-Patch3:         samba-smbclient-mget-bug-14517.patch
 
 Requires(pre): /usr/sbin/groupadd
 Requires(post): systemd
@@ -3629,6 +3628,9 @@ fi
 %endif
 
 %changelog
+* Tue Dec 15 2020 Guenther Deschner <gdeschner@redhat.com> - 4.13.3-0
+- Update to Samba 4.13.3
+
 * Wed Nov 25 2020 Alexander Bokovoy <abokovoy@redhat.com> - 4.13.2-2
 - rhbz#1892745, rhbz#1900232: smbclient mget crashes (upstream bug 14517)
 - Merge RHEL 8.4 patches:
