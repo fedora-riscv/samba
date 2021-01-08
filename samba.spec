@@ -218,6 +218,7 @@ Obsoletes: samba-swat < %{samba_depver}
 Provides: samba4-swat = %{samba_depver}
 Obsoletes: samba4-swat < %{samba_depver}
 
+BuildRequires: make
 BuildRequires: gcc
 BuildRequires: avahi-devel
 BuildRequires: bison
