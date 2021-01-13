@@ -108,7 +108,7 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%global main_release 0
+%global main_release 1
 
 %global samba_version 4.13.3
 %global talloc_version 2.3.1
@@ -139,7 +139,7 @@
 %global libwbc_alternatives_suffix -64
 %endif
 
-%global required_mit_krb5 1.18
+%global required_mit_krb5 1.19
 
 %global _systemd_extra "Environment=KRB5CCNAME=FILE:/run/samba/krb5cc_samba"
 
@@ -3799,6 +3799,10 @@ fi
 %endif
 
 %changelog
+* Wed Dec 16 2020 Guenther Deschner <gdeschner@redhat.com> - 4.13.3-1
+- Rebuild against krb5-1.19
+- Resolves: rhbz#1915928
+
 * Tue Dec 15 2020 Guenther Deschner <gdeschner@redhat.com> - 4.13.3-0
 - Update to Samba 4.13.3
 
