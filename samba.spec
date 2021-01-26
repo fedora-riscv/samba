@@ -10,7 +10,7 @@
 
 %define main_release 0
 
-%define samba_version 4.13.3
+%define samba_version 4.13.4
 %define talloc_version 2.3.1
 %define tdb_version 1.4.3
 %define tevent_version 0.10.2
@@ -120,7 +120,7 @@ URL:            https://www.samba.org
 # This is a xz recompressed file of https://ftp.samba.org/pub/samba/samba-%%{version}%%{pre_release}.tar.gz
 Source0:        https://ftp.samba.org/pub/samba/samba-%{version}%{pre_release}.tar.gz#/samba-%{version}%{pre_release}.tar.xz
 Source1:        https://ftp.samba.org/pub/samba/samba-%{version}%{pre_release}.tar.asc
-Source2:        gpgkey-52FBC0B86D954B0843324CDC6F33915B6568B7EA.gpg
+Source2:        samba-pubkey_AA99442FB680B620.gpg
 
 # Red Hat specific replacement-files
 Source10:       samba.logrotate
@@ -1537,7 +1537,6 @@ fi
 %{_libdir}/samba/libsmb-transport-samba4.so
 %{_libdir}/samba/libsmbclient-raw-samba4.so
 %{_libdir}/samba/libsmbd-base-samba4.so
-%{_libdir}/samba/libsmbd-conn-samba4.so
 %{_libdir}/samba/libsmbd-shim-samba4.so
 %{_libdir}/samba/libsmbldaphelper-samba4.so
 %{_libdir}/samba/libsys-rw-samba4.so
@@ -3628,6 +3627,9 @@ fi
 %endif
 
 %changelog
+* Tue Jan 26 2021 Guenther Deschner <gdeschner@redhat.com> - 4.13.4-0
+- Update to Samba 4.13.4
+
 * Tue Dec 15 2020 Guenther Deschner <gdeschner@redhat.com> - 4.13.3-0
 - Update to Samba 4.13.3
 
