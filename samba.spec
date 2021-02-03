@@ -190,6 +190,7 @@ Requires: %{name}-common-tools = %{samba_depver}
 Requires: %{name}-client-libs = %{samba_depver}
 Requires: %{name}-libs = %{samba_depver}
 %if %{with libwbclient}
+Requires(post): libwbclient = %{samba_depver}
 Requires: libwbclient = %{samba_depver}
 %endif
 
@@ -431,6 +432,10 @@ Requires: %{name}-libs = %{samba_depver}
 Requires: %{name}-dc-provision = %{samba_depver}
 Requires: %{name}-dc-libs = %{samba_depver}
 Requires: %{name}-winbind = %{samba_depver}
+
+Requires(post): libwbclient = %{samba_depver}
+Requires: libwbclient = %{samba_depver}
+
 # samba-tool needs tdbbackup
 Requires: tdb-tools
 # samba-tool needs mdb_copy
@@ -737,6 +742,8 @@ Requires: %{name}-common-tools = %{samba_depver}
 Requires: %{name}-client-libs = %{samba_depver}
 Requires: %{name}-libs = %{samba_depver}
 Requires: %{name}-winbind-modules = %{samba_depver}
+
+Requires(post): libwbclient = %{samba_depver}
 Requires: libwbclient = %{samba_depver}
 
 Provides: samba4-winbind = %{samba_depver}
