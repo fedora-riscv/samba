@@ -287,6 +287,7 @@ BuildRequires: liburing-devel >= 0.4
 # Add python3-iso8601 to avoid that the
 # version in Samba is being packaged
 BuildRequires: python3-iso8601
+BuildRequires: python3-pyasn1
 
 BuildRequires: bind
 BuildRequires: krb5-server >= %{required_mit_krb5}
