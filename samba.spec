@@ -434,8 +434,10 @@ Requires: %{name}-dc-provision = %{samba_depver}
 Requires: %{name}-dc-libs = %{samba_depver}
 Requires: %{name}-winbind = %{samba_depver}
 
+%if %{with libwbclient}
 Requires(post): libwbclient = %{samba_depver}
 Requires: libwbclient = %{samba_depver}
+%endif
 
 # samba-tool needs tdbbackup
 Requires: tdb-tools
@@ -744,8 +746,10 @@ Requires: %{name}-client-libs = %{samba_depver}
 Requires: %{name}-libs = %{samba_depver}
 Requires: %{name}-winbind-modules = %{samba_depver}
 
+%if %{with libwbclient}
 Requires(post): libwbclient = %{samba_depver}
 Requires: libwbclient = %{samba_depver}
+%endif
 
 Provides: samba4-winbind = %{samba_depver}
 Obsoletes: samba4-winbind < %{samba_depver}
