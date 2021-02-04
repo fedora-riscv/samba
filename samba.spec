@@ -116,7 +116,7 @@
 %global tevent_version 0.10.2
 %global ldb_version 2.2.0
 # This should be rc1 or nil
-%global pre_release rc1
+%global pre_release rc2
 
 %global samba_release %{main_release}%{?dist}
 %if "x%{?pre_release}" != "x"
@@ -3834,6 +3834,9 @@ fi
 %endif
 
 %changelog
+* Thu Feb 04 2021 Guenther Deschner <gdeschner@redhat.com> - 4.14.0rc2-0
+- Update to Samba 4.14.0rc2
+
 * Wed Jan 27 2021 Guenther Deschner <gdeschner@redhat.com> - 4.14.0rc1-0
 - Update to Samba 4.14.0rc1
 
