@@ -145,7 +145,7 @@
 
 Name:           samba
 Version:        %{samba_version}
-Release:        %{samba_release}
+Release:        %{samba_release}.2
 
 %if 0%{?rhel}
 Epoch:          0
@@ -3839,6 +3839,10 @@ fi
 %endif
 
 %changelog
+* Tue Mar 02 2021 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 2:4.14.0-0.0.rc4.2
+- Rebuilt for updated systemd-rpm-macros
+  See https://pagure.io/fesco/issue/2583.
+
 * Mon Mar 01 2021 Guenther Deschner <gdeschner@redhat.com> - 4.14.0rc4-0
 - Update to Samba 4.14.0rc4
 
