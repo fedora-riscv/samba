@@ -3627,7 +3627,7 @@ fi
 %endif
 
 %changelog
-* Wed Mar 23 2021 Guenther Deschner <gdeschner@redhat.com> - 4.13.6-0
+* Wed Mar 24 2021 Guenther Deschner <gdeschner@redhat.com> - 4.13.6-0
 - Update to Samba 4.13.6
 - resolves: #1941400, #1942496 - Security fixes for CVE-2020-27840
 - resolves: #1941402, #1942497 - Security fixes for CVE-2021-20277
