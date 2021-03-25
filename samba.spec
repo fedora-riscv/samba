@@ -10,11 +10,11 @@
 
 %define main_release 0
 
-%define samba_version 4.13.6
-%define talloc_version 2.3.1
+%define samba_version 4.13.7
+%define talloc_version 2.3.2
 %define tdb_version 1.4.3
 %define tevent_version 0.10.2
-%define ldb_version 2.2.0
+%define ldb_version 2.3.0
 # This should be rc1 or nil
 %define pre_release %nil
 
@@ -3627,6 +3627,11 @@ fi
 %endif
 
 %changelog
+* Thu Mar 25 2021 Guenther Deschner <gdeschner@redhat.com> - 4.13.7-0
+- Update to Samba 4.13.7
+- related: #1941400, #1942496 - Security fixes for CVE-2020-27840
+- related: #1941402, #1942497 - Security fixes for CVE-2021-20277
+
 * Wed Mar 24 2021 Guenther Deschner <gdeschner@redhat.com> - 4.13.6-0
 - Update to Samba 4.13.6
 - resolves: #1941400, #1942496 - Security fixes for CVE-2020-27840
