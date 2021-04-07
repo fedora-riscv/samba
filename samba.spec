@@ -8,7 +8,7 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%define main_release 0
+%define main_release 1
 
 %define samba_version 4.13.7
 %define talloc_version 2.3.1
@@ -136,6 +136,7 @@ Patch1:         samba-s4u.patch
 #
 # Generate the patchset using: git format-patch -l1 --stdout -N > samba-4.13-redhat.patch
 Patch2:         samba-4.13-redhat.patch
+Patch3:         samba-bz14675-fix.patch
 
 Requires(pre): /usr/sbin/groupadd
 Requires(post): systemd
@@ -3627,6 +3628,10 @@ fi
 %endif
 
 %changelog
+* Wed Apr 07 2021 Alexander Bokovoy <abokovoy@redhat.com> - 4.13.7-1
+- Fix memory leaks in RPC server
+- resolves: #1946950
+
 * Thu Mar 25 2021 Guenther Deschner <gdeschner@redhat.com> - 4.13.7-0
 - Update to Samba 4.13.7
 - related: #1941400, #1942496 - Security fixes for CVE-2020-27840
