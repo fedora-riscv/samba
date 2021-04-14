@@ -108,7 +108,7 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%global main_release 1
+%global main_release 2
 
 %global samba_version 4.14.2
 %global talloc_version 2.3.2
@@ -3840,6 +3840,9 @@ fi
 %endif
 
 %changelog
+* Wed Apr 14 2021 Richard W.M. Jones <rjones@redhat.com> - 2:4.14.2-2
+- Rebuild for updated liburing.
+
 * Wed Apr 07 2021 Alexander Bokovoy <abokovoy@redhat.com> - 4.14.2-1
 - Fix memory leaks in RPC server
 - resolves: #1946950
