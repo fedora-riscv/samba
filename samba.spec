@@ -108,7 +108,7 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%global main_release 2
+%global main_release 3
 
 %global samba_version 4.14.2
 %global talloc_version 2.3.2
@@ -311,6 +311,7 @@ BuildRequires: libtdb-devel >= %{tdb_version}
 BuildRequires: python3-tdb >= %{tdb_version}
 
 BuildRequires: libldb-devel >= %{ldb_version}
+BuildRequires: python3-ldb >= %{ldb_version}
 BuildRequires: python3-ldb-devel >= %{ldb_version}
 %else
 BuildRequires: lmdb-devel
@@ -3840,6 +3841,9 @@ fi
 %endif
 
 %changelog
+* Mon Apr 19 2021 Michal Ambroz <rebus _AT seznam.cz> - 4.14.2-3
+- Added python3-ldb to BR
+
 * Mon Apr 19 2021 Andreas Schneider <asn@redhat.com> - 4.12.2-2
 - resolves: #1949295 - Remove findsmb script
 
