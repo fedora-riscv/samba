@@ -108,7 +108,7 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%global main_release 1
+%global main_release 2
 
 %global samba_version 4.14.2
 %global talloc_version 2.3.2
@@ -1514,7 +1514,7 @@ fi
 %{_bindir}/cifsdd
 %{_bindir}/dbwrap_tool
 %{_bindir}/dumpmscat
-%{_bindir}/findsmb
+%exclude %{_bindir}/findsmb
 %{_bindir}/mvxattr
 %{_bindir}/mdfind
 %{_bindir}/nmblookup
@@ -1543,7 +1543,7 @@ fi
 %{_mandir}/man1/regpatch.1*
 %{_mandir}/man1/regshell.1*
 %{_mandir}/man1/regtree.1*
-%{_mandir}/man1/findsmb.1*
+%exclude %{_mandir}/man1/findsmb.1*
 %{_mandir}/man1/log2pcap.1*
 %{_mandir}/man1/mdfind.1*
 %{_mandir}/man1/mvxattr.1*
@@ -3840,6 +3840,9 @@ fi
 %endif
 
 %changelog
+* Mon Apr 19 2021 Andreas Schneider <asn@redhat.com> - 4.12.2-2
+- resolves: #1949295 - Remove findsmb script
+
 * Wed Apr 07 2021 Alexander Bokovoy <abokovoy@redhat.com> - 4.14.2-1
 - Fix memory leaks in RPC server
 - resolves: #1946950
