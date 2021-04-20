@@ -108,9 +108,9 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%global main_release 3
+%global main_release 0
 
-%global samba_version 4.14.2
+%global samba_version 4.14.3
 %global talloc_version 2.3.2
 %global tdb_version 1.4.3
 %global tevent_version 0.10.2
@@ -177,7 +177,6 @@ Source14:       samba.pamd
 
 Source201:      README.downgrade
 Patch1:         samba-s4u.patch
-Patch2:         samba-bz14675-fix.patch
 
 Requires(pre): /usr/sbin/groupadd
 Requires(post): systemd
@@ -3841,6 +3840,10 @@ fi
 %endif
 
 %changelog
+* Tue Apr 20 2021 Guenther Deschner <gdeschner@redhat.com> - 4.14.3-0
+- Update to Samba 4.14.3
+- resolves: #1951531
+
 * Mon Apr 19 2021 Michal Ambroz <rebus _AT seznam.cz> - 4.14.2-3
 - Added python3-ldb to BR
 
