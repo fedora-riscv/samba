@@ -108,7 +108,7 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%global main_release 0
+%global main_release 1
 
 %global samba_version 4.14.3
 %global talloc_version 2.3.2
@@ -236,8 +236,6 @@ BuildRequires: libattr-devel
 BuildRequires: libcap-devel
 BuildRequires: libicu-devel
 BuildRequires: libcmocka-devel
-BuildRequires: libnsl2-devel
-BuildRequires: libtirpc-devel
 BuildRequires: libuuid-devel
 BuildRequires: libxslt
 BuildRequires: lmdb
@@ -3840,6 +3838,9 @@ fi
 %endif
 
 %changelog
+* Tue Apr 20 2021 Andreas Schneider <asn@redhat.com> - 4.14.3-1
+- resolves: #1942378 - Drop NIS support
+
 * Tue Apr 20 2021 Guenther Deschner <gdeschner@redhat.com> - 4.14.3-0
 - Update to Samba 4.14.3
 - resolves: #1951531
