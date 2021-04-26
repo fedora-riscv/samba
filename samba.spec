@@ -214,6 +214,8 @@ Obsoletes: samba-swat < %{samba_depver}
 Provides: samba4-swat = %{samba_depver}
 Obsoletes: samba4-swat < %{samba_depver}
 
+Provides: bundled(libreplace)
+
 BuildRequires: make
 BuildRequires: gcc
 BuildRequires: avahi-devel
@@ -354,6 +356,8 @@ Obsoletes: samba4-client < %{samba_depver}
 Requires(post): %{_sbindir}/update-alternatives
 Requires(postun): %{_sbindir}/update-alternatives
 
+Provides: bundled(libreplace)
+
 %description client
 The %{name}-client package provides some SMB/CIFS clients to complement
 the built-in SMB/CIFS filesystem in Linux. These clients allow access
@@ -391,6 +395,8 @@ Obsoletes: samba-dc-libs < %{samba_depver}
 Obsoletes: samba-dc-bind-dlz < %{samba_depver}
 %endif
 
+Provides: bundled(libreplace)
+
 %description common
 samba-common provides files necessary for both the server and client
 packages of Samba.
@@ -405,6 +411,8 @@ Requires: %{name}-client-libs = %{samba_depver}
 Requires: libwbclient = %{samba_depver}
 %endif
 
+Provides: bundled(libreplace)
+
 %description common-libs
 The samba-common-libs package contains internal libraries needed by the
 SMB/CIFS clients.
@@ -418,6 +426,8 @@ Requires: samba-libs = %{samba_depver}
 %if %{with libwbclient}
 Requires: libwbclient = %{samba_depver}
 %endif
+
+Provides: bundled(libreplace)
 
 %description common-tools
 The samba-common-tools package contains tools for Samba servers and
@@ -456,6 +466,8 @@ Requires: krb5-server >= %{required_mit_krb5}
 Provides: samba4-dc = %{samba_depver}
 Obsoletes: samba4-dc < %{samba_depver}
 
+Provides: bundled(libreplace)
+
 %description dc
 The samba-dc package provides AD Domain Controller functionality
 
@@ -476,6 +488,8 @@ Requires: %{name}-libs = %{samba_depver}
 Provides: samba4-dc-libs = %{samba_depver}
 Obsoletes: samba4-dc-libs < %{samba_depver}
 
+Provides: bundled(libreplace)
+
 %description dc-libs
 The %{name}-dc-libs package contains the libraries needed by the DC to
 link against the SMB, RPC and other protocols.
@@ -487,6 +501,8 @@ Requires: %{name}-common = %{samba_depver}
 Requires: %{name}-dc-libs = %{samba_depver}
 Requires: %{name}-dc = %{samba_depver}
 Requires: bind
+
+Provides: bundled(libreplace)
 
 %description dc-bind-dlz
 The %{name}-dc-bind-dlz package contains the libraries for bind to manage all
@@ -515,6 +531,8 @@ Summary: Samba VFS module for Ceph distributed storage system
 Requires: %{name} = %{samba_depver}
 Requires: %{name}-libs = %{samba_depver}
 
+Provides: bundled(libreplace)
+
 %description vfs-cephfs
 Samba VFS module for Ceph distributed storage system integration.
 #endif with vfs_cephfs
@@ -536,6 +554,8 @@ Requires: libwbclient = %{samba_depver}
 
 Obsoletes: samba-glusterfs < %{samba_depver}
 Provides: samba-glusterfs = %{samba_depver}
+
+Provides: bundled(libreplace)
 
 %description vfs-glusterfs
 Samba VFS module for GlusterFS integration.
@@ -567,6 +587,8 @@ Requires: libwbclient = %{samba_depver}
 
 Provides: samba4-libs = %{samba_depver}
 Obsoletes: samba4-libs < %{samba_depver}
+
+Provides: bundled(libreplace)
 
 %description libs
 The %{name}-libs package contains the libraries needed by programs that link
@@ -639,6 +661,8 @@ Requires: libsmbclient = %{samba_depver}
 %if %{with libwbclient}
 Requires: libwbclient = %{samba_depver}
 %endif
+
+Provides: bundled(libreplace)
 
 %description -n python3-%{name}
 The python3-%{name} package contains the Python 3 libraries needed by programs
@@ -714,6 +738,8 @@ Requires: perl(Archive::Tar)
 Provides: samba4-test = %{samba_depver}
 Obsoletes: samba4-test < %{samba_depver}
 
+Provides: bundled(libreplace)
+
 %description test
 %{name}-test provides testing tools for both the server and client
 packages of Samba.
@@ -730,6 +756,8 @@ Requires: libwbclient = %{samba_depver}
 
 Provides: %{name}-test-devel = %{samba_depver}
 Obsoletes: %{name}-test-devel < %{samba_depver}
+
+Provides: bundled(libreplace)
 
 %description test-libs
 %{name}-test-libs provides libraries required by the testing tools.
@@ -756,6 +784,8 @@ Obsoletes: samba4-winbind < %{samba_depver}
 # Old NetworkManager expects the dispatcher scripts in a different place
 Conflicts: NetworkManager < 1.20
 
+Provides: bundled(libreplace)
+
 %description winbind
 The samba-winbind package provides the winbind NSS library, and some client
 tools.  Winbind enables Linux to be a full member in Windows domains and to use
@@ -775,6 +805,8 @@ Requires: libwbclient = %{samba_depver}
 
 Provides: samba4-winbind-clients = %{samba_depver}
 Obsoletes: samba4-winbind-clients < %{samba_depver}
+
+Provides: bundled(libreplace)
 
 %description winbind-clients
 The samba-winbind-clients package provides the wbinfo and ntlm_auth
@@ -803,6 +835,8 @@ Requires(post): %{_sbindir}/update-alternatives
 Requires(postun): %{_sbindir}/update-alternatives
 Requires(preun): %{_sbindir}/update-alternatives
 
+Provides: bundled(libreplace)
+
 %description winbind-krb5-locator
 The winbind krb5 locator is a plugin for the system kerberos library to allow
 the local kerberos library to use the same KDC as samba and winbind use
@@ -817,6 +851,8 @@ Requires: libwbclient = %{samba_depver}
 %endif
 Requires: pam
 
+Provides: bundled(libreplace)
+
 %description winbind-modules
 The samba-winbind-modules package provides the NSS library and a PAM module
 necessary to communicate to the Winbind Daemon
@@ -827,6 +863,8 @@ necessary to communicate to the Winbind Daemon
 Summary: Samba Winexe Windows Binary
 License: GPLv3
 Requires: %{name}-client-libs = %{samba_depver}
+
+Provides: bundled(libreplace)
 
 %description winexe
 Winexe is a Remote Windows®-command executor
@@ -860,6 +898,8 @@ Requires: util-linux
 Requires(post): systemd-units
 Requires(preun): systemd-units
 Requires(postun): systemd-units
+
+Provides: bundled(libreplace)
 
 %description -n ctdb
 CTDB is a cluster implementation of the TDB database used by Samba and other
