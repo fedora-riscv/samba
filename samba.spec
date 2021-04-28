@@ -108,7 +108,7 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%global main_release 0
+%global main_release 1
 
 %global samba_version 4.14.3
 %global talloc_version 2.3.2
@@ -391,7 +391,7 @@ Recommends:     logrotate
 Provides: samba4-common = %{samba_depver}
 Obsoletes: samba4-common < %{samba_depver}
 
-%if %{with dc} || %{with testsuite}
+%if %{without dc} && %{without testsuite}
 Obsoletes: samba-dc < %{samba_depver}
 Obsoletes: samba-dc-libs < %{samba_depver}
 Obsoletes: samba-dc-bind-dlz < %{samba_depver}
@@ -3880,6 +3880,9 @@ fi
 %endif
 
 %changelog
+* Wed Apr 28 2021 Anoop C S <anoopcs@samba.org> - 4.14.3-1
+- resolves: #1954263 - wrong conditional build check of AD DC
+
 * Tue Apr 20 2021 Guenther Deschner <gdeschner@redhat.com> - 4.14.3-0
 - Update to Samba 4.14.3
 - resolves: #1951531
