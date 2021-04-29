@@ -8,9 +8,9 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%define main_release 1
+%define main_release 0
 
-%define samba_version 4.13.7
+%define samba_version 4.13.8
 %define talloc_version 2.3.1
 %define tdb_version 1.4.3
 %define tevent_version 0.10.2
@@ -3628,6 +3628,10 @@ fi
 %endif
 
 %changelog
+* Thu Apr 29 2021 Guenther Deschner <gdeschner@redhat.com> - 4.13.8-0
+- Update to Samba 4.13.8
+- resolves: #1949442, #1955027 - Security fixes for CVE-2021-20254
+
 * Wed Apr 07 2021 Alexander Bokovoy <abokovoy@redhat.com> - 4.13.7-1
 - Fix memory leaks in RPC server
 - resolves: #1946950
