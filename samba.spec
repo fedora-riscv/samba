@@ -108,9 +108,9 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%global main_release 2
+%global main_release 0
 
-%global samba_version 4.14.3
+%global samba_version 4.14.4
 %global talloc_version 2.3.2
 %global tdb_version 1.4.3
 %global tevent_version 0.10.2
@@ -3878,6 +3878,11 @@ fi
 %endif
 
 %changelog
+* Thu Apr 29 2021 Guenther Deschner <gdeschner@redhat.com> - 4.14.4-0
+- Update to Samba 4.14.4
+- resolves: #1949442, #1955027 - Security fixes for CVE-2021-20254
+- resolves: #1955011
+
 * Wed Apr 28 2021 Anoop C S <anoopcs@samba.org> - 4.14.3-2
 - resolves: #1954263 - wrong conditional build check of AD DC
 
