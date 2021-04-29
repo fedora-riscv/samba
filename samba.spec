@@ -10,7 +10,7 @@
 
 %define main_release 0
 
-%define samba_version 4.12.14
+%define samba_version 4.12.15
 %define talloc_version 2.3.1
 %define tdb_version 1.4.3
 %define tevent_version 0.10.2
@@ -3589,6 +3589,10 @@ fi
 %endif
 
 %changelog
+* Thu Apr 29 2021 Guenther Deschner <gdeschner@redhat.com> - 4.12.15-0
+- Update to Samba 4.12.15
+- resolves: #1949442, #1955027 - Security fixes for CVE-2021-20254
+
 * Thu Mar 25 2021 Guenther Deschner <gdeschner@redhat.com> - 4.12.14-0
 - Update to Samba 4.12.14
 - related: #1941400, #1942496 - Security fixes for CVE-2020-27840
