@@ -118,9 +118,9 @@
 # This should be rc1 or nil
 %global pre_release %nil
 
-%global samba_release %{main_release}%{?dist}
+%global samba_release %{main_release}
 %if "x%{?pre_release}" != "x"
-%global samba_release 0.%{main_release}.%{pre_release}%{?dist}
+%global samba_release 0.%{main_release}.%{pre_release}
 %endif
 
 # This is a network daemon, do a hardened build
@@ -145,7 +145,7 @@
 
 Name:           samba
 Version:        %{samba_version}
-Release:        %{samba_release}
+Release:        %{samba_release}%{?dist}
 
 %if 0%{?rhel}
 Epoch:          0
