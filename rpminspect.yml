@@ -1,0 +1,15 @@
+---
+badfuncs:
+    ignore:
+        - /usr/libexec/ctdb/smnotify
+        - /usr/bin/smbtorture
+        - /usr/sbin/nmbd
+        - /usr/bin/nmblookup
+        - /usr/lib64/libndr.so.*
+        - /usr/lib64/libsmbconf.so.*
+        - /usr/lib64/samba/libgse-samba4.so
+        - /usr/lib64/samba/libsamba-sockets-samba4.so
+
+runpath:
+    allowed_paths:
+        - /usr/lib64/samba
