@@ -5,10 +5,10 @@ badfuncs:
         - /usr/bin/smbtorture
         - /usr/sbin/nmbd
         - /usr/bin/nmblookup
-        - /usr/lib64/libndr.so.*
-        - /usr/lib64/libsmbconf.so.*
-        - /usr/lib64/samba/libgse-samba4.so
-        - /usr/lib64/samba/libsamba-sockets-samba4.so
+        - /usr/lib*/libndr.so.*
+        - /usr/lib*/libsmbconf.so.*
+        - /usr/lib*/samba/libgse-samba4.so
+        - /usr/lib*/samba/libsamba-sockets-samba4.so
 
 runpath:
     allowed_paths:
