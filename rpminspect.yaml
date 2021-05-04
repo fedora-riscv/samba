@@ -12,4 +12,4 @@ badfuncs:
 
 runpath:
     allowed_paths:
-        - /usr/lib64/samba
+        - /usr/lib*/samba
