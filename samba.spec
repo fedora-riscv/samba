@@ -238,6 +238,7 @@ BuildRequires: libattr-devel
 BuildRequires: libcap-devel
 BuildRequires: libicu-devel
 BuildRequires: libcmocka-devel
+BuildRequires: libtirpc-devel
 BuildRequires: libuuid-devel
 BuildRequires: libxslt
 BuildRequires: lmdb
