@@ -92,7 +92,7 @@
 %endif
 
 # Build vfs_io_uring module by default on 64bit Fedora
-%if 0%{?fedora}
+%if 0%{?fedora} || 0%{?rhel} >= 8
 
 %ifarch aarch64 ppc64le s390x x86_64
 %bcond_without vfs_io_uring
@@ -103,7 +103,7 @@
 
 %else
 %bcond_with vfs_io_uring
-#endif fedora
+#endif fedora || rhel >= 8
 %endif
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
