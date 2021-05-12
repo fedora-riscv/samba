@@ -396,6 +396,22 @@ Obsoletes: samba-dc-libs < %{samba_depver}
 Obsoletes: samba-dc-bind-dlz < %{samba_depver}
 %endif
 
+# If only build glusterfs for RHGS and Fedora, so obsolete it on other version
+# of the distro
+%if %{without vfs_glusterfs}
+Obsoletes: samba-vfs-glusterfs < %{samba_depver}
+# endif without vfs_glusterfs
+%endif
+
+# ctdb-tests package has been dropped if we do not build the testsuite
+%if %{with clustering}
+%if %{without testsuite}
+Obsoletes: ctdb-tests< %{samba_depver}
+# endif without testsuite
+%endif
+# endif with clustering
+%endif
+
 Provides: bundled(libreplace)
 
 %description common
