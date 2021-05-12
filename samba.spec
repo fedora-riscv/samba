@@ -929,7 +929,7 @@ projects to store temporary data. If an application is already using TDB for
 temporary data it is very easy to convert that application to be cluster aware
 and use CTDB instead.
 
-#endif with selftest
+#endif with testsuite
 %endif
 #endif with clustering
 %endif
