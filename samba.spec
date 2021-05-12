@@ -406,7 +406,8 @@ Obsoletes: samba-vfs-glusterfs < %{samba_depver}
 # ctdb-tests package has been dropped if we do not build the testsuite
 %if %{with clustering}
 %if %{without testsuite}
-Obsoletes: ctdb-tests< %{samba_depver}
+Obsoletes: ctdb-tests < %{samba_depver}
+Obsoletes: ctdb-tests-debuginfo < %{samba_depver}
 # endif without testsuite
 %endif
 # endif with clustering
