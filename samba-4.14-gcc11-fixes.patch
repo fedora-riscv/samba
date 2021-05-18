@@ -1,0 +1,408 @@
+From 661e76cbc5f87040877d361d801a52cff355d603 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?G=C3=BCnther=20Deschner?= <gd@samba.org>
+Date: Mon, 3 May 2021 21:27:43 +0200
+Subject: [PATCH 1/3] Fix gcc11 compiler issue "-Werror=maybe-uninitialized"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+BUG: https://bugzilla.samba.org/show_bug.cgi?id=14699
+
+../../source4/dsdb/common/util_links.c: In function ‘ndr_guid_compare’:
+../../source4/dsdb/common/util_links.c:38:29: error: ‘v1_data’ may be used uninitialized [-Werror=maybe-uninitialized]
+   38 |         struct ldb_val v1 = data_blob_const(v1_data, sizeof(v1_data));
+      |                             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from ../../source4/../lib/util/samba_util.h:48,
+                 from ../../source4/include/includes.h:62,
+                 from ../../source4/dsdb/common/util_links.c:22:
+../../lib/util/data_blob.h:116:20: note: by argument 1 of type ‘const void *’ to ‘data_blob_const’ declared here
+  116 | _PUBLIC_ DATA_BLOB data_blob_const(const void *p, size_t length);
+      |                    ^~~~~~~~~~~~~~~
+../../source4/dsdb/common/util_links.c:37:17: note: ‘v1_data’ declared here
+   37 |         uint8_t v1_data[16];
+      |                 ^~~~~~~
+cc1: all warnings being treated as errors
+
+../../libcli/auth/smbencrypt.c: In function ‘decode_wkssvc_join_password_buffer’:
+../../libcli/auth/smbencrypt.c:1045:32: error: ‘_confounder’ may be used uninitialized [-Werror=maybe-uninitialized]
+ 1045 |         DATA_BLOB confounder = data_blob_const(_confounder, 8);
+      |                                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from ../../source4/../lib/util/samba_util.h:48,
+                 from ../../source4/include/includes.h:62,
+                 from ../../libcli/auth/smbencrypt.c:24:
+../../lib/util/data_blob.h:116:20: note: by argument 1 of type ‘const void *’ to ‘data_blob_const’ declared here
+  116 | _PUBLIC_ DATA_BLOB data_blob_const(const void *p, size_t length);
+      |                    ^~~~~~~~~~~~~~~
+../../libcli/auth/smbencrypt.c:1044:17: note: ‘_confounder’ declared here
+ 1044 |         uint8_t _confounder[8];
+      |                 ^~~~~~~~~~~
+cc1: all warnings being treated as errors
+
+[2624/3991] Compiling source4/torture/rpc/samr.c
+../../source3/rpc_client/cli_samr.c: In function ‘dcerpc_samr_chgpasswd_user2’:
+../../source3/rpc_client/cli_samr.c:158:33: error: ‘old_nt_hash’ may be used uninitialized [-Werror=maybe-uninitialized]
+  158 |         DATA_BLOB session_key = data_blob_const(old_nt_hash, 16);
+      |                                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from ../../source3/../lib/util/samba_util.h:48,
+                 from ../../source3/include/includes.h:256,
+                 from ../../source3/rpc_client/cli_samr.c:24:
+../../lib/util/data_blob.h:116:20: note: by argument 1 of type ‘const void *’ to ‘data_blob_const’ declared here
+  116 | _PUBLIC_ DATA_BLOB data_blob_const(const void *p, size_t length);
+      |                    ^~~~~~~~~~~~~~~
+../../source3/rpc_client/cli_samr.c:152:17: note: ‘old_nt_hash’ declared here
+  152 |         uint8_t old_nt_hash[16];
+      |                 ^~~~~~~~~~~
+../../source3/rpc_client/cli_samr.c: In function ‘dcerpc_samr_chgpasswd_user3’:
+../../source3/rpc_client/cli_samr.c:365:33: error: ‘old_nt_hash’ may be used uninitialized [-Werror=maybe-uninitialized]
+  365 |         DATA_BLOB session_key = data_blob_const(old_nt_hash, 16);
+      |                                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from ../../source3/../lib/util/samba_util.h:48,
+                 from ../../source3/include/includes.h:256,
+                 from ../../source3/rpc_client/cli_samr.c:24:
+../../lib/util/data_blob.h:116:20: note: by argument 1 of type ‘const void *’ to ‘data_blob_const’ declared here
+  116 | _PUBLIC_ DATA_BLOB data_blob_const(const void *p, size_t length);
+      |                    ^~~~~~~~~~~~~~~
+../../source3/rpc_client/cli_samr.c:358:17: note: ‘old_nt_hash’ declared here
+  358 |         uint8_t old_nt_hash[16];
+      |                 ^~~~~~~~~~~
+cc1: all warnings being treated as errors
+
+[3399/3991] Compiling source3/rpcclient/cmd_spotlight.c
+../../source3/rpcclient/cmd_spotlight.c: In function ‘cmd_mdssvc_fetch_properties’:
+../../source3/rpcclient/cmd_spotlight.c:60:18: error: ‘share_path’ may be used uninitialized [-Werror=maybe-uninitialized]
+   60 |         status = dcerpc_mdssvc_open(b, mem_ctx,
+      |                  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   61 |                                     &device_id,
+      |                                     ~~~~~~~~~~~
+   62 |                                     &unkn1,
+      |                                     ~~~~~~~
+   63 |                                     &unkn2,
+      |                                     ~~~~~~~
+   64 |                                     argv[2],
+      |                                     ~~~~~~~~
+   65 |                                     argv[1],
+      |                                     ~~~~~~~~
+   66 |                                     share_path,
+      |                                     ~~~~~~~~~~~
+   67 |                                     &share_handle);
+      |                                     ~~~~~~~~~~~~~~
+In file included from ../../source3/rpcclient/cmd_spotlight.c:24:
+source3/../librpc/gen_ndr/ndr_mdssvc_c.h:26:10: note: by argument 8 of type ‘const char *’ to ‘dcerpc_mdssvc_open’ declared here
+   26 | NTSTATUS dcerpc_mdssvc_open(struct dcerpc_binding_handle *h,
+      |          ^~~~~~~~~~~~~~~~~~
+../../source3/rpcclient/cmd_spotlight.c:40:14: note: ‘share_path’ declared here
+   40 |         char share_path[1025];
+      |              ^~~~~~~~~~
+cc1: all warnings being treated as errors
+
+../../source4/torture/rpc/samr.c: In function ‘test_ChangePasswordUser2’:
+../../source4/torture/rpc/samr.c:2266:19: error: ‘old_nt_hash’ may be used uninitialized [-Werror=maybe-uninitialized]
+ 2266 |                 = data_blob_const(old_nt_hash, sizeof(old_nt_hash));
+      |                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from ../../source4/../lib/util/samba_util.h:48,
+                 from ../../source4/include/includes.h:62,
+                 from ../../source4/torture/rpc/samr.c:24:
+../../lib/util/data_blob.h:116:20: note: by argument 1 of type ‘const void *’ to ‘data_blob_const’ declared here
+  116 | _PUBLIC_ DATA_BLOB data_blob_const(const void *p, size_t length);
+      |                    ^~~~~~~~~~~~~~~
+../../source4/torture/rpc/samr.c:2263:17: note: ‘old_nt_hash’ declared here
+ 2263 |         uint8_t old_nt_hash[16], new_nt_hash[16];
+      |                 ^~~~~~~~~~~
+../../source4/torture/rpc/samr.c: In function ‘test_ChangePasswordUser2_ntstatus’:
+../../source4/torture/rpc/samr.c:2371:19: error: ‘old_nt_hash’ may be used uninitialized [-Werror=maybe-uninitialized]
+ 2371 |                 = data_blob_const(old_nt_hash, sizeof(old_nt_hash));
+      |                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from ../../source4/../lib/util/samba_util.h:48,
+                 from ../../source4/include/includes.h:62,
+                 from ../../source4/torture/rpc/samr.c:24:
+../../lib/util/data_blob.h:116:20: note: by argument 1 of type ‘const void *’ to ‘data_blob_const’ declared here
+  116 | _PUBLIC_ DATA_BLOB data_blob_const(const void *p, size_t length);
+      |                    ^~~~~~~~~~~~~~~
+../../source4/torture/rpc/samr.c:2368:17: note: ‘old_nt_hash’ declared here
+ 2368 |         uint8_t old_nt_hash[16], new_nt_hash[16];
+      |                 ^~~~~~~~~~~
+../../source4/torture/rpc/samr.c: In function ‘test_ChangePasswordUser3’:
+../../source4/torture/rpc/samr.c:2478:38: error: ‘old_nt_hash’ may be used uninitialized [-Werror=maybe-uninitialized]
+ 2478 |         DATA_BLOB old_nt_hash_blob = data_blob_const(old_nt_hash, 16);
+      |                                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from ../../source4/../lib/util/samba_util.h:48,
+                 from ../../source4/include/includes.h:62,
+                 from ../../source4/torture/rpc/samr.c:24:
+../../lib/util/data_blob.h:116:20: note: by argument 1 of type ‘const void *’ to ‘data_blob_const’ declared here
+  116 | _PUBLIC_ DATA_BLOB data_blob_const(const void *p, size_t length);
+      |                    ^~~~~~~~~~~~~~~
+../../source4/torture/rpc/samr.c:2473:17: note: ‘old_nt_hash’ declared here
+ 2473 |         uint8_t old_nt_hash[16], new_nt_hash[16];
+      |                 ^~~~~~~~~~~
+../../source4/torture/rpc/samr.c: In function ‘test_ChangePasswordRandomBytes’:
+../../source4/torture/rpc/samr.c:2794:19: error: ‘old_nt_hash’ may be used uninitialized [-Werror=maybe-uninitialized]
+ 2794 |                 = data_blob_const(old_nt_hash,
+      |                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ 2795 |                                   sizeof(old_nt_hash));
+      |                                   ~~~~~~~~~~~~~~~~~~~~
+In file included from ../../source4/../lib/util/samba_util.h:48,
+                 from ../../source4/include/includes.h:62,
+                 from ../../source4/torture/rpc/samr.c:24:
+../../lib/util/data_blob.h:116:20: note: by argument 1 of type ‘const void *’ to ‘data_blob_const’ declared here
+  116 | _PUBLIC_ DATA_BLOB data_blob_const(const void *p, size_t length);
+      |                    ^~~~~~~~~~~~~~~
+../../source4/torture/rpc/samr.c:2792:17: note: ‘old_nt_hash’ declared here
+ 2792 |         uint8_t old_nt_hash[16], new_nt_hash[16];
+      |                 ^~~~~~~~~~~
+cc1: all warnings being treated as errors
+
+Guenther
+
+Signed-off-by: Guenther Deschner <gd@samba.org>
+Reviewed-by: Andreas Schneider <asn@samba.org>
+(cherry picked from commit 0e1695df7fe8952b5c503cf7ab1ff31784736988)
+---
+ libcli/auth/smbencrypt.c          | 2 +-
+ source3/rpc_client/cli_samr.c     | 4 ++--
+ source3/rpcclient/cmd_spotlight.c | 2 +-
+ source4/dsdb/common/util_links.c  | 2 +-
+ source4/torture/rpc/samr.c        | 8 ++++----
+ 5 files changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/libcli/auth/smbencrypt.c b/libcli/auth/smbencrypt.c
+index 337e89ef559..468374699f7 100644
+--- a/libcli/auth/smbencrypt.c
++++ b/libcli/auth/smbencrypt.c
+@@ -1041,7 +1041,7 @@ WERROR decode_wkssvc_join_password_buffer(TALLOC_CTX *mem_ctx,
+ 					  DATA_BLOB *session_key,
+ 					  char **pwd)
+ {
+-	uint8_t _confounder[8];
++	uint8_t _confounder[8] = { 0 };
+ 	DATA_BLOB confounder = data_blob_const(_confounder, 8);
+ 	uint8_t pwbuf[516] = {0};
+ 	DATA_BLOB decrypt_pwbuf = data_blob_const(pwbuf, 516);
+diff --git a/source3/rpc_client/cli_samr.c b/source3/rpc_client/cli_samr.c
+index acd96480a20..25b54298b32 100644
+--- a/source3/rpc_client/cli_samr.c
++++ b/source3/rpc_client/cli_samr.c
+@@ -149,7 +149,7 @@ NTSTATUS dcerpc_samr_chgpasswd_user2(struct dcerpc_binding_handle *h,
+ 	struct samr_Password old_nt_hash_enc;
+ 	struct samr_Password old_lanman_hash_enc;
+ 
+-	uint8_t old_nt_hash[16];
++	uint8_t old_nt_hash[16] = { 0 };
+ 	uint8_t old_lanman_hash[16];
+ 	uint8_t new_nt_hash[16];
+ 	uint8_t new_lanman_hash[16];
+@@ -355,7 +355,7 @@ NTSTATUS dcerpc_samr_chgpasswd_user3(struct dcerpc_binding_handle *h,
+ 	struct samr_Password old_nt_hash_enc;
+ 	struct samr_Password old_lanman_hash_enc;
+ 
+-	uint8_t old_nt_hash[16];
++	uint8_t old_nt_hash[16] = { 0 };
+ 	uint8_t old_lanman_hash[16];
+ 	uint8_t new_nt_hash[16];
+ 	uint8_t new_lanman_hash[16];
+diff --git a/source3/rpcclient/cmd_spotlight.c b/source3/rpcclient/cmd_spotlight.c
+index 661ada7efb8..24db9893df6 100644
+--- a/source3/rpcclient/cmd_spotlight.c
++++ b/source3/rpcclient/cmd_spotlight.c
+@@ -37,7 +37,7 @@ static NTSTATUS cmd_mdssvc_fetch_properties(
+ 	uint32_t unkn1 = 23;
+ 	uint32_t unkn2 = 0;
+ 	struct policy_handle share_handle;
+-	char share_path[1025];
++	char share_path[1025] = { 0 };
+ 	uint32_t mds_status;
+ 	uint32_t flags;	     /* server always returns 0x6b000001 ? */
+ 	uint32_t unkn3;	     /* server always returns 0 ? */
+diff --git a/source4/dsdb/common/util_links.c b/source4/dsdb/common/util_links.c
+index 9e9e2b0161a..08fc2d657bb 100644
+--- a/source4/dsdb/common/util_links.c
++++ b/source4/dsdb/common/util_links.c
+@@ -34,7 +34,7 @@
+  */
+ int ndr_guid_compare(const struct GUID *guid1, const struct GUID *guid2)
+ {
+-	uint8_t v1_data[16];
++	uint8_t v1_data[16] = { 0 };
+ 	struct ldb_val v1 = data_blob_const(v1_data, sizeof(v1_data));
+ 	uint8_t v2_data[16];
+ 	struct ldb_val v2 = data_blob_const(v2_data, sizeof(v2_data));
+diff --git a/source4/torture/rpc/samr.c b/source4/torture/rpc/samr.c
+index 5863a6d1ee6..6c901c3c2ab 100644
+--- a/source4/torture/rpc/samr.c
++++ b/source4/torture/rpc/samr.c
+@@ -2260,7 +2260,7 @@ static bool test_ChangePasswordUser2(struct dcerpc_pipe *p, struct torture_conte
+ 	struct samr_Password nt_verifier, lm_verifier;
+ 	char *oldpass;
+ 	struct dcerpc_binding_handle *b = p->binding_handle;
+-	uint8_t old_nt_hash[16], new_nt_hash[16];
++	uint8_t old_nt_hash[16] = { 0 }, new_nt_hash[16];
+ 	uint8_t old_lm_hash[16], new_lm_hash[16];
+ 	DATA_BLOB old_nt_hash_blob
+ 		= data_blob_const(old_nt_hash, sizeof(old_nt_hash));
+@@ -2365,7 +2365,7 @@ static bool test_ChangePasswordUser2_ntstatus(struct dcerpc_pipe *p, struct tort
+ 	struct samr_Password nt_verifier, lm_verifier;
+ 	const char *oldpass;
+ 	struct dcerpc_binding_handle *b = p->binding_handle;
+-	uint8_t old_nt_hash[16], new_nt_hash[16];
++	uint8_t old_nt_hash[16] = { 0 }, new_nt_hash[16];
+ 	uint8_t old_lm_hash[16], new_lm_hash[16];
+ 	DATA_BLOB old_nt_hash_blob
+ 		= data_blob_const(old_nt_hash, sizeof(old_nt_hash));
+@@ -2470,7 +2470,7 @@ bool test_ChangePasswordUser3(struct dcerpc_pipe *p, struct torture_context *tct
+ 	struct samr_Password nt_verifier, lm_verifier;
+ 	char *oldpass;
+ 	struct dcerpc_binding_handle *b = p->binding_handle;
+-	uint8_t old_nt_hash[16], new_nt_hash[16];
++	uint8_t old_nt_hash[16] = { 0 }, new_nt_hash[16];
+ 	uint8_t old_lm_hash[16], new_lm_hash[16];
+ 	NTTIME t;
+ 	struct samr_DomInfo1 *dominfo = NULL;
+@@ -2789,7 +2789,7 @@ bool test_ChangePasswordRandomBytes(struct dcerpc_pipe *p, struct torture_contex
+ 	char *newpass;
+ 	char *oldpass;
+ 	struct dcerpc_binding_handle *b = p->binding_handle;
+-	uint8_t old_nt_hash[16], new_nt_hash[16];
++	uint8_t old_nt_hash[16] = { 0 }, new_nt_hash[16];
+ 	DATA_BLOB old_nt_hash_blob
+ 		= data_blob_const(old_nt_hash,
+ 				  sizeof(old_nt_hash));
+-- 
+2.31.1
+
+
+From 7f7777d63085d0a1a030ef1dd1a921a3c4f75c32 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?G=C3=BCnther=20Deschner?= <gd@samba.org>
+Date: Mon, 3 May 2021 21:27:58 +0200
+Subject: [PATCH 2/3] Fix gcc11 compiler issue "-Werror=stringop-overflow="
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+BUG: https://bugzilla.samba.org/show_bug.cgi?id=14699
+
+[3548/3991] Compiling source3/winbindd/winbindd_pam.c
+../../source3/winbindd/winbindd_pam.c: In function ‘winbindd_dual_pam_auth_cached’:
+../../source3/winbindd/winbindd_pam.c:1069:18: error: ‘winbindd_get_creds’ accessing 128 bytes in a region of size 8 [-Werror=stringop-overflow=]
+ 1069 |         result = winbindd_get_creds(domain,
+      |                  ^~~~~~~~~~~~~~~~~~~~~~~~~~
+ 1070 |                                     state->mem_ctx,
+      |                                     ~~~~~~~~~~~~~~~
+ 1071 |                                     &sid,
+      |                                     ~~~~~
+ 1072 |                                     &my_info3,
+      |                                     ~~~~~~~~~~
+ 1073 |                                     &cached_nt_pass,
+      |                                     ~~~~~~~~~~~~~~~~
+ 1074 |                                     &cached_salt);
+      |                                     ~~~~~~~~~~~~~
+../../source3/winbindd/winbindd_pam.c:1069:18: note: referencing argument 5 of type ‘const uint8_t **’ {aka ‘const unsigned char **’}
+../../source3/winbindd/winbindd_pam.c:1069:18: error: ‘winbindd_get_creds’ accessing 128 bytes in a region of size 8 [-Werror=stringop-overflow=]
+../../source3/winbindd/winbindd_pam.c:1069:18: note: referencing argument 6 of type ‘const uint8_t **’ {aka ‘const unsigned char **’}
+In file included from ../../source3/winbindd/winbindd.h:359,
+                 from ../../source3/winbindd/winbindd_pam.c:26:
+../../source3/winbindd/winbindd_proto.h:251:10: note: in a call to function ‘winbindd_get_creds’
+  251 | NTSTATUS winbindd_get_creds(struct winbindd_domain *domain,
+      |          ^~~~~~~~~~~~~~~~~~
+cc1: all warnings being treated as errors
+
+Guenther
+
+Signed-off-by: Guenther Deschner <gd@samba.org>
+Reviewed-by: Andreas Schneider <asn@samba.org>
+(cherry picked from commit 17ae9974f36ce8929f0c50c357dd4f88fbf37d7c)
+---
+ source3/winbindd/winbindd_creds.c | 4 ++--
+ source3/winbindd/winbindd_proto.h | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/source3/winbindd/winbindd_creds.c b/source3/winbindd/winbindd_creds.c
+index 2d7aacf36a9..97262bbf87b 100644
+--- a/source3/winbindd/winbindd_creds.c
++++ b/source3/winbindd/winbindd_creds.c
+@@ -33,8 +33,8 @@ NTSTATUS winbindd_get_creds(struct winbindd_domain *domain,
+ 			    TALLOC_CTX *mem_ctx,
+ 			    const struct dom_sid *sid,
+ 			    struct netr_SamInfo3 **info3,
+-			    const uint8_t *cached_nt_pass[NT_HASH_LEN],
+-			    const uint8_t *cred_salt[NT_HASH_LEN])
++			    const uint8_t **cached_nt_pass,
++			    const uint8_t **cred_salt)
+ {
+ 	struct netr_SamInfo3 *info;
+ 	NTSTATUS status;
+diff --git a/source3/winbindd/winbindd_proto.h b/source3/winbindd/winbindd_proto.h
+index 8923bb3124f..12a113ed636 100644
+--- a/source3/winbindd/winbindd_proto.h
++++ b/source3/winbindd/winbindd_proto.h
+@@ -252,8 +252,8 @@ NTSTATUS winbindd_get_creds(struct winbindd_domain *domain,
+ 			    TALLOC_CTX *mem_ctx,
+ 			    const struct dom_sid *sid,
+ 			    struct netr_SamInfo3 **info3,
+-			    const uint8_t *cached_nt_pass[NT_HASH_LEN],
+-			    const uint8_t *cred_salt[NT_HASH_LEN]);
++			    const uint8_t **cached_nt_pass,
++			    const uint8_t **cred_salt);
+ NTSTATUS winbindd_store_creds(struct winbindd_domain *domain,
+ 			      const char *user, 
+ 			      const char *pass, 
+-- 
+2.31.1
+
+
+From 0f06f48c2ce23047527ddc8127845777beeb92c1 Mon Sep 17 00:00:00 2001
+From: Andreas Schneider <asn@samba.org>
+Date: Thu, 6 May 2021 19:07:04 +0200
+Subject: [PATCH 3/3] lib:replace: Do not build strndup test with gcc 11 or
+ newer
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+BUG: https://bugzilla.samba.org/show_bug.cgi?id=14699
+
+gcc11 with -O3 detects that the size is incorrect:
+
+lib/replace/tests/testsuite.c:286:13: error: ‘strndup’ specified bound 10 exceeds source size 4 [-Werror=stringop-overread]
+  286 |         x = strndup("bla", 10);
+      |             ^~~~~~~~~~~~~~~~~~
+
+Signed-off-by: Andreas Schneider <asn@samba.org>
+Reviewed-by: Guenther Deschner <gd@samba.org>
+(cherry picked from commit 8f12793ca5e7c9aa7c23a17400986878ae110e70)
+---
+ lib/replace/tests/testsuite.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+diff --git a/lib/replace/tests/testsuite.c b/lib/replace/tests/testsuite.c
+index 2ece95332d2..17ce022c178 100644
+--- a/lib/replace/tests/testsuite.c
++++ b/lib/replace/tests/testsuite.c
+@@ -272,6 +272,16 @@ static int test_strndup(void)
+ 		return false;
+ 	}
+ 	free(x);
++
++#ifdef __GNUC__
++# if __GNUC__ < 11
++	/*
++	 * This code will not compile with gcc11 -O3 anymore.
++	 *
++	 * error: ‘strndup’ specified bound 10 exceeds source size 4 [-Werror=stringop-overread]
++	 *          x = strndup("bla", 10);
++	 *          ^~~~~~~~~~~~~~~~~~
++	 */
+ 	x = strndup("bla", 10);
+ 	if (strcmp(x, "bla") != 0) {
+ 		printf("failure: strndup [\ninvalid\n]\n");
+@@ -279,6 +289,9 @@ static int test_strndup(void)
+ 		return false;
+ 	}
+ 	free(x);
++# endif
++#endif /* __GNUC__ */
++
+ 	printf("success: strndup\n");
+ 	return true;
+ }
+-- 
+2.31.1
+

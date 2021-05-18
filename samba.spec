@@ -108,7 +108,7 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%global main_release 0
+%global main_release 1
 
 %global samba_version 4.14.4
 %global talloc_version 2.3.2
@@ -176,6 +176,8 @@ Source13:       pam_winbind.conf
 Source14:       samba.pamd
 
 Source201:      README.downgrade
+
+Patch0:         samba-4.14-gcc11-fixes.patch
 Patch1:         samba-s4u.patch
 
 Requires(pre): /usr/sbin/groupadd
@@ -3894,6 +3896,10 @@ fi
 %endif
 
 %changelog
+* Tue May 18 2021 Andreas Schneider <asn@redhat.com> - 4.14.4-1
+- Fixed building with gcc 11.x
+- Fixed quota support
+
 * Thu Apr 29 2021 Guenther Deschner <gdeschner@redhat.com> - 4.14.4-0
 - Update to Samba 4.14.4
 - resolves: #1949442, #1955027 - Security fixes for CVE-2021-20254
