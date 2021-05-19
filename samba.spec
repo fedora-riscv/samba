@@ -145,7 +145,7 @@
 
 Name:           samba
 Version:        %{samba_version}
-Release:        %{samba_release}%{?dist}
+Release:        %{samba_release}%{?dist}.1
 
 %if 0%{?rhel}
 Epoch:          0
@@ -3896,6 +3896,9 @@ fi
 %endif
 
 %changelog
+* Wed May 19 2021 Pete Walter <pwalter@fedoraproject.org> - 2:4.14.4-1.1
+- Rebuild for ICU 69
+
 * Tue May 18 2021 Andreas Schneider <asn@redhat.com> - 4.14.4-1
 - Fixed building with gcc 11.x
 - Fixed quota support
