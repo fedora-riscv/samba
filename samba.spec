@@ -108,7 +108,7 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%global main_release 1
+%global main_release 2
 
 %global samba_version 4.14.4
 %global talloc_version 2.3.2
@@ -145,7 +145,7 @@
 
 Name:           samba
 Version:        %{samba_version}
-Release:        %{samba_release}%{?dist}.1
+Release:        %{samba_release}%{?dist}
 
 %if 0%{?rhel}
 Epoch:          0
@@ -3896,7 +3896,7 @@ fi
 %endif
 
 %changelog
-* Wed May 19 2021 Pete Walter <pwalter@fedoraproject.org> - 2:4.14.4-1.1
+* Wed May 19 2021 Pete Walter <pwalter@fedoraproject.org> - 2:4.14.4-2
 - Rebuild for ICU 69
 
 * Tue May 18 2021 Andreas Schneider <asn@redhat.com> - 4.14.4-1
