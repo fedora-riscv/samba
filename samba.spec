@@ -108,7 +108,7 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%global main_release 2
+%global baserelease 2
 
 %global samba_version 4.14.4
 %global talloc_version 2.3.2
@@ -118,9 +118,9 @@
 # This should be rc1 or nil
 %global pre_release %nil
 
-%global samba_release %{main_release}
+%global samba_release %{baserelease}
 %if "x%{?pre_release}" != "x"
-%global samba_release 0.%{main_release}.%{pre_release}
+%global samba_release 0.%{baserelease}.%{pre_release}
 %endif
 
 # This is a network daemon, do a hardened build
