@@ -108,7 +108,7 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%global baserelease 2
+%global baserelease 3
 
 %global samba_version 4.14.4
 %global talloc_version 2.3.2
@@ -3896,6 +3896,9 @@ fi
 %endif
 
 %changelog
+* Fri May 21 2021 Jitka Plesnikova <jplesnik@redhat.com> - 2:4.14.4-3
+- Perl 5.34 rebuild
+
 * Wed May 19 2021 Pete Walter <pwalter@fedoraproject.org> - 2:4.14.4-2
 - Rebuild for ICU 69
 
