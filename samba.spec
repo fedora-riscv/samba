@@ -392,31 +392,6 @@ Recommends:     logrotate
 Provides: samba4-common = %{samba_depver}
 Obsoletes: samba4-common < %{samba_depver}
 
-%if %{without dc} && %{without testsuite}
-Obsoletes: samba-dc < %{samba_depver}
-Obsoletes: samba-dc-libs < %{samba_depver}
-Obsoletes: samba-dc-bind-dlz < %{samba_depver}
-%endif
-
-# If only build glusterfs for RHGS and Fedora, so obsolete it on other version
-# of the distro
-%if %{without vfs_glusterfs}
-Obsoletes: samba-vfs-glusterfs < %{samba_depver}
-# endif without vfs_glusterfs
-%endif
-
-# ctdb-tests package has been dropped if we do not build the testsuite
-%if %{with clustering}
-%if %{without testsuite}
-Obsoletes: ctdb-tests < %{samba_depver}
-Obsoletes: ctdb-tests-debuginfo < %{samba_depver}
-# endif without testsuite
-%endif
-# endif with clustering
-%endif
-
-Provides: bundled(libreplace)
-
 %description common
 samba-common provides files necessary for both the server and client
 packages of Samba.
@@ -432,6 +407,29 @@ Requires: libwbclient = %{samba_depver}
 %endif
 
 Provides: bundled(libreplace)
+
+%if %{without dc} && %{without testsuite}
+Obsoletes: samba-dc < %{samba_depver}
+Obsoletes: samba-dc-libs < %{samba_depver}
+Obsoletes: samba-dc-bind-dlz < %{samba_depver}
+%endif
+
+# ctdb-tests package has been dropped if we do not build the testsuite
+%if %{with clustering}
+%if %{without testsuite}
+Obsoletes: ctdb-tests < %{samba_depver}
+Obsoletes: ctdb-tests-debuginfo < %{samba_depver}
+# endif without testsuite
+%endif
+# endif with clustering
+%endif
+
+# If only build glusterfs for RHGS and Fedora, so obsolete it on other version
+# of the distro
+%if %{without vfs_glusterfs}
+Obsoletes: samba-vfs-glusterfs < %{samba_depver}
+# endif without vfs_glusterfs
+%endif
 
 %description common-libs
 The samba-common-libs package contains internal libraries needed by the
