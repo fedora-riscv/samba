@@ -108,9 +108,9 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%global baserelease 3
+%global baserelease 0
 
-%global samba_version 4.14.4
+%global samba_version 4.14.5
 %global talloc_version 2.3.2
 %global tdb_version 1.4.3
 %global tevent_version 0.10.2
@@ -177,8 +177,7 @@ Source14:       samba.pamd
 
 Source201:      README.downgrade
 
-Patch0:         samba-4.14-gcc11-fixes.patch
-Patch1:         samba-s4u.patch
+Patch0:         samba-s4u.patch
 
 Requires(pre): /usr/sbin/groupadd
 Requires(post): systemd
@@ -3894,6 +3893,10 @@ fi
 %endif
 
 %changelog
+* Tue Jun 01 2021 Guenther Deschner <gdeschner@redhat.com> - 4.14.5-0
+- Update to Samba 4.14.5
+- resolves: #1966456
+
 * Fri May 21 2021 Jitka Plesnikova <jplesnik@redhat.com> - 2:4.14.4-3
 - Perl 5.34 rebuild
 
