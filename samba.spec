@@ -110,7 +110,7 @@
 
 %global main_release 0
 
-%global samba_version 4.14.4
+%global samba_version 4.14.5
 %global talloc_version 2.3.2
 %global tdb_version 1.4.3
 %global tevent_version 0.10.2
@@ -176,7 +176,8 @@ Source13:       pam_winbind.conf
 Source14:       samba.pamd
 
 Source201:      README.downgrade
-Patch1:         samba-s4u.patch
+
+Patch0:         samba-s4u.patch
 
 Requires(pre): /usr/sbin/groupadd
 Requires(post): systemd
@@ -3878,6 +3879,10 @@ fi
 %endif
 
 %changelog
+* Tue Jun 01 2021 Guenther Deschner <gdeschner@redhat.com> - 4.14.5-0
+- Update to Samba 4.14.5
+- resolves: #1966456
+
 * Thu Apr 29 2021 Guenther Deschner <gdeschner@redhat.com> - 4.14.4-0
 - Update to Samba 4.14.4
 - resolves: #1949442, #1955027 - Security fixes for CVE-2021-20254
