@@ -108,7 +108,7 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%global baserelease 0
+%global baserelease 1
 
 %global samba_version 4.14.5
 %global talloc_version 2.3.2
@@ -3893,6 +3893,9 @@ fi
 %endif
 
 %changelog
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 2:4.14.5-1
+- Rebuilt for Python 3.10
+
 * Tue Jun 01 2021 Guenther Deschner <gdeschner@redhat.com> - 4.14.5-0
 - Update to Samba 4.14.5
 - resolves: #1966456
