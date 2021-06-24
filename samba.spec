@@ -108,7 +108,7 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%global baserelease 2
+%global baserelease 3
 
 %global samba_version 4.14.5
 %global talloc_version 2.3.2
@@ -556,7 +556,7 @@ Samba VFS module for Ceph distributed storage system integration.
 %endif
 
 ### IOURING
-%if %{with vfs_cephfs}
+%if %{with vfs_io_uring}
 %package vfs-iouring
 Summary: Samba VFS module for io_uring
 Requires: %{name} = %{samba_depver}
@@ -2105,7 +2105,7 @@ fi
 %{_mandir}/man8/vfs_ceph_snapshots.8*
 %endif
 
-### VFS-CEPHFS
+### VFS-IOURING
 %if %{with vfs_io_uring}
 %files vfs-iouring
 %{_libdir}/samba/vfs/io_uring.so
@@ -3908,7 +3908,7 @@ fi
 %endif
 
 %changelog
-* Thu Jun 24 2021 Andreas Schneider <asn@redhat.com> - 4.14.5-2
+* Thu Jun 24 2021 Andreas Schneider <asn@redhat.com> - 4.14.5-3
 - Create a subpackage for vfs-io-uring
 
 * Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 2:4.14.5-1
