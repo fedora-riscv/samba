@@ -555,6 +555,20 @@ Samba VFS module for Ceph distributed storage system integration.
 #endif with vfs_cephfs
 %endif
 
+### IOURING
+%if %{with vfs_cephfs}
+%package vfs-iouring
+Summary: Samba VFS module for io_uring
+Requires: %{name} = %{samba_depver}
+Requires: %{name}-libs = %{samba_depver}
+
+Provides: bundled(libreplace)
+
+%description vfs-iouring
+Samba VFS module for io_uring instance integration.
+#endif with vfs_cephfs
+%endif
+
 ### GLUSTER
 %if %{with vfs_glusterfs}
 %package vfs-glusterfs
@@ -1475,9 +1489,6 @@ fi
 %{_libdir}/samba/vfs/full_audit.so
 %{_libdir}/samba/vfs/gpfs.so
 %{_libdir}/samba/vfs/glusterfs_fuse.so
-%if %{with vfs_io_uring}
-%{_libdir}/samba/vfs/io_uring.so
-%endif
 %{_libdir}/samba/vfs/linux_xfs_sgid.so
 %{_libdir}/samba/vfs/media_harmony.so
 %{_libdir}/samba/vfs/offline.so
@@ -1535,9 +1546,6 @@ fi
 %{_mandir}/man8/vfs_full_audit.8*
 %{_mandir}/man8/vfs_gpfs.8*
 %{_mandir}/man8/vfs_glusterfs_fuse.8*
-%if %{with vfs_io_uring}
-%{_mandir}/man8/vfs_io_uring.8*
-%endif
 %{_mandir}/man8/vfs_linux_xfs_sgid.8*
 %{_mandir}/man8/vfs_media_harmony.8*
 %{_mandir}/man8/vfs_offline.8*
@@ -2095,6 +2103,13 @@ fi
 %{_libdir}/samba/vfs/ceph_snapshots.so
 %{_mandir}/man8/vfs_ceph.8*
 %{_mandir}/man8/vfs_ceph_snapshots.8*
+%endif
+
+### VFS-CEPHFS
+%if %{with vfs_io_uring}
+%files vfs-iouring
+%{_libdir}/samba/vfs/io_uring.so
+%{_mandir}/man8/vfs_io_uring.8*
 %endif
 
 ### VFS-GLUSTERFS
@@ -3893,6 +3908,9 @@ fi
 %endif
 
 %changelog
+* Thu Jun 24 2021 Andreas Schneider <asn@redhat.com> - 4.14.5-2
+- Create a subpackage for vfs-io-uring
+
 * Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 2:4.14.5-1
 - Rebuilt for Python 3.10
 
