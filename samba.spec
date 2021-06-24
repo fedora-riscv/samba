@@ -566,7 +566,7 @@ Provides: bundled(libreplace)
 
 %description vfs-iouring
 Samba VFS module for io_uring instance integration.
-#endif with vfs_cephfs
+#endif with vfs_io_uring
 %endif
 
 ### GLUSTER
