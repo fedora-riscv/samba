@@ -676,7 +676,7 @@ Summary: Samba python devel files
 Requires: python3-%{name} = %{samba_depver}
 
 %description -n python3-%{name}-devel
-The python3-%{name}-devel package contains the Python 3 defel files.
+The python3-%{name}-devel package contains the Python 3 devel files.
 
 %package -n python3-samba-test
 Summary: Samba Python libraries
