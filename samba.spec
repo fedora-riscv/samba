@@ -423,7 +423,7 @@ Obsoletes: ctdb-tests-debuginfo < %{samba_depver}
 # endif with clustering
 %endif
 
-# If only build glusterfs for RHGS and Fedora, so obsolete it on other version
+# We only build glusterfs for RHGS and Fedora, so obsolete it on other versions
 # of the distro
 %if %{without vfs_glusterfs}
 Obsoletes: samba-vfs-glusterfs < %{samba_depver}
@@ -704,7 +704,7 @@ Summary: Samba python devel files
 Requires: python3-%{name} = %{samba_depver}
 
 %description -n python3-%{name}-devel
-The python3-%{name}-devel package contains the Python 3 defel files.
+The python3-%{name}-devel package contains the Python 3 devel files.
 
 %package -n python3-samba-test
 Summary: Samba Python libraries
