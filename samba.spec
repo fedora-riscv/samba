@@ -110,7 +110,7 @@
 
 %global main_release 0
 
-%global samba_version 4.14.5
+%global samba_version 4.14.6
 %global talloc_version 2.3.2
 %global tdb_version 1.4.3
 %global tevent_version 0.10.2
@@ -3879,6 +3879,10 @@ fi
 %endif
 
 %changelog
+* Tue Jul 13 2021 Guenther Deschner <gdeschner@redhat.com> - 4.14.6-0
+- Update to Samba 4.14.6
+- resolves: #1981764
+
 * Tue Jun 01 2021 Guenther Deschner <gdeschner@redhat.com> - 4.14.5-0
 - Update to Samba 4.14.5
 - resolves: #1966456
