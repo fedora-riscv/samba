@@ -108,9 +108,9 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%global baserelease 3
+%global baserelease 0
 
-%global samba_version 4.14.5
+%global samba_version 4.14.6
 %global talloc_version 2.3.2
 %global tdb_version 1.4.3
 %global tevent_version 0.10.2
@@ -3908,6 +3908,10 @@ fi
 %endif
 
 %changelog
+* Tue Jul 13 2021 Guenther Deschner <gdeschner@redhat.com> - 4.14.6-0
+- Update to Samba 4.14.6
+- resolves: #1981764
+
 * Thu Jun 24 2021 Andreas Schneider <asn@redhat.com> - 4.14.5-3
 - Create a subpackage for vfs-io-uring
 
