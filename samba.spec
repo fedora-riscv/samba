@@ -106,9 +106,16 @@
 #endif fedora || rhel >= 8
 %endif
 
+# Build the ctdb-pcp-pmda package by default on Fedora
+%if 0%{?fedora}
+%bcond_without pcp_pmda
+%else
+%bcond_with pcp_pmda
+%endif
+
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%global baserelease 0
+%global baserelease 1
 
 %global samba_version 4.14.6
 %global talloc_version 2.3.2
@@ -283,6 +290,10 @@ BuildRequires: libcephfs-devel
 
 %if %{with vfs_io_uring}
 BuildRequires: liburing-devel >= 0.4
+%endif
+
+%if %{with pcp_pmda}
+BuildRequires: pcp-libs-devel
 %endif
 
 %if %{with dc} || %{with testsuite}
@@ -961,6 +972,20 @@ and use CTDB instead.
 
 #endif with testsuite
 %endif
+
+%if %{with pcp_pmda}
+
+%package -n ctdb-pcp-pmda
+Summary: CTDB PCP pmda support
+Requires: ctdb = %{version}
+Requires: pcp-libs
+
+%description -n ctdb-pcp-pmda
+Performance Co-Pilot (PCP) support for CTDB
+
+#endif with pcp_pmda
+%endif
+
 #endif with clustering
 %endif
 
@@ -1050,6 +1075,9 @@ export LDFLAGS="%{__global_ldflags} -fuse-ld=gold"
 %endif
 %if %{with testsuite}
         --enable-selftest \
+%endif
+%if %{with pcp_pmda}
+        --enable-pmda \
 %endif
         --with-profiling-data \
         --with-systemd \
@@ -3897,6 +3925,19 @@ fi
 #endif with selftest
 %endif
 
+%if %{with pcp_pmda}
+%files -n ctdb-pcp-pmda
+%dir %{_localstatedir}/lib/pcp/pmdas/ctdb
+%{_localstatedir}/lib/pcp/pmdas/ctdb/Install
+%{_localstatedir}/lib/pcp/pmdas/ctdb/README
+%{_localstatedir}/lib/pcp/pmdas/ctdb/Remove
+%{_localstatedir}/lib/pcp/pmdas/ctdb/domain.h
+%{_localstatedir}/lib/pcp/pmdas/ctdb/help
+%{_localstatedir}/lib/pcp/pmdas/ctdb/pmdactdb
+%{_localstatedir}/lib/pcp/pmdas/ctdb/pmns
+#endif with pcp_pmda
+%endif
+
 #endif with clustering
 %endif
 
@@ -3908,6 +3949,10 @@ fi
 %endif
 
 %changelog
+* Wed Jul 14 2021 Guenther Deschner <gdeschner@redhat.com> - 4.14.6-1
+- Build with pcp-pmda support by default on Fedora
+- resolves: #1552276
+
 * Tue Jul 13 2021 Guenther Deschner <gdeschner@redhat.com> - 4.14.6-0
 - Update to Samba 4.14.6
 - resolves: #1981764
