@@ -325,10 +325,9 @@ BuildRequires: python3-tdb >= %{tdb_version}
 BuildRequires: libldb-devel >= %{ldb_version}
 BuildRequires: python3-ldb >= %{ldb_version}
 BuildRequires: python3-ldb-devel >= %{ldb_version}
-%else
-BuildRequires: lmdb-devel
-#endif without testsuite
+#endif without includelibs
 %endif
+BuildRequires: lmdb-devel
 
 %if %{with dc} || %{with testsuite}
 BuildRequires: bind
