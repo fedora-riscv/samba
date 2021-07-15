@@ -1897,7 +1897,6 @@ fi
 %{_libdir}/samba/ldb/lazy_commit.so
 %{_libdir}/samba/ldb/ldbsamba_extensions.so
 %{_libdir}/samba/ldb/linked_attributes.so
-%{_libdir}/samba/ldb/mdb.so
 %{_libdir}/samba/ldb/new_partition.so
 %{_libdir}/samba/ldb/objectclass.so
 %{_libdir}/samba/ldb/objectclass_attrs.so
