@@ -115,7 +115,7 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%global main_release 1
+%global main_release 2
 
 %global samba_version 4.14.6
 %global talloc_version 2.3.2
@@ -949,7 +949,7 @@ and use CTDB instead.
 
 %package -n ctdb-pcp-pmda
 Summary: CTDB PCP pmda support
-Requires: ctdb = %{version}
+Requires: ctdb = %{samba_depver}
 Requires: pcp-libs
 
 %description -n ctdb-pcp-pmda
@@ -3920,6 +3920,10 @@ fi
 %endif
 
 %changelog
+* Mon Jul 19 2021 Guenther Deschner <gdeschner@redhat.com> - 4.14.6-2
+- Fix ctdb-pcp-pmda install
+- resolves: #1983369
+
 * Wed Jul 14 2021 Guenther Deschner <gdeschner@redhat.com> - 4.14.6-1
 - Build with pcp-pmda support by default on Fedora
 - resolves: #1552276
