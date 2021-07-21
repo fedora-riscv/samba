@@ -325,9 +325,12 @@ BuildRequires: python3-tdb >= %{tdb_version}
 BuildRequires: libldb-devel >= %{ldb_version}
 BuildRequires: python3-ldb >= %{ldb_version}
 BuildRequires: python3-ldb-devel >= %{ldb_version}
+%else
+# lmdb-devel is required for the mdb ldb module, if samba is configured
+# to build includelibs we need lmdb-devel for building that module on our own
+BuildRequires: lmdb-devel
 #endif without includelibs
 %endif
-BuildRequires: lmdb-devel
 
 %if %{with dc} || %{with testsuite}
 BuildRequires: bind
@@ -1798,7 +1801,7 @@ fi
 
 %{_libdir}/samba/ldb/asq.so
 %{_libdir}/samba/ldb/ldb.so
-#%%{_libdir}/samba/ldb/mdb.so
+%{_libdir}/samba/ldb/mdb.so
 %{_libdir}/samba/ldb/paged_searches.so
 %{_libdir}/samba/ldb/rdn_name.so
 %{_libdir}/samba/ldb/sample.so
