@@ -115,7 +115,7 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%global baserelease 1
+%global baserelease 2
 
 %global samba_version 4.15.0
 %global talloc_version 2.3.3
@@ -3997,6 +3997,9 @@ fi
 %endif
 
 %changelog
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2:4.15.0-0.2.rc1
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
 * Mon Jul 19 2021 Guenther Deschner <gdeschner@redhat.com> - 4.15.0rc1-1
 - Fix ctdb-pcp-pmda install
 - resolves: #1983369
