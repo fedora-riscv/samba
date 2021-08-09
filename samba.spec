@@ -115,7 +115,7 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%global baserelease 2
+%global baserelease 3
 
 %global samba_version 4.15.0
 %global talloc_version 2.3.3
@@ -123,7 +123,7 @@
 %global tevent_version 0.11.0
 %global ldb_version 2.4.0
 # This should be rc1 or nil
-%global pre_release rc1
+%global pre_release rc2
 
 %global samba_release %{baserelease}
 %if "x%{?pre_release}" != "x"
@@ -3997,6 +3997,10 @@ fi
 %endif
 
 %changelog
+* Mon Aug 09 2021 Guenther Deschner <gdeschner@redhat.com> - 4.15.0rc2-3
+- Update to Samba 4.15.0rc2
+- resolves: #1991634
+
 * Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2:4.15.0-0.2.rc1
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
 
