@@ -2,12 +2,16 @@
 #
 # To build and run the tests use:
 #
+# fedpkg local --with testsuite
+# or
 # rpmbuild --rebuild --with testsuite samba.src.rpm
 #
 %bcond_with testsuite
 
 # Build with internal talloc, tevent, tdb and ldb.
 #
+# fedpkg local --with=testsuite --with=includelibs
+# or
 # rpmbuild --rebuild --with=testsuite --with=includelibs samba.src.rpm
 #
 %bcond_with includelibs
