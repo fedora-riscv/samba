@@ -1103,7 +1103,8 @@ pushd pidl
 popd
 
 %install
-%make_install
+# Do not use %%make_install, make is just a wrapper around waf in Samba!
+%{__make} %{?_smp_mflags} %{_make_verbose} install DESTDIR=%{buildroot}
 
 install -d -m 0755 %{buildroot}/usr/{sbin,bin}
 install -d -m 0755 %{buildroot}%{_libdir}/security
