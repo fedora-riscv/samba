@@ -812,9 +812,12 @@ Summary: Samba winbind
 Requires(pre): %{name}-common = %{samba_depver}
 Requires: %{name}-common = %{samba_depver}
 Requires: %{name}-common-libs = %{samba_depver}
+Requires(post): %{name}-common-libs = %{samba_depver}
 Requires: %{name}-common-tools = %{samba_depver}
 Requires: %{name}-client-libs = %{samba_depver}
+Requires(post): %{name}-client-libs = %{samba_depver}
 Requires: %{name}-libs = %{samba_depver}
+Requires(post): %{name}-libs = %{samba_depver}
 Requires: %{name}-winbind-modules = %{samba_depver}
 
 %if %{with libwbclient}
