@@ -1193,7 +1193,6 @@ for i in \
     %{_libdir}/samba/libscavenge-dns-records-samba4.so \
     %{_mandir}/man8/samba.8 \
     %{_mandir}/man8/samba_downgrade_db.8 \
-    %{_mandir}/man8/samba-tool.8 \
     %{_mandir}/man8/samba-gpupdate.8 \
     %{_libdir}/samba/ldb/ildap.so \
     %{_libdir}/samba/ldb/ldbsamba_extensions.so \
@@ -1854,6 +1853,7 @@ fi
 %{_bindir}/net
 %{_bindir}/pdbedit
 %{_bindir}/profiles
+%{_bindir}/samba-tool
 %{_bindir}/smbcontrol
 %{_bindir}/smbpasswd
 %{_bindir}/testparm
@@ -1862,13 +1862,13 @@ fi
 %{_mandir}/man1/testparm.1*
 %{_mandir}/man8/net.8*
 %{_mandir}/man8/pdbedit.8*
+%{_mandir}/man8/samba-tool.8*
 %{_mandir}/man8/smbpasswd.8*
 
 ### DC
 %if %{with dc} || %{with testsuite}
 %files dc
 %{_unitdir}/samba.service
-%{_bindir}/samba-tool
 %{_sbindir}/samba
 %{_sbindir}/samba_dnsupdate
 %{_sbindir}/samba_downgrade_db
@@ -1936,7 +1936,6 @@ fi
 %{_mandir}/man8/samba.8*
 %{_mandir}/man8/samba_downgrade_db.8*
 %{_mandir}/man8/samba-gpupdate.8*
-%{_mandir}/man8/samba-tool.8*
 %dir %{_datadir}/samba/admx
 %{_datadir}/samba/admx/samba.admx
 %dir %{_datadir}/samba/admx/en-US
