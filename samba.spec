@@ -1201,6 +1201,8 @@ for i in \
     %{python3_sitearch}/samba/dcerpc/dnsserver.*.so \
     %{python3_sitearch}/samba/dnsserver.py \
     %{python3_sitearch}/samba/domain_update.py \
+    %{python3_sitearch}/samba/dsdb.*.so
+    %{python3_sitearch}/samba/dsdb_dns.*.so
     %{python3_sitearch}/samba/forest_update.py \
     %{python3_sitearch}/samba/kcc/__init__.py \
     %{python3_sitearch}/samba/kcc/debug.py \
