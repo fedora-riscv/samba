@@ -1196,7 +1196,6 @@ touch %{buildroot}%{_libdir}/krb5/plugins/libkrb5/winbind_krb5_locator.so
 %if %{without dc} && %{without testsuite}
 for i in \
     %{_libdir}/samba/libdfs-server-ad-samba4.so \
-    %{_libdir}/samba/libdnsserver-common-samba4.so \
     %{_libdir}/samba/libdsdb-garbage-collect-tombstones-samba4.so \
     %{_libdir}/samba/libscavenge-dns-records-samba4.so \
     %{_mandir}/man8/samba.8 \
@@ -2168,6 +2167,7 @@ fi
 %{_libdir}/samba/libauth4-samba4.so
 %{_libdir}/samba/libauth-unix-token-samba4.so
 %{_libdir}/samba/libdcerpc-samba4.so
+%{_libdir}/samba/libdnsserver-common-samba4.so
 %{_libdir}/samba/libshares-samba4.so
 %{_libdir}/samba/libsmbpasswdparser-samba4.so
 %{_libdir}/samba/libxattr-tdb-samba4.so
@@ -2350,6 +2350,8 @@ fi
 %{python3_sitearch}/samba/descriptor.py
 %{python3_sitearch}/samba/dnsresolver.py
 %{python3_sitearch}/samba/drs_utils.py
+%{python3_sitearch}/samba/dsdb.*.so
+%{python3_sitearch}/samba/dsdb_dns.*.so
 %{python3_sitearch}/samba/gensec.*.so
 %{python3_sitearch}/samba/getopt.py
 %{python3_sitearch}/samba/gpclass.py
@@ -2541,8 +2543,6 @@ fi
 
 %{python3_sitearch}/samba/dcerpc/dnsserver.*.so
 %{python3_sitearch}/samba/dckeytab.*.so
-%{python3_sitearch}/samba/dsdb.*.so
-%{python3_sitearch}/samba/dsdb_dns.*.so
 %{python3_sitearch}/samba/domain_update.py
 %{python3_sitearch}/samba/forest_update.py
 %{python3_sitearch}/samba/ms_forest_updates_markdown.py
