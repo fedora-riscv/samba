@@ -119,7 +119,7 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%global baserelease 4
+%global baserelease 5
 
 %global samba_version 4.15.0
 %global talloc_version 2.3.3
@@ -462,7 +462,7 @@ Requires: libwbclient = %{samba_depver}
 %endif
 
 # samba-tool needs python3-samba
-Requires: python3-%{samba} = %{samba_depver}
+Requires: python3-%{name} = %{samba_depver}
 # samba-tool needs tdbbackup
 Requires: tdb-tools
 # samba-tool needs mdb_copy
@@ -4009,10 +4009,13 @@ fi
 %endif
 
 %changelog
-* Thu Aug 12 2021 Andreas Schneider <asn@redhat.com> - 4.15.0rc2-4
+* Fri Aug 13 2021 Adam Williamson <awilliam@redhat.com> - 4.15.0-0.5.rc2
+- Fix samba-common-tools dependency
+
+* Thu Aug 12 2021 Andreas Schneider <asn@redhat.com> - 4.15.0-0.4.rc2
 - Package samba-tool correctly
 
-* Mon Aug 09 2021 Guenther Deschner <gdeschner@redhat.com> - 4.15.0rc2-3
+* Mon Aug 09 2021 Guenther Deschner <gdeschner@redhat.com> - 4.15.0-0.3.rc2
 - Update to Samba 4.15.0rc2
 - resolves: #1991634
 
