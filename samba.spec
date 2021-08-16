@@ -119,7 +119,7 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%global baserelease 5
+%global baserelease 6
 
 %global samba_version 4.15.0
 %global talloc_version 2.3.3
@@ -1210,8 +1210,6 @@ for i in \
     %{python3_sitearch}/samba/dcerpc/dnsserver.*.so \
     %{python3_sitearch}/samba/dnsserver.py \
     %{python3_sitearch}/samba/domain_update.py \
-    %{python3_sitearch}/samba/dsdb.*.so
-    %{python3_sitearch}/samba/dsdb_dns.*.so
     %{python3_sitearch}/samba/forest_update.py \
     %{python3_sitearch}/samba/kcc/__init__.py \
     %{python3_sitearch}/samba/kcc/debug.py \
@@ -4008,6 +4006,9 @@ fi
 %endif
 
 %changelog
+* Mon Aug 16 2021 Anoop C S <anoopcs@samba.org> - 4.15.0-0.6.rc2
+- Avoid removing PyDSDB library files from buildroot for non AD DC build
+
 * Fri Aug 13 2021 Adam Williamson <awilliam@redhat.com> - 4.15.0-0.5.rc2
 - Fix samba-common-tools dependency
 
