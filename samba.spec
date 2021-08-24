@@ -115,9 +115,9 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%global main_release 2
+%global main_release 0
 
-%global samba_version 4.14.6
+%global samba_version 4.14.7
 %global talloc_version 2.3.2
 %global tdb_version 1.4.3
 %global tevent_version 0.10.2
@@ -3920,6 +3920,9 @@ fi
 %endif
 
 %changelog
+* Tue Aug 24 2021 Guenther Deschner <gdeschner@redhat.com> - 4.14.7-0
+- Update to Samba 4.14.7
+
 * Mon Jul 19 2021 Guenther Deschner <gdeschner@redhat.com> - 4.14.6-2
 - Fix ctdb-pcp-pmda install
 - resolves: #1983369
