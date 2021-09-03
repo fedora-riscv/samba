@@ -346,7 +346,9 @@ BuildRequires: python3-tdb >= %{tdb_version}
 BuildRequires: libldb-devel >= %{ldb_version}
 BuildRequires: python3-ldb >= %{ldb_version}
 BuildRequires: python3-ldb-devel >= %{ldb_version}
-%else
+%endif
+
+%if %{with includelibs} || %{with testsuite}
 # lmdb-devel is required for the mdb ldb module, if samba is configured
 # to build includelibs we need lmdb-devel for building that module on our own
 BuildRequires: lmdb-devel
