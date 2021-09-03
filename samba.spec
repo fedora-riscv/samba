@@ -360,6 +360,7 @@ BuildRequires: ldb-tools
 BuildRequires: python3-gpg
 BuildRequires: python3-markdown
 BuildRequires: python3-setproctitle
+BuildRequires: python3-cryptography
 BuildRequires: tdb-tools
 %endif
 
