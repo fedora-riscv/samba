@@ -10,7 +10,7 @@
 
 %define main_release 0
 
-%define samba_version 4.13.10
+%define samba_version 4.13.11
 %define talloc_version 2.3.1
 %define tdb_version 1.4.3
 %define tevent_version 0.10.2
@@ -3627,6 +3627,9 @@ fi
 %endif
 
 %changelog
+* Tue Sep 07 2021 Guenther Deschner <gdeschner@redhat.com> - 4.13.11-0
+- Update to Samba 4.13.11
+
 * Wed Jul 14 2021 Guenther Deschner <gdeschner@redhat.com> - 4.13.10-0
 - Update to Samba 4.13.10
 

@@ -1,4 +1,4 @@
-From 02f3f310bee630ed6e6b8adea542436f0dfadd83 Mon Sep 17 00:00:00 2001
+From a1f5903240ac444b867c7f0aaf1e0e2b815ea2e8 Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Mon, 13 Jul 2020 16:15:03 +0200
 Subject: [PATCH 001/105] libcli:smb2: Do not leak ptext on error
@@ -22,10 +22,10 @@ index 230475480c2..cfb3b613f9d 100644
  			goto out;
  		}
 -- 
-2.29.2
+2.31.1
 
 
-From 7680b849e6967ec6c364c10a46c205e4b61268e1 Mon Sep 17 00:00:00 2001
+From 343b6fb03e6c26054adb02b3fbd866e5650e9766 Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Mon, 13 Jul 2020 17:23:37 +0200
 Subject: [PATCH 002/105] libcli:smb2: Use talloc NULL context if we don't have
@@ -106,10 +106,10 @@ index cfb3b613f9d..b1e0253948f 100644
  			TALLOC_FREE(ptext);
  			status = NT_STATUS_NO_MEMORY;
 -- 
-2.29.2
+2.31.1
 
 
-From fd7b8857ddacb301e57b4ef0b87e786b47651b2d Mon Sep 17 00:00:00 2001
+From 844c227f014581c46f75cb72fe749ceb8c062f23 Mon Sep 17 00:00:00 2001
 From: Stefan Metzmacher <metze@samba.org>
 Date: Wed, 6 Nov 2019 17:37:45 +0100
 Subject: [PATCH 003/105] auth:creds: Introduce CRED_SMB_CONF
@@ -202,10 +202,10 @@ index d2a81506de3..6454ac9ff7c 100644
          self.assertEqual(creds.get_domain(), lp.get("workgroup").upper())
          self.assertEqual(creds.get_realm(), realm.upper())
 -- 
-2.29.2
+2.31.1
 
 
-From d6d61e6863b2e393c115c0ec7fbd75a5ffdf8aba Mon Sep 17 00:00:00 2001
+From e4bca5f38ed6ad8cd48b1b3e97569165b3d8d189 Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Thu, 10 Oct 2019 14:18:23 +0200
 Subject: [PATCH 004/105] param: Add 'server smb encrypt' parameter
@@ -821,10 +821,10 @@ index 7acde285a90..b745e0906b1 100644
  						req,
  						NT_STATUS_NOT_SUPPORTED);
 -- 
-2.29.2
+2.31.1
 
 
-From eb2987a887281c9e2d8993ef646e354f3f5488f7 Mon Sep 17 00:00:00 2001
+From fd86806d67c924a5a18ee1cc2b876082b0bc024e Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Thu, 28 May 2020 10:04:19 +0200
 Subject: [PATCH 005/105] param: Create and use enum_smb_encryption_vals
@@ -899,7 +899,7 @@ index 47b85de1f87..e2f737279dc 100644
  	{MDNS_NAME_NETBIOS, "netbios"},
  	{MDNS_NAME_MDNS, "mdns"},
 diff --git a/libcli/smb/smb_constants.h b/libcli/smb/smb_constants.h
-index d2345f094e1..8ee99e25566 100644
+index af8e7204013..8e757dbc5b5 100644
 --- a/libcli/smb/smb_constants.h
 +++ b/libcli/smb/smb_constants.h
 @@ -106,6 +106,15 @@ enum smb_signing_setting {
@@ -919,10 +919,10 @@ index d2345f094e1..8ee99e25566 100644
  #define SMB_DATA_BLOCK 0x1
  #define SMB_ASCII4     0x4
 -- 
-2.29.2
+2.31.1
 
 
-From 47f2864f002e34bc5efbb682dad4dab13855d39f Mon Sep 17 00:00:00 2001
+From 9edfbc5907c07eb82bef0ddaa2d888e0baac8b43 Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Tue, 26 May 2020 09:34:54 +0200
 Subject: [PATCH 006/105] s3:smbd: Use 'enum smb_encryption_setting' values
@@ -1043,10 +1043,10 @@ index b745e0906b1..2f2fdcb7260 100644
  						req,
  						NT_STATUS_NOT_SUPPORTED);
 -- 
-2.29.2
+2.31.1
 
 
-From 004c8bafd87a3d0109ab62522d47f7e376de7601 Mon Sep 17 00:00:00 2001
+From 326b92aeb4b20301ff5eebb9e6d7650330854394 Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Thu, 9 Apr 2020 10:38:41 +0200
 Subject: [PATCH 007/105] docs-xml: Add 'client smb encrypt'
@@ -1221,10 +1221,10 @@ index 4ad541301b3..6418a42b6eb 100644
  	apply_lp_set_cmdline();
  }
 -- 
-2.29.2
+2.31.1
 
 
-From 2b0594870c4bd61e5a5aa012dd028b92020c542f Mon Sep 17 00:00:00 2001
+From 63b9df55730fc876988eca33c129f769de75b0fd Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Wed, 22 Jul 2020 17:48:25 +0200
 Subject: [PATCH 008/105] lib:param: Add lpcfg_parse_enum_vals()
@@ -1288,10 +1288,10 @@ index 323fcf84523..e66ce2324b4 100644
  struct loadparm_substitution;
  #ifdef LOADPARM_SUBSTITUTION_INTERNALS
 -- 
-2.29.2
+2.31.1
 
 
-From a68f4821cb7f2936a7437947db52fd20522893cc Mon Sep 17 00:00:00 2001
+From 36a90aee5b31b0d71cd3ea0ce405deb7d89674a0 Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Wed, 9 Oct 2019 09:38:08 +0200
 Subject: [PATCH 009/105] libcli:smb: Add smb_signing_setting_translate()
@@ -1461,10 +1461,10 @@ index 2b65943b2ed..9938bf53ed6 100644
  plantestsuite("samba.unittests.talloc_keep_secret", "none",
                [os.path.join(bindir(), "default/lib/util/test_talloc_keep_secret")])
 -- 
-2.29.2
+2.31.1
 
 
-From e9943e865ea4d49f40fdee30c7af84c36fe5f604 Mon Sep 17 00:00:00 2001
+From 982e1bcc7c451eb4cb20d3c105b2d67eb3dbbf89 Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Tue, 26 May 2020 08:39:34 +0200
 Subject: [PATCH 010/105] libcli:smb: Add smb_encryption_setting_translate()
@@ -1555,10 +1555,10 @@ index da0e4db2bf3..ac2887ee5c4 100644
 +	return encryption_state;
 +}
 -- 
-2.29.2
+2.31.1
 
 
-From 31f1863918cde009dd05a0cbd1d235ef024dd43d Mon Sep 17 00:00:00 2001
+From ccf0bea67282852031d12205e1e741f974d0b56d Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Wed, 9 Oct 2019 09:47:59 +0200
 Subject: [PATCH 011/105] s3:lib: Use smb_signing_setting_translate for cmdline
@@ -1622,10 +1622,10 @@ index d86a9fcadbf..c1051c62393 100644
  
  bld.SAMBA3_LIBRARY('cmdline_contexts',
 -- 
-2.29.2
+2.31.1
 
 
-From 2f2cc5f127c36b8b0731a589df63841660f6bece Mon Sep 17 00:00:00 2001
+From 9ff8e1d264555f35d49455c10ad1e4d8b5064566 Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Thu, 23 Jul 2020 07:47:18 +0200
 Subject: [PATCH 012/105] auth:creds: Remove unused credentials autoproto
@@ -1702,10 +1702,10 @@ index 7711eac2afa..d9be3562adb 100644
  #include "auth/kerberos/kerberos_credentials.h"
  #include "auth/kerberos/kerberos_util.h"
 -- 
-2.29.2
+2.31.1
 
 
-From aa7dcb366db8976571a0ead6fe2f75e37db1752d Mon Sep 17 00:00:00 2001
+From 62e645e77e33b16e060c81838a281f8ea9cabb99 Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Tue, 26 May 2020 09:32:44 +0200
 Subject: [PATCH 013/105] auth:creds: Add
@@ -1844,10 +1844,10 @@ index 68f1f25dce1..9cde0000b5f 100644
  
  #endif /* __CREDENTIALS_INTERNAL_H__ */
 -- 
-2.29.2
+2.31.1
 
 
-From dd10642b665a212c1c4183209d878220f577a3e7 Mon Sep 17 00:00:00 2001
+From b63074e5adcc245672fc8cb5c1b7eb1d2670ba5d Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Wed, 3 Jun 2020 11:56:01 +0200
 Subject: [PATCH 014/105] auth:creds: Add python bindings for
@@ -1970,10 +1970,10 @@ index 6454ac9ff7c..e5f8122fa21 100644
 +        creds.set_smb_signing(credentials.SMB_SIGNING_REQUIRED)
 +        self.assertEqual(creds.get_smb_signing(), credentials.SMB_SIGNING_REQUIRED)
 -- 
-2.29.2
+2.31.1
 
 
-From 8c748d0fcdd5079402cdf6fc86e8c7b4e0f0b90c Mon Sep 17 00:00:00 2001
+From e04467371cc14f6aa9e19befc387b8e0f2ef1f53 Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Thu, 28 May 2020 16:31:35 +0200
 Subject: [PATCH 015/105] auth:creds: Add
@@ -2102,10 +2102,10 @@ index 9cde0000b5f..54e8271471f 100644
  
  #endif /* __CREDENTIALS_INTERNAL_H__ */
 -- 
-2.29.2
+2.31.1
 
 
-From 72f28717b09a46482a2f1487946e3a230c33ced3 Mon Sep 17 00:00:00 2001
+From 063f2b6f2f128a513e6ee4506640783657a9cc31 Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Wed, 3 Jun 2020 12:32:46 +0200
 Subject: [PATCH 016/105] auth:creds: Add python bindings for
@@ -2207,10 +2207,10 @@ index e5f8122fa21..8edf13ce6ff 100644
 +        creds.set_smb_ipc_signing(credentials.SMB_SIGNING_OFF)
 +        self.assertEqual(creds.get_smb_ipc_signing(), credentials.SMB_SIGNING_OFF)
 -- 
-2.29.2
+2.31.1
 
 
-From a688ad98ccd64e740d8be389e1e15d073a9ddada Mon Sep 17 00:00:00 2001
+From bcdc3b4af590e4d80405724cf47c0e97b1fa20a4 Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Thu, 28 May 2020 16:10:52 +0200
 Subject: [PATCH 017/105] auth:creds: Add
@@ -2341,10 +2341,10 @@ index 54e8271471f..3b86b742448 100644
  
  #endif /* __CREDENTIALS_INTERNAL_H__ */
 -- 
-2.29.2
+2.31.1
 
 
-From 029866668c4cd4dda5b32528959a6784d74c604e Mon Sep 17 00:00:00 2001
+From f6cb4cf6c7163849756cca238aecd4065120892a Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Wed, 3 Jun 2020 12:38:30 +0200
 Subject: [PATCH 018/105] auth:creds: Add python bindings for
@@ -2459,10 +2459,10 @@ index 8edf13ce6ff..e0a6248d37a 100644
 +        creds.set_smb_encryption(credentials.SMB_ENCRYPTION_REQUIRED)
 +        self.assertEqual(creds.get_smb_encryption(), credentials.SMB_ENCRYPTION_REQUIRED)
 -- 
-2.29.2
+2.31.1
 
 
-From 621e40b6196c9f6f5e4400476601153234e86c28 Mon Sep 17 00:00:00 2001
+From 9b64d94eef247bd6f778dac3b32f8daa50c298b5 Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Thu, 4 Jun 2020 11:19:53 +0200
 Subject: [PATCH 019/105] auth:creds: Add python bindings for
@@ -2587,10 +2587,10 @@ index e0a6248d37a..6187bded0b6 100644
 +        creds.set_conf(lp)
 +        self.assertEqual(creds.get_smb_encryption(), credentials.SMB_ENCRYPTION_OFF)
 -- 
-2.29.2
+2.31.1
 
 
-From 5f1e16203fae87672e62aae1cb117ae91bfb3216 Mon Sep 17 00:00:00 2001
+From d20272910d64fcd380e11ca059060a60d731799e Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Thu, 23 Jul 2020 08:14:23 +0200
 Subject: [PATCH 020/105] auth:creds: Bump library version
@@ -2617,10 +2617,10 @@ index 564a04fe8dd..1e3302e3e48 100644
  
  bld.SAMBA_SUBSYSTEM('CREDENTIALS_KRB5',
 -- 
-2.29.2
+2.31.1
 
 
-From be3dcfd38f21e48dc9bc0fe35be8b95ccb82111b Mon Sep 17 00:00:00 2001
+From 54767e3ac82152bef1c2d8a4231ce498da7ccf1c Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Wed, 27 May 2020 11:10:30 +0200
 Subject: [PATCH 021/105] s3:lib: Use cli_credential_(get|set)_smb_signing()
@@ -2688,10 +2688,10 @@ index bc1f1c3ed25..6038ec11515 100644
  
  void set_cmdline_auth_info_use_ccache(struct user_auth_info *auth_info, bool b)
 -- 
-2.29.2
+2.31.1
 
 
-From 860f6d0de5bf56a457fdd75f80520741cd30ac77 Mon Sep 17 00:00:00 2001
+From eb90be62d5708553dd2c2da2d2bd305d69676531 Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Wed, 10 Jun 2020 12:45:34 +0200
 Subject: [PATCH 022/105] s3:lib: Set smb encryption also via cli creds API
@@ -2717,10 +2717,10 @@ index 6038ec11515..9c9e2f0ac0f 100644
  }
  
 -- 
-2.29.2
+2.31.1
 
 
-From 45641219a0dfcd4c0cd02e740086cb249df606eb Mon Sep 17 00:00:00 2001
+From cbb6cfe771e664f6232e0691724a09db714ae50e Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Thu, 13 Aug 2020 10:40:23 +0200
 Subject: [PATCH 023/105] python: Remove unused sign argument from
@@ -2772,10 +2772,10 @@ index 1e2c2918ebe..ad60cda0690 100644
          smb_dir = '\\'.join([self.lp.get('realm').lower(),
                               'Policies', 'PolicyDefinitions'])
 -- 
-2.29.2
+2.31.1
 
 
-From b1851e401118a069e0b34722bd1106f9f7b17105 Mon Sep 17 00:00:00 2001
+From 3a93f116d5a219fef008fe2709e79e134988c31e Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Wed, 3 Jun 2020 14:02:37 +0200
 Subject: [PATCH 024/105] python: Set smb signing via the creds API
@@ -2817,10 +2817,10 @@ index cc574e12a42..1781a55a618 100644
      for gpo in gpos:
          if not gpo.file_sys_path:
 diff --git a/python/samba/netcmd/domain_backup.py b/python/samba/netcmd/domain_backup.py
-index a3dc7fb454f..a9e0ba5bc67 100644
+index a629b31d70f..15704459fc1 100644
 --- a/python/samba/netcmd/domain_backup.py
 +++ b/python/samba/netcmd/domain_backup.py
-@@ -54,6 +54,7 @@ from subprocess import CalledProcessError
+@@ -55,6 +55,7 @@ from subprocess import CalledProcessError
  from samba import sites
  from samba.dsdb import _dsdb_load_udv_v2
  from samba.ndr import ndr_pack
@@ -2828,7 +2828,7 @@ index a3dc7fb454f..a9e0ba5bc67 100644
  
  
  # work out a SID (based on a free RID) to use when the domain gets restored.
-@@ -115,7 +116,14 @@ def smb_sysvol_conn(server, lp, creds):
+@@ -113,7 +114,14 @@ def smb_sysvol_conn(server, lp, creds):
      # the SMB bindings rely on having a s3 loadparm
      s3_lp = s3param.get_context()
      s3_lp.load(lp.configfile)
@@ -2876,10 +2876,10 @@ index ad60cda0690..0f2f6520fc3 100644
  
  
 -- 
-2.29.2
+2.31.1
 
 
-From 5689e0f72d3a32b7b76f6c2927c184d8b748c6aa Mon Sep 17 00:00:00 2001
+From 0948c3afb426cbba2f245da1a85eb3c6f31dc91e Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Thu, 28 May 2020 17:22:12 +0200
 Subject: [PATCH 025/105] s3:libsmb: Introduce CLI_FULL_CONNECTION_IPC
@@ -2977,7 +2977,7 @@ index 1fb1f0127b9..f20146378e3 100644
  	nt_status = cli_full_connection_creds(&cli, NULL, server, server_ss, 0, "IPC$", "IPC",
  					get_cmdline_auth_info_creds(user_info),
 diff --git a/source3/rpc_server/spoolss/srv_spoolss_nt.c b/source3/rpc_server/spoolss/srv_spoolss_nt.c
-index 10c1b1d54f2..f578f1c4131 100644
+index 7951543747d..29afbb9ccb5 100644
 --- a/source3/rpc_server/spoolss/srv_spoolss_nt.c
 +++ b/source3/rpc_server/spoolss/srv_spoolss_nt.c
 @@ -2482,7 +2482,9 @@ static bool spoolss_connect_to_client(struct rpc_pipe_client **pp_pipe, struct c
@@ -3099,10 +3099,10 @@ index 6cea2ee306c..2241beb331f 100644
  	if (!NT_STATUS_IS_OK(nt_status)) {
  		DEBUG(2,("create_cs: Connect failed. Error was %s\n", nt_errstr(nt_status)));
 -- 
-2.29.2
+2.31.1
 
 
-From eff95f5b430d241d9036be2c899094d1cc3f39b1 Mon Sep 17 00:00:00 2001
+From c3ca4b0ab10a2643ee70a1765505142d3f8abde5 Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Thu, 28 May 2020 17:29:25 +0200
 Subject: [PATCH 026/105] s3:pylibsmb: Add ipc=True support for
@@ -3164,10 +3164,10 @@ index 3fcc3424a57..3579a040830 100644
  #ifdef HAVE_PTHREAD
  		ret = py_cli_state_setup_mt_ev(self);
 -- 
-2.29.2
+2.31.1
 
 
-From 280ae642e1842fad44b9628130100db98894929f Mon Sep 17 00:00:00 2001
+From 12fbff7317277e1e7f43659268936f9e02b42fe9 Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Fri, 24 Jul 2020 09:47:11 +0200
 Subject: [PATCH 027/105] python:tests: Mark libsmb connection as an IPC
@@ -3193,10 +3193,10 @@ index ba7440df13b..2c028d381db 100644
                                            DesiredAccess=0x12019f,
                                            ShareAccess=0x7,
 -- 
-2.29.2
+2.31.1
 
 
-From 28843ea17ad1abb916177a25142c7bc57727a7be Mon Sep 17 00:00:00 2001
+From d75ad55c81f1e15f197e8eda1e43a43be6c89f90 Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Mon, 17 Aug 2020 12:52:39 +0200
 Subject: [PATCH 028/105] python:tests: Set smb ipc signing via the creds API
@@ -3231,10 +3231,10 @@ index 2c028d381db..d6f5de7440a 100644
                                            DesiredAccess=0x12019f,
                                            ShareAccess=0x7,
 -- 
-2.29.2
+2.31.1
 
 
-From 158e5d6e21515f95daa469ea8bd69d330463e0dd Mon Sep 17 00:00:00 2001
+From 40c2118465404e84368ba6db8a27a68620878b5d Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Thu, 28 May 2020 17:59:19 +0200
 Subject: [PATCH 029/105] s3:libsmb: Use 'enum smb_signing_setting' in
@@ -3361,10 +3361,10 @@ index d214cdabca4..995187e21b4 100644
  void cli_nt_pipes_close(struct cli_state *cli);
  void cli_shutdown(struct cli_state *cli);
 -- 
-2.29.2
+2.31.1
 
 
-From ec3033ed2ca61778efaa291e0f3f66e0bbc73a01 Mon Sep 17 00:00:00 2001
+From 6c640b56c8d8ac11b60a5b8e2e55fbe63982cae8 Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Thu, 28 May 2020 18:11:31 +0200
 Subject: [PATCH 030/105] s3:client: Turn off smb signing for message op
@@ -3394,10 +3394,10 @@ index 1781a55a618..2c00f5349a0 100644
      creds.set_smb_signing(saved_signing_state)
      cache_path = lp.cache_path('gpo_cache')
 diff --git a/python/samba/netcmd/domain_backup.py b/python/samba/netcmd/domain_backup.py
-index a9e0ba5bc67..2977b071ec3 100644
+index 15704459fc1..f441e7407ee 100644
 --- a/python/samba/netcmd/domain_backup.py
 +++ b/python/samba/netcmd/domain_backup.py
-@@ -120,7 +120,7 @@ def smb_sysvol_conn(server, lp, creds):
+@@ -118,7 +118,7 @@ def smb_sysvol_conn(server, lp, creds):
      # Force signing for the connection
      saved_signing_state = creds.get_smb_signing()
      creds.set_smb_signing(SMB_SIGNING_REQUIRED)
@@ -3513,10 +3513,10 @@ index 3579a040830..f8a4d56cf53 100644
  		NULL, self->ev, "myname", host, NULL, 0, share, "?????",
  		cli_creds, flags, signing_state);
 -- 
-2.29.2
+2.31.1
 
 
-From 73abea023b529c2c37a4c11875c0fca554ff32ab Mon Sep 17 00:00:00 2001
+From 8ce8cf3ac5b6587609a4772e5272733bb0b2668f Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Thu, 28 May 2020 18:20:02 +0200
 Subject: [PATCH 031/105] s3:libsmb: Remove signing_state from
@@ -3612,10 +3612,10 @@ index f8a4d56cf53..c7a2d73afcb 100644
  		return -1;
  	}
 -- 
-2.29.2
+2.31.1
 
 
-From 5134d4a361d8984ca62e24679c3b3010106e8819 Mon Sep 17 00:00:00 2001
+From a26fc81d9dd0ee303ffa48dc9ab73cb3f7e059a6 Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Thu, 4 Jun 2020 14:59:14 +0200
 Subject: [PATCH 032/105] s3:libsmb: Remove signing_state from
@@ -3782,7 +3782,7 @@ index bef04d32638..850cf12c8a6 100644
  		      const char *service, const char *pass, const char *dev,
  		      uint16_t *max_xmit, uint16_t *tid);
 diff --git a/source3/rpc_server/spoolss/srv_spoolss_nt.c b/source3/rpc_server/spoolss/srv_spoolss_nt.c
-index f578f1c4131..906fab2adb5 100644
+index 29afbb9ccb5..adbc0c9db10 100644
 --- a/source3/rpc_server/spoolss/srv_spoolss_nt.c
 +++ b/source3/rpc_server/spoolss/srv_spoolss_nt.c
 @@ -2483,8 +2483,7 @@ static bool spoolss_connect_to_client(struct rpc_pipe_client **pp_pipe, struct c
@@ -3983,10 +3983,10 @@ index 954d6eba804..fea066ce468 100644
  		DEBUG(0,("cli_full_connection failed! (%s)\n", nt_errstr(nt_status)));
  		return NULL;
 -- 
-2.29.2
+2.31.1
 
 
-From bdcbd317d650b381f71f463941c0779333cea2f2 Mon Sep 17 00:00:00 2001
+From cd8bcd19a3dd5be0cb54df9ecbe43bee13c69763 Mon Sep 17 00:00:00 2001
 From: Stefan Metzmacher <metze@samba.org>
 Date: Mon, 8 Jun 2020 08:04:24 +0200
 Subject: [PATCH 033/105] s3:libsmb: Add encryption support to
@@ -4200,10 +4200,10 @@ index b24743d789b..abfd18bfaf1 100644
  }
  
 -- 
-2.29.2
+2.31.1
 
 
-From 9f1dfbc190ba7c83e0197036c102479015f9f416 Mon Sep 17 00:00:00 2001
+From e7e622ffa049878df69bc59002255f89ae6b0b94 Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Wed, 10 Jun 2020 11:26:00 +0200
 Subject: [PATCH 034/105] python: Add a test for SMB encryption
@@ -4274,10 +4274,10 @@ index e8f8e7fe94d..81d4e482644 100644
  if __name__ == "__main__":
      import unittest
 -- 
-2.29.2
+2.31.1
 
 
-From 87985a403abb4ef396d277a1e51a1983cf079875 Mon Sep 17 00:00:00 2001
+From 0b2a5d5372a76ce3d56c12d670f232f22d672bad Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Wed, 10 Jun 2020 12:31:02 +0200
 Subject: [PATCH 035/105] s3:net: Use cli_credentials_set_smb_encryption()
@@ -4323,10 +4323,10 @@ index b139fb2d0da..5829d891075 100644
  }
  
 -- 
-2.29.2
+2.31.1
 
 
-From 386fde23e657b1160b890d30e235c003ad3f41ec Mon Sep 17 00:00:00 2001
+From d9db3f116c0afeafaf599df9d48be58ce4b28b98 Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Wed, 10 Jun 2020 12:40:13 +0200
 Subject: [PATCH 036/105] s3:libsmb: Use cli_credentials_set_smb_encryption()
@@ -4682,10 +4682,10 @@ index ec4a516b2ee..61503d0a98b 100644
 +                       vnum='0.7.0',
                         pc_files='smbclient.pc')
 -- 
-2.29.2
+2.31.1
 
 
-From c228afe71fdaf950790f46a1f497f52198bd77ca Mon Sep 17 00:00:00 2001
+From 93fbea950f6bd5edc1b61c8f069f9518f251f5f0 Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Wed, 10 Jun 2020 12:43:33 +0200
 Subject: [PATCH 037/105] s3:client: Remove unused smb encryption code
@@ -4718,10 +4718,10 @@ index f56dc323b6e..16a8d44c069 100644
  	*output_cli = cli;
  	return NT_STATUS_OK;
 -- 
-2.29.2
+2.31.1
 
 
-From 421b1bfc7f110787b541976c9bcdf7857bc93dfa Mon Sep 17 00:00:00 2001
+From 47001c60bd87b2da1d2b17838d79ab7f88b0fbd4 Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Wed, 10 Jun 2020 12:47:05 +0200
 Subject: [PATCH 038/105] s3:utils: Remove obsolete force encryption from
@@ -4755,10 +4755,10 @@ index 5983ebbd0a5..8fd9fcc5780 100644
  }
  
 -- 
-2.29.2
+2.31.1
 
 
-From 3f08abb5fa7eaf7785690234b773aee5392c45ac Mon Sep 17 00:00:00 2001
+From 15d7a20de7217b69a1a78081f550fb81082b6629 Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Wed, 10 Jun 2020 12:48:18 +0200
 Subject: [PATCH 039/105] s3:utils: Remove obsolete force encryption from
@@ -4789,10 +4789,10 @@ index 2ac4fde7daf..ef2657e4fa5 100644
  						    NCACN_NP,
  						    &ndr_table_mdssvc,
 -- 
-2.29.2
+2.31.1
 
 
-From 9d67a64586896ea912933f5742225f30399fc401 Mon Sep 17 00:00:00 2001
+From 0b48c264633422fa459b1d59001f0edc743b1aba Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Wed, 10 Jun 2020 12:49:28 +0200
 Subject: [PATCH 040/105] s3:utils: Remove obsolete force encryption from
@@ -4827,10 +4827,10 @@ index fea066ce468..4ceac7b3ab0 100644
  }
  
 -- 
-2.29.2
+2.31.1
 
 
-From 33bd60da866aec4212533e72410a9440f7727a33 Mon Sep 17 00:00:00 2001
+From ebecd6b5b125630a3ff9c08f3ef6ffa7137795c0 Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Wed, 10 Jun 2020 12:51:18 +0200
 Subject: [PATCH 041/105] s3:rpcclient: Remove obsolete force encryption from
@@ -4865,10 +4865,10 @@ index 2ead6cc7ba5..575a42ebf70 100644
  	memset(cmdline_auth_info.password,'X',sizeof(cmdline_auth_info.password));
  #endif
 -- 
-2.29.2
+2.31.1
 
 
-From 1e5c002e86fd794ee4c972fe9b802b1cc90910cd Mon Sep 17 00:00:00 2001
+From ae3879060ccef1c7bb19cf26505575c164904c2b Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Mon, 6 Jul 2020 10:58:36 +0200
 Subject: [PATCH 042/105] examples: Remove obsolete force encryption from
@@ -4903,10 +4903,10 @@ index 6206c3a9701..c64be573462 100644
  }
  
 -- 
-2.29.2
+2.31.1
 
 
-From a207a4a9f0633c4f658152ef5715a18e655027d2 Mon Sep 17 00:00:00 2001
+From ece6dfebb43ada628fa97965ef834bd4433c3e6d Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Mon, 6 Jul 2020 11:05:59 +0200
 Subject: [PATCH 043/105] s3:libsmb: Make cli_cm_force_encryption_creds()
@@ -4920,7 +4920,7 @@ Reviewed-by: Stefan Metzmacher <metze@samba.org>
  2 files changed, 3 insertions(+), 6 deletions(-)
 
 diff --git a/source3/libsmb/clidfs.c b/source3/libsmb/clidfs.c
-index 3cc52cc5ac9..a7230c84db1 100644
+index 2a2509870e3..93b2525b204 100644
 --- a/source3/libsmb/clidfs.c
 +++ b/source3/libsmb/clidfs.c
 @@ -43,9 +43,9 @@
@@ -4951,10 +4951,10 @@ index 850cf12c8a6..eeabcaa7463 100644
  				struct cli_state *referring_cli,
  				const char *server,
 -- 
-2.29.2
+2.31.1
 
 
-From bff823d8817a1f2734e8e3b52a9b7e4f3a964908 Mon Sep 17 00:00:00 2001
+From 0d89aa3c788314a9bf53b9164ec774f5a903261c Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Thu, 13 Aug 2020 16:16:55 +0200
 Subject: [PATCH 044/105] s4:libcli: Return NTSTATUS errors for
@@ -5051,10 +5051,10 @@ index 582d43ef173..ad50ae0ac81 100644
  	return smb_composite_connect_recv(c, mem_ctx);
  }
 -- 
-2.29.2
+2.31.1
 
 
-From b48bca36393efebd55a46c59656ea9d2bca592f3 Mon Sep 17 00:00:00 2001
+From 94406c0bf84ff8a3a8bbb55ebedcddcf0f832333 Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Tue, 7 Jul 2020 12:54:26 +0200
 Subject: [PATCH 045/105] s4:libcli: Return if encryption is requested for SMB1
@@ -5088,10 +5088,10 @@ index 6ee4929e8d7..51e121bdce6 100644
  	if (composite_nomem(state, c)) return c;
  	c->private_data = state;
 -- 
-2.29.2
+2.31.1
 
 
-From 262b7b90d4618ee6b20414b19c3c79831b72a5d9 Mon Sep 17 00:00:00 2001
+From 2b05d3a069d98b49542f14cab802f5a75e04ca43 Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Tue, 7 Jul 2020 12:29:39 +0200
 Subject: [PATCH 046/105] s3:libcli: Split out smb2_connect_tcon_start()
@@ -5141,10 +5141,10 @@ index 6fc3993a4e8..95ff05eac8f 100644
  
  	subreq = smb2cli_tcon_send(state, state->ev,
 -- 
-2.29.2
+2.31.1
 
 
-From dfd9ffca1955efa021aae9b73c9d4aec65d9e7da Mon Sep 17 00:00:00 2001
+From 48998a581ddce11e3eebbd0b16493caa4a891b3b Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Tue, 7 Jul 2020 12:44:26 +0200
 Subject: [PATCH 047/105] s4:libcli: Add smb2_connect_enc_start()
@@ -5212,10 +5212,10 @@ index 95ff05eac8f..3a3ecdf20e8 100644
  }
  
 -- 
-2.29.2
+2.31.1
 
 
-From c5bfb3e621e7a386f64d7e9c9a6eb05905aec4d2 Mon Sep 17 00:00:00 2001
+From 0dab6d1c2f21f01a09f0152a52e0b07b244e680a Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Fri, 24 Jul 2020 10:18:52 +0200
 Subject: [PATCH 048/105] s4:libcli: Require signing for SMB encryption
@@ -5268,10 +5268,10 @@ index 3a3ecdf20e8..9540704491e 100644
  		if (tevent_req_nterror(req, status)) {
  			return tevent_req_post(req, ev);
 -- 
-2.29.2
+2.31.1
 
 
-From b8406d50c6b52838f14f2e5e29c06919d4949386 Mon Sep 17 00:00:00 2001
+From 7b781fafcb94f3a6e3bccc57b5e75fe5ecc8c30d Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Tue, 7 Jul 2020 14:27:07 +0200
 Subject: [PATCH 049/105] python:tests: Add test for SMB encrypted DCERPC
@@ -5389,10 +5389,10 @@ index 9938bf53ed6..3246161f0d7 100644
  
  def cmdline(script, *args):
 -- 
-2.29.2
+2.31.1
 
 
-From bf61849ded5c9a389b0f2a2d4a14ac74e4470852 Mon Sep 17 00:00:00 2001
+From 84fbe5d588f735d7284e652cea18628d0ab4d5e0 Mon Sep 17 00:00:00 2001
 From: Stefan Metzmacher <metze@samba.org>
 Date: Fri, 4 Sep 2020 10:47:54 +0200
 Subject: [PATCH 050/105] auth:gensec: Add gensec_security_sasl_names()
@@ -5519,10 +5519,10 @@ index d2d62d6652e..4eb45643714 100644
   * Return a unique list of security subsystems from those specified in
   * the list of SASL names.
 -- 
-2.29.2
+2.31.1
 
 
-From 311a23ab25c306093b4c60fa0113a85ccc875f20 Mon Sep 17 00:00:00 2001
+From 953c1831d397e2699343778244679deeebb3c2b3 Mon Sep 17 00:00:00 2001
 From: Stefan Metzmacher <metze@samba.org>
 Date: Fri, 4 Sep 2020 10:48:27 +0200
 Subject: [PATCH 051/105] s4:ldap_server: Use samba_server_gensec_start() in
@@ -5631,10 +5631,10 @@ index 2839082daef..915d9b94f9b 100644
  		ldb_set_opaque(conn->ldb, "supportedSASLMechanisms", sasl_mechs);
  	}
 -- 
-2.29.2
+2.31.1
 
 
-From b7a4e9531c434b9e120588fa721d96cee73abc27 Mon Sep 17 00:00:00 2001
+From 71f34484b5573e85e2db0e3bcaddca6dea921d75 Mon Sep 17 00:00:00 2001
 From: Stefan Metzmacher <metze@samba.org>
 Date: Fri, 4 Sep 2020 14:39:15 +0200
 Subject: [PATCH 052/105] auth:gensec: Make gensec_use_kerberos_mechs() a
@@ -5681,10 +5681,10 @@ index 4eb45643714..ebcab76999a 100644
  	const struct gensec_security_ops **new_gensec_list;
  	int i, j, num_mechs_in;
 -- 
-2.29.2
+2.31.1
 
 
-From 938a5b9a816000ac505aab0d49e0feee5ebc02a7 Mon Sep 17 00:00:00 2001
+From f974fcb76a58515a848e2c94ff43a3a8ab781b98 Mon Sep 17 00:00:00 2001
 From: Stefan Metzmacher <metze@samba.org>
 Date: Fri, 4 Sep 2020 14:41:43 +0200
 Subject: [PATCH 053/105] auth:gensec: Pass use_kerberos and keep_schannel to
@@ -5755,10 +5755,10 @@ index ebcab76999a..8d1b41fec74 100644
  }
  
 -- 
-2.29.2
+2.31.1
 
 
-From 634283ed239a5759645ad7e9cf63b723fae4d184 Mon Sep 17 00:00:00 2001
+From 373566a4c0b9f466098edaaca2cb769dc1e77014 Mon Sep 17 00:00:00 2001
 From: Stefan Metzmacher <metze@samba.org>
 Date: Fri, 4 Sep 2020 17:00:45 +0200
 Subject: [PATCH 054/105] auth:gensec: If Kerberos is required, keep schannel
@@ -5792,10 +5792,10 @@ index 8d1b41fec74..3f42d611140 100644
  
  		if (gensec_security->settings->backends) {
 -- 
-2.29.2
+2.31.1
 
 
-From 712f4b7a2f8826f68e9862256bfc1a59eb5e2dfb Mon Sep 17 00:00:00 2001
+From c701769574ddedd0fd22569c72993a79caa28d82 Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Fri, 4 Sep 2020 12:21:21 +0200
 Subject: [PATCH 055/105] auth:creds: Add cli_credentials_init_server()
@@ -5858,10 +5858,10 @@ index 7d0cf53194b..438bcdce232 100644
  bool cli_credentials_wrong_password(struct cli_credentials *cred);
  const char *cli_credentials_get_password(struct cli_credentials *cred);
 -- 
-2.29.2
+2.31.1
 
 
-From 589d1ee99d6f4591da90731cd61b3932874a6c96 Mon Sep 17 00:00:00 2001
+From 3b30ef57090aebd30fa48e671025a11f1f0aba6e Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Fri, 4 Sep 2020 12:21:36 +0200
 Subject: [PATCH 056/105] s4:rpc_server: Use cli_credentials_init_server()
@@ -5906,10 +5906,10 @@ index 084857a44bf..e64148ef788 100644
  					 call->event_ctx,
  					 imsg_ctx,
 -- 
-2.29.2
+2.31.1
 
 
-From 0be08bb35342640aab826b8ba5a17a270170a7c4 Mon Sep 17 00:00:00 2001
+From c9b1c8897ddd39045c45b75c63f7344fcd35ee92 Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Mon, 7 Sep 2020 09:19:43 +0200
 Subject: [PATCH 057/105] s4:smb_server: Use cli_credentials_init_server() for
@@ -6006,10 +6006,10 @@ index 4aaaf46793b..c433eb194bd 100644
  
  	req->smb_conn->negotiate.server_credentials = talloc_steal(req->smb_conn, server_credentials);
 -- 
-2.29.2
+2.31.1
 
 
-From db71a0fa865cdd7339121f91a1e490289ada14f8 Mon Sep 17 00:00:00 2001
+From 190f1455e2e783ac0590ef3317724c7210f5a1ef Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Tue, 8 Sep 2020 10:15:22 +0200
 Subject: [PATCH 058/105] selftest: Rename 'smb encrypt' to 'server smb
@@ -6057,10 +6057,10 @@ index c15057fa80b..aeebf303c9b 100755
  [tmpguest]
  	path = $shrdir
 -- 
-2.29.2
+2.31.1
 
 
-From 9adc33b7364d8a7bce384d5a17de8a450ad8c642 Mon Sep 17 00:00:00 2001
+From e875960f0c9dd06faa1bc685bb477b4aa2df36ab Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Tue, 8 Sep 2020 12:30:08 +0200
 Subject: [PATCH 059/105] selftest: Move enc_desired to provision to have it in
@@ -6104,10 +6104,10 @@ index aeebf303c9b..7873692b8ec 100755
  
  	my $net = Samba::bindir_path($self, "net");
 -- 
-2.29.2
+2.31.1
 
 
-From 79f57ea590227441e510113863740bea6643c942 Mon Sep 17 00:00:00 2001
+From bbfa3bd50d5c7ba3e810e4dd4c44694b045e4889 Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Tue, 8 Sep 2020 10:15:20 +0200
 Subject: [PATCH 060/105] s3:tests: Add smbclient tests for 'client smb
@@ -6228,10 +6228,10 @@ index 00000000000..9a717cdac4f
 +
 +testok $0 $failed
 diff --git a/source3/selftest/tests.py b/source3/selftest/tests.py
-index 47e914b1009..61a5b3e1cbd 100755
+index 90bda2052af..26d8c2230b6 100755
 --- a/source3/selftest/tests.py
 +++ b/source3/selftest/tests.py
-@@ -1043,6 +1043,12 @@ plantestsuite("samba3.blackbox.smbclient.encryption_off", "simpleserver",
+@@ -1047,6 +1047,12 @@ plantestsuite("samba3.blackbox.smbclient.encryption_off", "simpleserver",
                 "$USERNAME", "$PASSWORD", "$SERVER",
                 smbclient3])
  
@@ -6245,10 +6245,10 @@ index 47e914b1009..61a5b3e1cbd 100755
                [os.path.join(samba3srcdir,
                              "script/tests/test_rpcclient_netsessenum.sh"),
 -- 
-2.29.2
+2.31.1
 
 
-From adb9139bb935553b9cf5f1201129eea563afa931 Mon Sep 17 00:00:00 2001
+From 76ca7b477dc739777b01322f3225cd1b6f8ca97e Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Thu, 27 Aug 2020 15:19:27 +0200
 Subject: [PATCH 061/105] s3:client: Remove global smb_encrypt
@@ -6353,10 +6353,10 @@ index 56309efcea7..60d4fb3c5ee 100644
  	max_protocol = lp_client_max_protocol();
  
 -- 
-2.29.2
+2.31.1
 
 
-From 0babfdb10e32d729f8750096126c8ea117cb2f8a Mon Sep 17 00:00:00 2001
+From 402b5cd6e6a8b541d6bdf6494692c36f924ee6c9 Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Thu, 27 Aug 2020 15:24:27 +0200
 Subject: [PATCH 062/105] s3:libsmb: Remove force_encrypt from cli_cm_open()
@@ -6466,10 +6466,10 @@ index 1b8f2a4e97a..0fd31ef3d5a 100644
  			     NULL, 0, 0x20, &cli_ipc);
  	if (!NT_STATUS_IS_OK(status)) {
 diff --git a/source3/libsmb/clidfs.c b/source3/libsmb/clidfs.c
-index a7230c84db1..f190698b38d 100644
+index 93b2525b204..13613afb6e7 100644
 --- a/source3/libsmb/clidfs.c
 +++ b/source3/libsmb/clidfs.c
-@@ -383,7 +383,6 @@ NTSTATUS cli_cm_open(TALLOC_CTX *ctx,
+@@ -407,7 +407,6 @@ NTSTATUS cli_cm_open(TALLOC_CTX *ctx,
  				const char *server,
  				const char *share,
  				const struct user_auth_info *auth_info,
@@ -6477,7 +6477,7 @@ index a7230c84db1..f190698b38d 100644
  				int max_protocol,
  				const struct sockaddr_storage *dest_ss,
  				int port,
-@@ -393,6 +392,8 @@ NTSTATUS cli_cm_open(TALLOC_CTX *ctx,
+@@ -417,6 +416,8 @@ NTSTATUS cli_cm_open(TALLOC_CTX *ctx,
  	/* Try to reuse an existing connection in this list. */
  	struct cli_state *c = cli_cm_find(referring_cli, server, share);
  	NTSTATUS status;
@@ -6486,7 +6486,7 @@ index a7230c84db1..f190698b38d 100644
  
  	if (c) {
  		*pcli = c;
-@@ -962,7 +963,6 @@ NTSTATUS cli_resolve_path(TALLOC_CTX *ctx,
+@@ -986,7 +987,6 @@ NTSTATUS cli_resolve_path(TALLOC_CTX *ctx,
  			     smbXcli_conn_remote_name(rootcli->conn),
  			     "IPC$",
  			     dfs_auth_info,
@@ -6507,10 +6507,10 @@ index eeabcaa7463..bb3e9e6874e 100644
  				const struct sockaddr_storage *dest_ss,
  				int port,
 -- 
-2.29.2
+2.31.1
 
 
-From 099ce3bae15197294b1cb6e136bb3fc35ab64f43 Mon Sep 17 00:00:00 2001
+From eb6b9b3fe6bde3544347b50b8576986b9f4635fb Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Thu, 27 Aug 2020 15:26:39 +0200
 Subject: [PATCH 063/105] s3:libsmb: Remove force_encrypt from cli_cm_connect()
@@ -6523,10 +6523,10 @@ Reviewed-by: Jeremy Allison <jra@samba.org>
  1 file changed, 2 insertions(+), 5 deletions(-)
 
 diff --git a/source3/libsmb/clidfs.c b/source3/libsmb/clidfs.c
-index f190698b38d..7f2faee94bb 100644
+index 13613afb6e7..9e5c9e57e74 100644
 --- a/source3/libsmb/clidfs.c
 +++ b/source3/libsmb/clidfs.c
-@@ -287,7 +287,6 @@ static NTSTATUS cli_cm_connect(TALLOC_CTX *ctx,
+@@ -311,7 +311,6 @@ static NTSTATUS cli_cm_connect(TALLOC_CTX *ctx,
  			       const char *server,
  			       const char *share,
  			       const struct user_auth_info *auth_info,
@@ -6534,7 +6534,7 @@ index f190698b38d..7f2faee94bb 100644
  			       int max_protocol,
  			       const struct sockaddr_storage *dest_ss,
  			       int port,
-@@ -296,6 +295,8 @@ static NTSTATUS cli_cm_connect(TALLOC_CTX *ctx,
+@@ -320,6 +319,8 @@ static NTSTATUS cli_cm_connect(TALLOC_CTX *ctx,
  {
  	struct cli_state *cli = NULL;
  	NTSTATUS status;
@@ -6543,7 +6543,7 @@ index f190698b38d..7f2faee94bb 100644
  
  	status = do_connect(ctx, server, share,
  				auth_info,
-@@ -392,8 +393,6 @@ NTSTATUS cli_cm_open(TALLOC_CTX *ctx,
+@@ -416,8 +417,6 @@ NTSTATUS cli_cm_open(TALLOC_CTX *ctx,
  	/* Try to reuse an existing connection in this list. */
  	struct cli_state *c = cli_cm_find(referring_cli, server, share);
  	NTSTATUS status;
@@ -6552,7 +6552,7 @@ index f190698b38d..7f2faee94bb 100644
  
  	if (c) {
  		*pcli = c;
-@@ -414,7 +413,6 @@ NTSTATUS cli_cm_open(TALLOC_CTX *ctx,
+@@ -438,7 +437,6 @@ NTSTATUS cli_cm_open(TALLOC_CTX *ctx,
  				server,
  				share,
  				auth_info,
@@ -6560,7 +6560,7 @@ index f190698b38d..7f2faee94bb 100644
  				max_protocol,
  				dest_ss,
  				port,
-@@ -1020,7 +1018,6 @@ NTSTATUS cli_resolve_path(TALLOC_CTX *ctx,
+@@ -1044,7 +1042,6 @@ NTSTATUS cli_resolve_path(TALLOC_CTX *ctx,
  				dfs_refs[count].server,
  				dfs_refs[count].share,
  				dfs_auth_info,
@@ -6569,10 +6569,10 @@ index f190698b38d..7f2faee94bb 100644
  				NULL, /* dest_ss */
  				0, /* port */
 -- 
-2.29.2
+2.31.1
 
 
-From f469d4511115bd0a707a8a05e4ef575bd8fdffd0 Mon Sep 17 00:00:00 2001
+From d9c3cbc0ea5d33a42e4d213b0caa5d39585b46a2 Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Thu, 27 Aug 2020 15:28:28 +0200
 Subject: [PATCH 064/105] s3:libsmb: Remove force_encrypt from clidfs
@@ -6586,10 +6586,10 @@ Reviewed-by: Jeremy Allison <jra@samba.org>
  1 file changed, 4 insertions(+), 5 deletions(-)
 
 diff --git a/source3/libsmb/clidfs.c b/source3/libsmb/clidfs.c
-index 7f2faee94bb..e81d86ae059 100644
+index 9e5c9e57e74..c5b79bb37dd 100644
 --- a/source3/libsmb/clidfs.c
 +++ b/source3/libsmb/clidfs.c
-@@ -107,7 +107,6 @@ static NTSTATUS do_connect(TALLOC_CTX *ctx,
+@@ -131,7 +131,6 @@ static NTSTATUS do_connect(TALLOC_CTX *ctx,
  					const char *server,
  					const char *share,
  					const struct user_auth_info *auth_info,
@@ -6597,7 +6597,7 @@ index 7f2faee94bb..e81d86ae059 100644
  					int max_protocol,
  					const struct sockaddr_storage *dest_ss,
  					int port,
-@@ -123,6 +122,8 @@ static NTSTATUS do_connect(TALLOC_CTX *ctx,
+@@ -147,6 +146,8 @@ static NTSTATUS do_connect(TALLOC_CTX *ctx,
  	enum protocol_types protocol = PROTOCOL_NONE;
  	int signing_state = get_cmdline_auth_info_signing_state(auth_info);
  	struct cli_credentials *creds = NULL;
@@ -6606,7 +6606,7 @@ index 7f2faee94bb..e81d86ae059 100644
  
  	if (force_encrypt) {
  		signing_state = SMB_SIGNING_REQUIRED;
-@@ -233,7 +234,7 @@ static NTSTATUS do_connect(TALLOC_CTX *ctx,
+@@ -267,7 +268,7 @@ static NTSTATUS do_connect(TALLOC_CTX *ctx,
  		cli_shutdown(c);
  		return do_connect(ctx, newserver,
  				newshare, auth_info,
@@ -6615,7 +6615,7 @@ index 7f2faee94bb..e81d86ae059 100644
  				NULL, port, name_type, pcli);
  	}
  
-@@ -295,12 +296,10 @@ static NTSTATUS cli_cm_connect(TALLOC_CTX *ctx,
+@@ -319,12 +320,10 @@ static NTSTATUS cli_cm_connect(TALLOC_CTX *ctx,
  {
  	struct cli_state *cli = NULL;
  	NTSTATUS status;
@@ -6630,10 +6630,10 @@ index 7f2faee94bb..e81d86ae059 100644
  
  	if (!NT_STATUS_IS_OK(status)) {
 -- 
-2.29.2
+2.31.1
 
 
-From 787d8a2976a642b2ae175e41290990a8908a6d6a Mon Sep 17 00:00:00 2001
+From 9848ab05ef48882218cf1ca2a4e9ddf74d18504f Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Thu, 27 Aug 2020 15:52:11 +0200
 Subject: [PATCH 065/105] s3:libsmb: Remove force_encrypt from
@@ -6649,10 +6649,10 @@ Reviewed-by: Jeremy Allison <jra@samba.org>
  3 files changed, 13 insertions(+), 11 deletions(-)
 
 diff --git a/source3/libsmb/clidfs.c b/source3/libsmb/clidfs.c
-index e81d86ae059..a4caf807856 100644
+index c5b79bb37dd..8fb450b5327 100644
 --- a/source3/libsmb/clidfs.c
 +++ b/source3/libsmb/clidfs.c
-@@ -230,7 +230,7 @@ static NTSTATUS do_connect(TALLOC_CTX *ctx,
+@@ -264,7 +264,7 @@ static NTSTATUS do_connect(TALLOC_CTX *ctx,
  	if (smbXcli_conn_dfs_supported(c->conn) &&
  			cli_check_msdfs_proxy(ctx, c, sharename,
  				&newserver, &newshare,
@@ -6661,7 +6661,7 @@ index e81d86ae059..a4caf807856 100644
  		cli_shutdown(c);
  		return do_connect(ctx, newserver,
  				newshare, auth_info,
-@@ -1176,7 +1176,6 @@ bool cli_check_msdfs_proxy(TALLOC_CTX *ctx,
+@@ -1200,7 +1200,6 @@ bool cli_check_msdfs_proxy(TALLOC_CTX *ctx,
  				const char *sharename,
  				char **pp_newserver,
  				char **pp_newshare,
@@ -6669,7 +6669,7 @@ index e81d86ae059..a4caf807856 100644
  				struct cli_credentials *creds)
  {
  	struct client_dfs_referral *refs = NULL;
-@@ -1188,6 +1187,8 @@ bool cli_check_msdfs_proxy(TALLOC_CTX *ctx,
+@@ -1212,6 +1211,8 @@ bool cli_check_msdfs_proxy(TALLOC_CTX *ctx,
  	char *newextrapath = NULL;
  	NTSTATUS status;
  	const char *remote_name;
@@ -6678,7 +6678,7 @@ index e81d86ae059..a4caf807856 100644
  
  	if (!cli || !sharename) {
  		return false;
-@@ -1223,12 +1224,18 @@ bool cli_check_msdfs_proxy(TALLOC_CTX *ctx,
+@@ -1247,12 +1248,18 @@ bool cli_check_msdfs_proxy(TALLOC_CTX *ctx,
  		return false;
  	}
  
@@ -6729,10 +6729,10 @@ index bb3e9e6874e..f2b0a8c5ff8 100644
  
  /* The following definitions come from libsmb/clientgen.c  */
 -- 
-2.29.2
+2.31.1
 
 
-From 7bbe38b45690781e6fe110a10bb5f63b3af21009 Mon Sep 17 00:00:00 2001
+From 0c6fd4334f82cace19124e9e4887372cefeb3891 Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Tue, 18 Aug 2020 17:15:09 +0200
 Subject: [PATCH 066/105] s3:libsmb: Pass cli_credentials to clidfs
@@ -6756,10 +6756,10 @@ index 972096bdc8b..00000000000
 -^samba3.blackbox.smbclient.encryption.smbclient.smb3.client.encrypt.required...LOCALSHARE4.enc_desired..simpleserver
 -^samba3.blackbox.smbclient.encryption.smbclient.smb3.client.encrypt.required...LOCALSHARE4.tmp..simpleserver
 diff --git a/source3/libsmb/clidfs.c b/source3/libsmb/clidfs.c
-index a4caf807856..29177cbb6f3 100644
+index 8fb450b5327..396856842aa 100644
 --- a/source3/libsmb/clidfs.c
 +++ b/source3/libsmb/clidfs.c
-@@ -106,7 +106,7 @@ static NTSTATUS cli_cm_force_encryption_creds(struct cli_state *c,
+@@ -130,7 +130,7 @@ static NTSTATUS cli_cm_force_encryption_creds(struct cli_state *c,
  static NTSTATUS do_connect(TALLOC_CTX *ctx,
  					const char *server,
  					const char *share,
@@ -6768,7 +6768,7 @@ index a4caf807856..29177cbb6f3 100644
  					int max_protocol,
  					const struct sockaddr_storage *dest_ss,
  					int port,
-@@ -120,12 +120,12 @@ static NTSTATUS do_connect(TALLOC_CTX *ctx,
+@@ -144,12 +144,12 @@ static NTSTATUS do_connect(TALLOC_CTX *ctx,
  	NTSTATUS status;
  	int flags = 0;
  	enum protocol_types protocol = PROTOCOL_NONE;
@@ -6786,7 +6786,7 @@ index a4caf807856..29177cbb6f3 100644
  		signing_state = SMB_SIGNING_REQUIRED;
  	}
  
-@@ -192,13 +192,12 @@ static NTSTATUS do_connect(TALLOC_CTX *ctx,
+@@ -216,13 +216,12 @@ static NTSTATUS do_connect(TALLOC_CTX *ctx,
  		smb2cli_conn_set_max_credits(c->conn, DEFAULT_SMB2_MAX_CREDITS);
  	}
  
@@ -6802,18 +6802,9 @@ index a4caf807856..29177cbb6f3 100644
  			cli_credentials_authentication_requested(creds) ||
  			cli_credentials_is_anonymous(creds) ||
  			!NT_STATUS_IS_OK(status = cli_session_setup_anon(c)))
-@@ -233,7 +232,7 @@ static NTSTATUS do_connect(TALLOC_CTX *ctx,
- 				creds)) {
- 		cli_shutdown(c);
- 		return do_connect(ctx, newserver,
--				newshare, auth_info,
-+				newshare, creds,
- 				max_protocol,
- 				NULL, port, name_type, pcli);
- 	}
-@@ -247,13 +246,19 @@ static NTSTATUS do_connect(TALLOC_CTX *ctx,
- 		return status;
- 	}
+@@ -246,13 +245,19 @@ static NTSTATUS do_connect(TALLOC_CTX *ctx,
+ 
+ 	DEBUG(4,(" session setup ok\n"));
  
 -	if (force_encrypt) {
 +	if (encryption_state >= SMB_ENCRYPTION_DESIRED) {
@@ -6834,7 +6825,16 @@ index a4caf807856..29177cbb6f3 100644
  		}
  	}
  
-@@ -295,10 +300,11 @@ static NTSTATUS cli_cm_connect(TALLOC_CTX *ctx,
+@@ -267,7 +272,7 @@ static NTSTATUS do_connect(TALLOC_CTX *ctx,
+ 				creds)) {
+ 		cli_shutdown(c);
+ 		return do_connect(ctx, newserver,
+-				newshare, auth_info,
++				newshare, creds,
+ 				max_protocol,
+ 				NULL, port, name_type, pcli);
+ 	}
+@@ -319,10 +324,11 @@ static NTSTATUS cli_cm_connect(TALLOC_CTX *ctx,
  			       struct cli_state **pcli)
  {
  	struct cli_state *cli = NULL;
@@ -6848,10 +6848,10 @@ index a4caf807856..29177cbb6f3 100644
  				dest_ss, port, name_type, &cli);
  
 -- 
-2.29.2
+2.31.1
 
 
-From 8b391c8c45ce09498ed16908943a9e6639bb7b00 Mon Sep 17 00:00:00 2001
+From 8846652624edc546bc5588d3aa0905e3f43db637 Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Tue, 18 Aug 2020 17:18:16 +0200
 Subject: [PATCH 067/105] s3:libsmb: Pass cli_credentials to cli_cm_connect()
@@ -6864,10 +6864,10 @@ Reviewed-by: Jeremy Allison <jra@samba.org>
  1 file changed, 5 insertions(+), 4 deletions(-)
 
 diff --git a/source3/libsmb/clidfs.c b/source3/libsmb/clidfs.c
-index 29177cbb6f3..316786f99ca 100644
+index 396856842aa..e17c0b875fd 100644
 --- a/source3/libsmb/clidfs.c
 +++ b/source3/libsmb/clidfs.c
-@@ -292,7 +292,7 @@ static NTSTATUS cli_cm_connect(TALLOC_CTX *ctx,
+@@ -316,7 +316,7 @@ static NTSTATUS cli_cm_connect(TALLOC_CTX *ctx,
  			       struct cli_state *referring_cli,
  			       const char *server,
  			       const char *share,
@@ -6876,7 +6876,7 @@ index 29177cbb6f3..316786f99ca 100644
  			       int max_protocol,
  			       const struct sockaddr_storage *dest_ss,
  			       int port,
-@@ -300,7 +300,6 @@ static NTSTATUS cli_cm_connect(TALLOC_CTX *ctx,
+@@ -324,7 +324,6 @@ static NTSTATUS cli_cm_connect(TALLOC_CTX *ctx,
  			       struct cli_state **pcli)
  {
  	struct cli_state *cli = NULL;
@@ -6884,7 +6884,7 @@ index 29177cbb6f3..316786f99ca 100644
  	NTSTATUS status;
  
  	status = do_connect(ctx, server, share,
-@@ -397,6 +396,7 @@ NTSTATUS cli_cm_open(TALLOC_CTX *ctx,
+@@ -421,6 +420,7 @@ NTSTATUS cli_cm_open(TALLOC_CTX *ctx,
  {
  	/* Try to reuse an existing connection in this list. */
  	struct cli_state *c = cli_cm_find(referring_cli, server, share);
@@ -6892,7 +6892,7 @@ index 29177cbb6f3..316786f99ca 100644
  	NTSTATUS status;
  
  	if (c) {
-@@ -417,7 +417,7 @@ NTSTATUS cli_cm_open(TALLOC_CTX *ctx,
+@@ -441,7 +441,7 @@ NTSTATUS cli_cm_open(TALLOC_CTX *ctx,
  				referring_cli,
  				server,
  				share,
@@ -6901,7 +6901,7 @@ index 29177cbb6f3..316786f99ca 100644
  				max_protocol,
  				dest_ss,
  				port,
-@@ -886,6 +886,7 @@ NTSTATUS cli_resolve_path(TALLOC_CTX *ctx,
+@@ -910,6 +910,7 @@ NTSTATUS cli_resolve_path(TALLOC_CTX *ctx,
  	struct smbXcli_tcon *root_tcon = NULL;
  	struct smbXcli_tcon *target_tcon = NULL;
  	struct cli_dfs_path_split *dfs_refs = NULL;
@@ -6909,7 +6909,7 @@ index 29177cbb6f3..316786f99ca 100644
  
  	if ( !rootcli || !path || !targetcli ) {
  		return NT_STATUS_INVALID_PARAMETER;
-@@ -1022,7 +1023,7 @@ NTSTATUS cli_resolve_path(TALLOC_CTX *ctx,
+@@ -1046,7 +1047,7 @@ NTSTATUS cli_resolve_path(TALLOC_CTX *ctx,
  		status = cli_cm_connect(ctx, rootcli,
  				dfs_refs[count].server,
  				dfs_refs[count].share,
@@ -6919,10 +6919,10 @@ index 29177cbb6f3..316786f99ca 100644
  				NULL, /* dest_ss */
  				0, /* port */
 -- 
-2.29.2
+2.31.1
 
 
-From e7b69b7c59c19bd835655d2da1b655ec600d8f70 Mon Sep 17 00:00:00 2001
+From 9abf11b2475cf7e46840b64025ccdc2a0d3c6dbb Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Tue, 18 Aug 2020 17:26:54 +0200
 Subject: [PATCH 068/105] s3:libsmb: Pass cli_credentials to cli_cm_open()
@@ -7045,10 +7045,10 @@ index 0fd31ef3d5a..943f7498e8c 100644
  			     NULL, 0, 0x20, &cli_ipc);
  	if (!NT_STATUS_IS_OK(status)) {
 diff --git a/source3/libsmb/clidfs.c b/source3/libsmb/clidfs.c
-index 316786f99ca..8e404ab1d57 100644
+index e17c0b875fd..5b04b63634f 100644
 --- a/source3/libsmb/clidfs.c
 +++ b/source3/libsmb/clidfs.c
-@@ -384,19 +384,18 @@ static struct cli_state *cli_cm_find(struct cli_state *cli,
+@@ -408,19 +408,18 @@ static struct cli_state *cli_cm_find(struct cli_state *cli,
  ****************************************************************************/
  
  NTSTATUS cli_cm_open(TALLOC_CTX *ctx,
@@ -7077,7 +7077,7 @@ index 316786f99ca..8e404ab1d57 100644
  	NTSTATUS status;
  
  	if (c) {
-@@ -404,11 +403,11 @@ NTSTATUS cli_cm_open(TALLOC_CTX *ctx,
+@@ -428,11 +427,11 @@ NTSTATUS cli_cm_open(TALLOC_CTX *ctx,
  		return NT_STATUS_OK;
  	}
  
@@ -7091,7 +7091,7 @@ index 316786f99ca..8e404ab1d57 100644
  			server, share );
  		return NT_STATUS_INVALID_PARAMETER;
  	}
-@@ -966,7 +965,7 @@ NTSTATUS cli_resolve_path(TALLOC_CTX *ctx,
+@@ -990,7 +989,7 @@ NTSTATUS cli_resolve_path(TALLOC_CTX *ctx,
  			     rootcli,
  			     smbXcli_conn_remote_name(rootcli->conn),
  			     "IPC$",
@@ -7130,10 +7130,10 @@ index f2b0a8c5ff8..0b8cf2a6036 100644
  struct client_dfs_referral;
  NTSTATUS cli_dfs_get_referral_ex(TALLOC_CTX *ctx,
 -- 
-2.29.2
+2.31.1
 
 
-From e506eaca259328d78c8dd971738c20944f920d48 Mon Sep 17 00:00:00 2001
+From 16840d117c536de77b21e453c66f25d23871c4e0 Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Tue, 18 Aug 2020 17:42:25 +0200
 Subject: [PATCH 069/105] s3:libsmb: Pass cli_credentials to
@@ -7690,10 +7690,10 @@ index c54b5065b44..13e48f80a01 100644
  	if (!NT_STATUS_IS_OK(status)) {
  		goto cleanup;
 diff --git a/source3/libsmb/clidfs.c b/source3/libsmb/clidfs.c
-index 8e404ab1d57..6e492fc522c 100644
+index 5b04b63634f..b4b8057ed2f 100644
 --- a/source3/libsmb/clidfs.c
 +++ b/source3/libsmb/clidfs.c
-@@ -859,7 +859,7 @@ struct cli_dfs_path_split {
+@@ -883,7 +883,7 @@ struct cli_dfs_path_split {
  
  NTSTATUS cli_resolve_path(TALLOC_CTX *ctx,
  			  const char *mountpt,
@@ -7702,7 +7702,7 @@ index 8e404ab1d57..6e492fc522c 100644
  			  struct cli_state *rootcli,
  			  const char *path,
  			  struct cli_state **targetcli,
-@@ -885,7 +885,6 @@ NTSTATUS cli_resolve_path(TALLOC_CTX *ctx,
+@@ -909,7 +909,6 @@ NTSTATUS cli_resolve_path(TALLOC_CTX *ctx,
  	struct smbXcli_tcon *root_tcon = NULL;
  	struct smbXcli_tcon *target_tcon = NULL;
  	struct cli_dfs_path_split *dfs_refs = NULL;
@@ -7710,7 +7710,7 @@ index 8e404ab1d57..6e492fc522c 100644
  
  	if ( !rootcli || !path || !targetcli ) {
  		return NT_STATUS_INVALID_PARAMETER;
-@@ -1130,7 +1129,7 @@ NTSTATUS cli_resolve_path(TALLOC_CTX *ctx,
+@@ -1154,7 +1153,7 @@ NTSTATUS cli_resolve_path(TALLOC_CTX *ctx,
  	if (!strequal(*pp_targetpath, "\\") && !strequal(*pp_targetpath, "/")) {
  		status = cli_resolve_path(ctx,
  					  newmount,
@@ -8017,10 +8017,10 @@ index 8fd9fcc5780..4989ec633c3 100644
  				  filename,
  				  &targetcli,
 -- 
-2.29.2
+2.31.1
 
 
-From d6f6b5eb7fe635caaf143b04af053c492e4251f5 Mon Sep 17 00:00:00 2001
+From 6b3a5bdb98434cb3eb88c5b9eec2b9ebc4ed79ba Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Thu, 27 Aug 2020 16:40:49 +0200
 Subject: [PATCH 070/105] s3:client: Remove global max_protocol
@@ -8099,10 +8099,10 @@ index 13e48f80a01..902cdec8b64 100644
  		if (cmdstr)
  			process_command_string(cmdstr);
 -- 
-2.29.2
+2.31.1
 
 
-From 012de005d6bb319d47bdb4c281c910820b3eb71a Mon Sep 17 00:00:00 2001
+From 067e4f27e24f874ebcce497851337905b48ee7e2 Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Thu, 27 Aug 2020 16:43:46 +0200
 Subject: [PATCH 071/105] s3:libsmb: Remove max_protocol from cli_cm_open()
@@ -8183,10 +8183,10 @@ index 943f7498e8c..3f4e188b396 100644
  	if (!NT_STATUS_IS_OK(status)) {
  		cli_ipc = NULL;
 diff --git a/source3/libsmb/clidfs.c b/source3/libsmb/clidfs.c
-index 6e492fc522c..d659040693e 100644
+index b4b8057ed2f..eb7da18c5ce 100644
 --- a/source3/libsmb/clidfs.c
 +++ b/source3/libsmb/clidfs.c
-@@ -388,7 +388,6 @@ NTSTATUS cli_cm_open(TALLOC_CTX *ctx,
+@@ -412,7 +412,6 @@ NTSTATUS cli_cm_open(TALLOC_CTX *ctx,
  		     const char *server,
  		     const char *share,
  		     struct cli_credentials *creds,
@@ -8194,7 +8194,7 @@ index 6e492fc522c..d659040693e 100644
  		     const struct sockaddr_storage *dest_ss,
  		     int port,
  		     int name_type,
-@@ -417,7 +416,7 @@ NTSTATUS cli_cm_open(TALLOC_CTX *ctx,
+@@ -441,7 +440,7 @@ NTSTATUS cli_cm_open(TALLOC_CTX *ctx,
  				server,
  				share,
  				creds,
@@ -8203,7 +8203,7 @@ index 6e492fc522c..d659040693e 100644
  				dest_ss,
  				port,
  				name_type,
-@@ -965,7 +964,6 @@ NTSTATUS cli_resolve_path(TALLOC_CTX *ctx,
+@@ -989,7 +988,6 @@ NTSTATUS cli_resolve_path(TALLOC_CTX *ctx,
  			     smbXcli_conn_remote_name(rootcli->conn),
  			     "IPC$",
  			     creds,
@@ -8224,10 +8224,10 @@ index 517738dbcd7..8aaaff2cb1e 100644
  		     int port,
  		     int name_type,
 -- 
-2.29.2
+2.31.1
 
 
-From f5861c11522b199a506e931d8d60f61a4667f9a6 Mon Sep 17 00:00:00 2001
+From d2a07db0250e067d07adf69fee78c88ce51baf88 Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Thu, 27 Aug 2020 16:45:12 +0200
 Subject: [PATCH 072/105] s3:libcmb: Remove max_protocol from cli_cm_connect()
@@ -8240,10 +8240,10 @@ Reviewed-by: Jeremy Allison <jra@samba.org>
  1 file changed, 1 insertion(+), 4 deletions(-)
 
 diff --git a/source3/libsmb/clidfs.c b/source3/libsmb/clidfs.c
-index d659040693e..a76f97203ee 100644
+index eb7da18c5ce..88faf22507e 100644
 --- a/source3/libsmb/clidfs.c
 +++ b/source3/libsmb/clidfs.c
-@@ -293,7 +293,6 @@ static NTSTATUS cli_cm_connect(TALLOC_CTX *ctx,
+@@ -317,7 +317,6 @@ static NTSTATUS cli_cm_connect(TALLOC_CTX *ctx,
  			       const char *server,
  			       const char *share,
  			       struct cli_credentials *creds,
@@ -8251,7 +8251,7 @@ index d659040693e..a76f97203ee 100644
  			       const struct sockaddr_storage *dest_ss,
  			       int port,
  			       int name_type,
-@@ -304,7 +303,7 @@ static NTSTATUS cli_cm_connect(TALLOC_CTX *ctx,
+@@ -328,7 +327,7 @@ static NTSTATUS cli_cm_connect(TALLOC_CTX *ctx,
  
  	status = do_connect(ctx, server, share,
  				creds,
@@ -8260,7 +8260,7 @@ index d659040693e..a76f97203ee 100644
  				dest_ss, port, name_type, &cli);
  
  	if (!NT_STATUS_IS_OK(status)) {
-@@ -416,7 +415,6 @@ NTSTATUS cli_cm_open(TALLOC_CTX *ctx,
+@@ -440,7 +439,6 @@ NTSTATUS cli_cm_open(TALLOC_CTX *ctx,
  				server,
  				share,
  				creds,
@@ -8268,7 +8268,7 @@ index d659040693e..a76f97203ee 100644
  				dest_ss,
  				port,
  				name_type,
-@@ -1020,7 +1018,6 @@ NTSTATUS cli_resolve_path(TALLOC_CTX *ctx,
+@@ -1044,7 +1042,6 @@ NTSTATUS cli_resolve_path(TALLOC_CTX *ctx,
  				dfs_refs[count].server,
  				dfs_refs[count].share,
  				creds,
@@ -8277,10 +8277,10 @@ index d659040693e..a76f97203ee 100644
  				0, /* port */
  				0x20,
 -- 
-2.29.2
+2.31.1
 
 
-From a5e1b39df83ebd300fbc3ac1022468e944dc90d5 Mon Sep 17 00:00:00 2001
+From bfaa7e48c302ceee9080d5f3fe640950a4a9a6c7 Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Thu, 27 Aug 2020 16:46:29 +0200
 Subject: [PATCH 073/105] s3:libsmb: Remove max_protocol from clidfs
@@ -8296,10 +8296,10 @@ Reviewed-by: Jeremy Allison <jra@samba.org>
  1 file changed, 1 insertion(+), 7 deletions(-)
 
 diff --git a/source3/libsmb/clidfs.c b/source3/libsmb/clidfs.c
-index a76f97203ee..286ca41fd71 100644
+index 88faf22507e..2c2e77b685a 100644
 --- a/source3/libsmb/clidfs.c
 +++ b/source3/libsmb/clidfs.c
-@@ -107,7 +107,6 @@ static NTSTATUS do_connect(TALLOC_CTX *ctx,
+@@ -131,7 +131,6 @@ static NTSTATUS do_connect(TALLOC_CTX *ctx,
  					const char *server,
  					const char *share,
  					struct cli_credentials *creds,
@@ -8307,7 +8307,7 @@ index a76f97203ee..286ca41fd71 100644
  					const struct sockaddr_storage *dest_ss,
  					int port,
  					int name_type,
-@@ -167,14 +166,11 @@ static NTSTATUS do_connect(TALLOC_CTX *ctx,
+@@ -191,14 +190,11 @@ static NTSTATUS do_connect(TALLOC_CTX *ctx,
  		return status;
  	}
  
@@ -8323,7 +8323,7 @@ index a76f97203ee..286ca41fd71 100644
  
  	if (!NT_STATUS_IS_OK(status)) {
  		d_printf("protocol negotiation failed: %s\n",
-@@ -233,7 +229,6 @@ static NTSTATUS do_connect(TALLOC_CTX *ctx,
+@@ -273,7 +269,6 @@ static NTSTATUS do_connect(TALLOC_CTX *ctx,
  		cli_shutdown(c);
  		return do_connect(ctx, newserver,
  				newshare, creds,
@@ -8331,7 +8331,7 @@ index a76f97203ee..286ca41fd71 100644
  				NULL, port, name_type, pcli);
  	}
  
-@@ -303,7 +298,6 @@ static NTSTATUS cli_cm_connect(TALLOC_CTX *ctx,
+@@ -327,7 +322,6 @@ static NTSTATUS cli_cm_connect(TALLOC_CTX *ctx,
  
  	status = do_connect(ctx, server, share,
  				creds,
@@ -8340,10 +8340,10 @@ index a76f97203ee..286ca41fd71 100644
  
  	if (!NT_STATUS_IS_OK(status)) {
 -- 
-2.29.2
+2.31.1
 
 
-From 82163b46808648c22c57f69cdf03d9ff9bcfe3e4 Mon Sep 17 00:00:00 2001
+From a87be8325e17a16f8e89f9ff7f12c79212a5645f Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Mon, 10 Aug 2020 15:47:35 +0200
 Subject: [PATCH 074/105] s3:include: Move loadparm prototypes to own header
@@ -8758,10 +8758,10 @@ index 00000000000..7686877ccf1
 +
 +#endif /* _S3_LOADPARM_H */
 -- 
-2.29.2
+2.31.1
 
 
-From a9365a42a95633e4b479c4126368b9e3e3368ba5 Mon Sep 17 00:00:00 2001
+From d06b27b2344875cc2bfa77d5438d9543f215b233 Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Tue, 11 Aug 2020 10:41:07 +0200
 Subject: [PATCH 075/105] s3:lib: Move interface prototypes to own header file
@@ -8864,10 +8864,10 @@ index 00000000000..f45435b4a81
 +
 +#endif /* _INTERFACE_H */
 -- 
-2.29.2
+2.31.1
 
 
-From 358074c6edc583521865538926dbcd96b1c541e6 Mon Sep 17 00:00:00 2001
+From 7e2cbeddea7398a3bf98e70bf0bd0cc8f8631dfd Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Fri, 7 Feb 2020 16:48:16 +0100
 Subject: [PATCH 076/105] idl: Add SID_SAMBA_SMB3
@@ -8894,10 +8894,10 @@ index a92e8f1518e..06bf7449a70 100644
  	const string NAME_NT_SERVICE            = "NT SERVICE";
  
 -- 
-2.29.2
+2.31.1
 
 
-From 118cf8e5df14da9654950af2ce613b00904b6c3f Mon Sep 17 00:00:00 2001
+From 7c3c02fa82ad5463ac586066c64eb56481f121d2 Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Fri, 7 Feb 2020 16:48:29 +0100
 Subject: [PATCH 077/105] s3:smbd: Add SMB3 connection information to session
@@ -9051,10 +9051,10 @@ index cf9de185c1f..cd24b7d2ed5 100644
  	}
  
 -- 
-2.29.2
+2.31.1
 
 
-From abfbb9d7e1968f8b6c3687e1057c8efc4d91cc82 Mon Sep 17 00:00:00 2001
+From 545e659f4be06d90c3d201e300a6ba66879f4d54 Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Thu, 12 Mar 2020 14:11:56 +0100
 Subject: [PATCH 078/105] librpc: Add dcerpc helper
@@ -9267,10 +9267,10 @@ index 27b180fa63d..109a1834841 100644
  	source='gen_ndr/ndr_winbind.c',
  	public_deps='ndr NDR_LSA'
 -- 
-2.29.2
+2.31.1
 
 
-From bf5a114f7d5a6772de3a6ca6b17bbef3237a0815 Mon Sep 17 00:00:00 2001
+From edf4ad5bfc2e78acfe506bb273d1170331836091 Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Fri, 28 Aug 2020 16:31:17 +0200
 Subject: [PATCH 079/105] s3:smbd: Use defines to set 'srv_smb_encrypt'
@@ -9304,10 +9304,10 @@ index d51a3de9497..785cbb23b5f 100644
  		char smb3_sid_str[SID_MAX_SIZE];
  		struct dom_sid smb3_dom_sid;
 -- 
-2.29.2
+2.31.1
 
 
-From 8fe707228fa12164b4c43740a2a6909650cd39b0 Mon Sep 17 00:00:00 2001
+From 59ce51b4e559b9b376e90a0c2244c879f6251881 Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Tue, 12 Nov 2019 16:56:45 +0100
 Subject: [PATCH 080/105] s3:rpc_server: Allow to use RC4 for setting passwords
@@ -9541,10 +9541,10 @@ index 2af02ad6fa8..eb91ac09384 100644
  bld.SAMBA3_SUBSYSTEM('RPC_SPOOLSS',
                      source='''spoolss/srv_spoolss_nt.c
 -- 
-2.29.2
+2.31.1
 
 
-From aa7b608747e1735b4edafe18ec06ddfaf5530067 Mon Sep 17 00:00:00 2001
+From 9301741e90f81ba99442c9b56f763ed79c2072f7 Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Fri, 15 Nov 2019 13:49:40 +0100
 Subject: [PATCH 081/105] s4:rpc_server: Allow to use RC4 for setting passwords
@@ -9672,10 +9672,10 @@ index de55ad6239a..c9c1978f223 100644
  
  
 -- 
-2.29.2
+2.31.1
 
 
-From b4708a9ee2133cc5b5159246add53f785bea0952 Mon Sep 17 00:00:00 2001
+From 0491de23f74496546f8e046d17c2d35a982f542a Mon Sep 17 00:00:00 2001
 From: Isaac Boukris <iboukris@gmail.com>
 Date: Thu, 20 Aug 2020 12:45:49 +0200
 Subject: [PATCH 082/105] lib:crypto: Add py binding for set_relax/strict fips
@@ -9730,10 +9730,10 @@ index 32b946eee8f..ad18d3ada0f 100644
  };
  
 -- 
-2.29.2
+2.31.1
 
 
-From 99dc2113b90c7852fdd30aa9037a965331d68b71 Mon Sep 17 00:00:00 2001
+From 4d7d990e7b2f025afbd9681de98cc888670636e7 Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Wed, 28 Oct 2020 17:05:36 +0100
 Subject: [PATCH 083/105] s4:param: Add 'weak crypto' getter to pyparam
@@ -9786,10 +9786,10 @@ index 4023fac4dd6..e15592b5743 100644
  };
  
 -- 
-2.29.2
+2.31.1
 
 
-From e3de8e62a904f3f8d5d5aebef3c3c0f71f287bc8 Mon Sep 17 00:00:00 2001
+From 12e7ec664999bc03bd34c5d1636a13baef13d438 Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Wed, 21 Oct 2020 10:09:22 +0200
 Subject: [PATCH 084/105] python:tests: Add SAMR password change tests for fips
@@ -10011,10 +10011,10 @@ index 3246161f0d7..4f164db9c73 100644
  
  def cmdline(script, *args):
 -- 
-2.29.2
+2.31.1
 
 
-From 08e686dd19925a62aaa98f3a558dc933bea83463 Mon Sep 17 00:00:00 2001
+From e93db2d240339ae9b6ec7b579e4a6bc2bedc77d2 Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Wed, 21 Oct 2020 10:09:22 +0200
 Subject: [PATCH 085/105] python:tests: Add SAMR password change tests for fips
@@ -10044,10 +10044,10 @@ index 77bd741d476..1ae9fb9d996 100755
  		warn("Unable to add '$testallowed_account' user to 'Allowed RODC Password Replication Group': \n$samba_tool_cmd\n");
  		return undef;
 -- 
-2.29.2
+2.31.1
 
 
-From 8f5ee560b92a607a5e28bf3b164a034226badfaf Mon Sep 17 00:00:00 2001
+From 3fa184ebdae4f84fee5231ca46e0c52c09b5a425 Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Thu, 20 Aug 2020 09:40:41 +0200
 Subject: [PATCH 086/105] auth:creds: Rename CRED_USE_KERBEROS values
@@ -10786,10 +10786,10 @@ index 07c6faebb15..701dfc10a07 100644
  		torture_skip(tctx, "smb2.session.expire1 requires -k yes!");
  	}
 -- 
-2.29.2
+2.31.1
 
 
-From 7bafd2824cb87ce6999b502d97217f1581acae97 Mon Sep 17 00:00:00 2001
+From c71b681c5dcdea518411c4bebfbdb5f72c89c6c8 Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Tue, 1 Sep 2020 12:32:28 +0200
 Subject: [PATCH 087/105] auth:creds:tests: Migrate test to a cmocka unit test
@@ -11083,10 +11083,10 @@ index 38b6c8f4b6e..f0ab0357986 100644
  	../../dsdb/schema/tests/schema_syntax.c
  	../../../lib/util/tests/anonymous_shared.c
 -- 
-2.29.2
+2.31.1
 
 
-From 3d8041a90cc293c52989e4fa25ea7b66209d036f Mon Sep 17 00:00:00 2001
+From 4115d47379781fe319c36fd6452188c6430ccd08 Mon Sep 17 00:00:00 2001
 From: Isaac Boukris <iboukris@gmail.com>
 Date: Thu, 20 Aug 2020 12:09:05 +0200
 Subject: [PATCH 088/105] Add smb2cli_session_get_encryption_cipher()
@@ -11104,7 +11104,7 @@ Reviewed-by: Alexander Bokovoy <ab@samba.org>
  2 files changed, 14 insertions(+)
 
 diff --git a/libcli/smb/smbXcli_base.c b/libcli/smb/smbXcli_base.c
-index 4909797543c..1be3a5506a0 100644
+index bcb601dde59..91c670706fc 100644
 --- a/libcli/smb/smbXcli_base.c
 +++ b/libcli/smb/smbXcli_base.c
 @@ -6461,6 +6461,19 @@ NTSTATUS smb2cli_session_encryption_on(struct smbXcli_session *session)
@@ -11128,10 +11128,10 @@ index 4909797543c..1be3a5506a0 100644
  {
  	struct smbXcli_tcon *tcon;
 diff --git a/libcli/smb/smbXcli_base.h b/libcli/smb/smbXcli_base.h
-index 2afc7165cd9..db5f5d58799 100644
+index 4452cd808ea..247bac98904 100644
 --- a/libcli/smb/smbXcli_base.h
 +++ b/libcli/smb/smbXcli_base.h
-@@ -518,6 +518,7 @@ NTSTATUS smb2cli_session_set_channel_key(struct smbXcli_session *session,
+@@ -527,6 +527,7 @@ NTSTATUS smb2cli_session_set_channel_key(struct smbXcli_session *session,
  					 const DATA_BLOB channel_key,
  					 const struct iovec *recv_iov);
  NTSTATUS smb2cli_session_encryption_on(struct smbXcli_session *session);
@@ -11140,10 +11140,10 @@ index 2afc7165cd9..db5f5d58799 100644
  struct smbXcli_tcon *smbXcli_tcon_create(TALLOC_CTX *mem_ctx);
  struct smbXcli_tcon *smbXcli_tcon_copy(TALLOC_CTX *mem_ctx,
 -- 
-2.29.2
+2.31.1
 
 
-From f7f374387cf30bf0811bcd83e12c0eb26c917ff8 Mon Sep 17 00:00:00 2001
+From e770fc65ac9c1dfc35619b0863ebaabc43b1412c Mon Sep 17 00:00:00 2001
 From: Isaac Boukris <iboukris@gmail.com>
 Date: Thu, 20 Aug 2020 12:18:21 +0200
 Subject: [PATCH 089/105] Add dcerpc_transport_encrypted()
@@ -11232,10 +11232,10 @@ index bd79a072bc8..6ea27a8d9a3 100644
    create a secondary context from a primary connection
  
 -- 
-2.29.2
+2.31.1
 
 
-From 46419d69586855c3df51ec79f0dd0b852912901c Mon Sep 17 00:00:00 2001
+From 12b3bcec468fc71b9567b85ebba3a18e5b8fb4d5 Mon Sep 17 00:00:00 2001
 From: Isaac Boukris <iboukris@gmail.com>
 Date: Thu, 20 Aug 2020 12:35:01 +0200
 Subject: [PATCH 090/105] Add py binding for dcerpc_transport_encrypted
@@ -11279,10 +11279,10 @@ index be914ed5f14..309a6d72e26 100644
  };
  
 -- 
-2.29.2
+2.31.1
 
 
-From df9e9ab494b224679d90af041d4b23ce082b1b5f Mon Sep 17 00:00:00 2001
+From 4d040fa848f1c71713b5e07594ab888f15dad5ec Mon Sep 17 00:00:00 2001
 From: Isaac Boukris <iboukris@gmail.com>
 Date: Thu, 20 Aug 2020 12:44:08 +0200
 Subject: [PATCH 091/105] selftest: add a test for py dce transport_encrypted
@@ -11344,10 +11344,10 @@ index 8e0d6a5ef0a..24e4ac77d89 100644
          objectAttr = lsa.ObjectAttribute()
          objectAttr.sec_qos = lsa.QosInfo()
 -- 
-2.29.2
+2.31.1
 
 
-From e2ee83d423afb38255e4e7bf042c5eafbaa476d3 Mon Sep 17 00:00:00 2001
+From 1e8f32667d93cd81df68eb43de6a882fdd4e025e Mon Sep 17 00:00:00 2001
 From: Isaac Boukris <iboukris@gmail.com>
 Date: Thu, 20 Aug 2020 12:47:12 +0200
 Subject: [PATCH 092/105] Add CreateTrustedDomainRelax wrapper for fips mode
@@ -11430,10 +11430,10 @@ index 00000000000..b4df0fa5bb8
 +
 +    return lsaconn.CreateTrustedDomainEx2(policy, trust_info, auth_info, mask)
 -- 
-2.29.2
+2.31.1
 
 
-From 25d7ca94cb6adb3142dcbf02115562f366ce6632 Mon Sep 17 00:00:00 2001
+From 5569a217d2778a16d0c2364b1fecf6ad327fa441 Mon Sep 17 00:00:00 2001
 From: Isaac Boukris <iboukris@gmail.com>
 Date: Thu, 20 Aug 2020 12:49:17 +0200
 Subject: [PATCH 093/105] Use the new CreateTrustedDomainRelax()
@@ -11537,10 +11537,10 @@ index 1d12c362911..93a3258d28d 100644
              if enc_types:
                  self.outf.write("Setting supported encryption types on local TDO.\n")
 -- 
-2.29.2
+2.31.1
 
 
-From 37eddec853ef26cd87dc21c2424a9aa565a350b7 Mon Sep 17 00:00:00 2001
+From 38f2363fea820551563398ee378aa84227274424 Mon Sep 17 00:00:00 2001
 From: Isaac Boukris <iboukris@gmail.com>
 Date: Tue, 1 Sep 2020 20:14:29 +0300
 Subject: [PATCH 094/105] selftest: add a test for the CreateTrustedDomainRelax
@@ -11707,7 +11707,7 @@ index 00000000000..80effda8343
 @@ -0,0 +1 @@
 +^samba.tests.dcerpc.createtrustrelax.samba.tests.dcerpc.createtrustrelax.CreateTrustedDomainRelaxTest.test_create_trust_relax_encrypt\(ad_dc_fips\)
 diff --git a/source4/selftest/tests.py b/source4/selftest/tests.py
-index 258c9122edc..18b671d0f29 100755
+index e16e64fb2f0..6e08e2e92e4 100755
 --- a/source4/selftest/tests.py
 +++ b/source4/selftest/tests.py
 @@ -705,6 +705,10 @@ def planoldpythontestsuite(env, module, name=None, extra_path=[], environ={}, ex
@@ -11722,10 +11722,10 @@ index 258c9122edc..18b671d0f29 100755
  # Right now ad_dc has mdb and ad_dc_ntvfs has tdb
  mdb_testenv = "ad_dc"
 -- 
-2.29.2
+2.31.1
 
 
-From 809a40543a137ede5d5d4ad7b87de5472e6855a8 Mon Sep 17 00:00:00 2001
+From 17e68dee20fcabf2764809ea25beeca7b522434f Mon Sep 17 00:00:00 2001
 From: Isaac Boukris <iboukris@gmail.com>
 Date: Thu, 5 Nov 2020 15:38:19 +0200
 Subject: [PATCH 095/105] Remove source4/scripting/devel/createtrust script
@@ -11877,10 +11877,10 @@ index 26b0d0dcb68..00000000000
 -                                                     auth_info,
 -                                                     security.SEC_STD_DELETE)
 -- 
-2.29.2
+2.31.1
 
 
-From 291cf61ae4eeefe061f2a0c13d8fedc58d5a6901 Mon Sep 17 00:00:00 2001
+From 8858b3bdc6e63a91f1d4d756cb0007d2394361f7 Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Fri, 6 Nov 2020 14:30:26 +0100
 Subject: [PATCH 096/105] s3:rpc_server: Use gnutls_cipher_decrypt() in
@@ -11909,10 +11909,10 @@ index 198387424e6..e749caf2551 100644
  				   auth_blob->length);
  	gnutls_cipher_deinit(cipher_hnd);
 -- 
-2.29.2
+2.31.1
 
 
-From abe5d5910739da48f3684f455e29c45a1e5772ce Mon Sep 17 00:00:00 2001
+From 07c786c60b88cec84e2246f6515443f20a4aa8ed Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Fri, 6 Nov 2020 14:33:38 +0100
 Subject: [PATCH 097/105] s4:rpc_server: Use gnutls_cipher_decrypt() in
@@ -11941,10 +11941,10 @@ index 8333cb149b6..4bb8aaa9592 100644
  				   auth_blob->length);
  	gnutls_cipher_deinit(cipher_hnd);
 -- 
-2.29.2
+2.31.1
 
 
-From 86def665c392f613f7b37a854487bf4037e1f8e0 Mon Sep 17 00:00:00 2001
+From f6d6dd2a5fbd754036bd4ac1a41f252ca36e2180 Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Thu, 20 Aug 2020 13:40:21 +0200
 Subject: [PATCH 098/105] s3:rpc_server: Allow to use RC4 for creating trusts
@@ -12008,10 +12008,10 @@ index e749caf2551..d6d606ddeca 100644
  		status = gnutls_error_to_ntstatus(rc, NT_STATUS_CRYPTO_SYSTEM_INVALID);
  		goto out;
 -- 
-2.29.2
+2.31.1
 
 
-From 4a7c7876ca2c67b02e4fec6c35e829126de0b740 Mon Sep 17 00:00:00 2001
+From e0f3eb1f42974944b99b67279c476e4ef4de3b3b Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Thu, 20 Aug 2020 13:51:39 +0200
 Subject: [PATCH 099/105] s4:rpc_server: Allow to use RC4 for creating trusts
@@ -12080,10 +12080,10 @@ index 4bb8aaa9592..5b3ef71d458 100644
  		nt_status = gnutls_error_to_ntstatus(rc, NT_STATUS_CRYPTO_SYSTEM_INVALID);
  		goto out;
 -- 
-2.29.2
+2.31.1
 
 
-From 345e9b4bd3983356474311cc878db89e4657cdf2 Mon Sep 17 00:00:00 2001
+From 6bd9116afeb5be59a6701a2dc349c5bcb78c91f6 Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Fri, 6 Nov 2020 10:13:48 +0100
 Subject: [PATCH 100/105] sefltest: Enable the dcerpc.createtrustrelax test
@@ -12110,10 +12110,10 @@ index 80effda8343..00000000000
 @@ -1 +0,0 @@
 -^samba.tests.dcerpc.createtrustrelax.samba.tests.dcerpc.createtrustrelax.CreateTrustedDomainRelaxTest.test_create_trust_relax_encrypt\(ad_dc_fips\)
 -- 
-2.29.2
+2.31.1
 
 
-From f0ac7a131e942175295ab471b44b662216a346b6 Mon Sep 17 00:00:00 2001
+From ecbcd57c425c69646ba649ea21f320cc7e56b02e Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Wed, 11 Nov 2020 13:42:06 +0100
 Subject: [PATCH 101/105] s3:smbd: Fix possible null pointer dereference in
@@ -12146,10 +12146,10 @@ index 57754a0f766..694c0c290e8 100644
  		/* Check if username starts with domain name */
  		if (domain_len > 0) {
 -- 
-2.29.2
+2.31.1
 
 
-From 2ed81da6506e43e3b94f479cd5edcbd11654fa6a Mon Sep 17 00:00:00 2001
+From f0654e4786cb44d5c2834c4cbeedec42a66107b5 Mon Sep 17 00:00:00 2001
 From: Alexander Bokovoy <ab@samba.org>
 Date: Tue, 10 Nov 2020 17:35:24 +0200
 Subject: [PATCH 102/105] lookup_name: allow lookup names prefixed with DNS
@@ -12206,10 +12206,10 @@ Autobuild-Date(master): Wed Nov 11 10:59:01 UTC 2020 on sn-devel-184
  1 file changed, 28 insertions(+), 9 deletions(-)
 
 diff --git a/source3/passdb/lookup_sid.c b/source3/passdb/lookup_sid.c
-index 82c47b3145b..864246da56e 100644
+index 4b3aa7e435d..99f9bdd7693 100644
 --- a/source3/passdb/lookup_sid.c
 +++ b/source3/passdb/lookup_sid.c
-@@ -113,17 +113,36 @@ bool lookup_name(TALLOC_CTX *mem_ctx,
+@@ -114,17 +114,36 @@ bool lookup_name(TALLOC_CTX *mem_ctx,
  		full_name, domain, name));
  	DEBUG(10, ("lookup_name: flags = 0x0%x\n", flags));
  
@@ -12256,10 +12256,10 @@ index 82c47b3145b..864246da56e 100644
  
  	if ((flags & LOOKUP_NAME_BUILTIN) &&
 -- 
-2.29.2
+2.31.1
 
 
-From 311a71971be6cb39806349291fd2cd44a4a7e214 Mon Sep 17 00:00:00 2001
+From 4ab1bdc465b7a02ab2dd8531be11518579e97f59 Mon Sep 17 00:00:00 2001
 From: Alexander Bokovoy <ab@samba.org>
 Date: Wed, 11 Nov 2020 14:42:55 +0200
 Subject: [PATCH 103/105] auth_sam: use pdb_get_domain_info to look up DNS
@@ -12479,10 +12479,10 @@ index 3c12f959faf..e8e0d543f8c 100644
  		DBG_INFO("%s is not our domain name (DC for %s)\n",
  			 effective_domain, lp_workgroup());
 -- 
-2.29.2
+2.31.1
 
 
-From cee41a7d2c051e6669f3fe63b7833c530d39212a Mon Sep 17 00:00:00 2001
+From fe9dffe41d545e41d4a1d9b2b1c6d5246a9f81af Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@samba.org>
 Date: Fri, 27 Nov 2020 11:22:15 +0100
 Subject: [PATCH 104/105] docs-xml: Add a section about weak crypto in testparm
@@ -12522,10 +12522,10 @@ index 9099cda010f..7c7abf50e8b 100644
  
  
 -- 
-2.29.2
+2.31.1
 
 
-From 75bac5fc644cfd36faa554b299f125f519bd3e89 Mon Sep 17 00:00:00 2001
+From 8abb1fa3b7972e89543f38a23d0979e1f0c2062f Mon Sep 17 00:00:00 2001
 From: Isaac Boukris <iboukris@gmail.com>
 Date: Tue, 15 Dec 2020 15:17:04 +0100
 Subject: [PATCH 105/105] HACK:s3:winbind: Rely on the domain child for online
@@ -12585,5 +12585,5 @@ index b1c86b2979c..c6362019877 100644
  
  	/* Handle online/offline messages. */
 -- 
-2.29.2
+2.31.1
 
