@@ -1,22 +1,21 @@
-From fe300549844509624d944b93fc64dc6d382e71c1 Mon Sep 17 00:00:00 2001
+From 7c4125deb1e03917f0a2353740f2c0e9e6cf87c5 Mon Sep 17 00:00:00 2001
 From: Isaac Boukris <iboukris@gmail.com>
 Date: Fri, 27 Sep 2019 18:25:03 +0300
-Subject: [PATCH 3/7] mit-kdc: add basic loacl realm S4U support
+Subject: [PATCH 1/3] mit-kdc: add basic loacl realm S4U support
 
 Signed-off-by: Isaac Boukris <iboukris@gmail.com>
 Pair-Programmed-With: Andreas Schneider <asn@samba.org>
 ---
- source4/kdc/mit-kdb/kdb_samba_policies.c      | 148 +++++++++---------
- source4/kdc/mit_samba.c                       |  47 ++----
- source4/kdc/mit_samba.h                       |   6 +-
- wscript_configure_system_mitkrb5              |   3 +
- 6 files changed, 91 insertions(+), 115 deletions(-)
+ source4/kdc/mit-kdb/kdb_samba_policies.c | 148 +++++++++++------------
+ source4/kdc/mit_samba.c                  |  47 ++-----
+ source4/kdc/mit_samba.h                  |   6 +-
+ 3 files changed, 86 insertions(+), 115 deletions(-)
 
 diff --git a/source4/kdc/mit-kdb/kdb_samba_policies.c b/source4/kdc/mit-kdb/kdb_samba_policies.c
-index 9197551ed61..944324d9a2f 100644
+index ac9865aac60..17d4c4028b9 100644
 --- a/source4/kdc/mit-kdb/kdb_samba_policies.c
 +++ b/source4/kdc/mit-kdb/kdb_samba_policies.c
-@@ -192,13 +192,17 @@ static krb5_error_code ks_verify_pac(krb5_context context,
+@@ -195,13 +195,17 @@ static krb5_error_code ks_verify_pac(krb5_context context,
  				     krb5_keyblock *krbtgt_key,
  				     krb5_timestamp authtime,
  				     krb5_authdata **tgt_auth_data,
@@ -37,7 +36,7 @@ index 9197551ed61..944324d9a2f 100644
  
  	mit_ctx = ks_get_context(context);
  	if (mit_ctx == NULL) {
-@@ -230,41 +234,43 @@ static krb5_error_code ks_verify_pac(krb5_context context,
+@@ -233,41 +237,43 @@ static krb5_error_code ks_verify_pac(krb5_context context,
  	code = krb5_pac_parse(context,
  			      authdata[0]->contents,
  			      authdata[0]->length,
@@ -107,7 +106,7 @@ index 9197551ed61..944324d9a2f 100644
  	if (code != 0) {
  		goto done;
  	}
-@@ -272,17 +278,22 @@ static krb5_error_code ks_verify_pac(krb5_context context,
+@@ -275,17 +281,22 @@ static krb5_error_code ks_verify_pac(krb5_context context,
  	code = mit_samba_reget_pac(mit_ctx,
  				   context,
  				   flags,
@@ -134,18 +133,18 @@ index 9197551ed61..944324d9a2f 100644
  
  	return code;
  }
-@@ -324,7 +335,7 @@ krb5_error_code kdb_samba_db_sign_auth_data(krb5_context context,
+@@ -310,7 +321,7 @@ krb5_error_code kdb_samba_db_sign_auth_data(krb5_context context,
+ 					    krb5_authdata ***signed_auth_data)
  {
- #endif
  	krb5_authdata **authdata = NULL;
 -	krb5_boolean is_as_req;
 +	krb5_const_principal pac_client;
  	krb5_error_code code;
  	krb5_pac pac = NULL;
  	krb5_data pac_data;
-@@ -334,24 +345,21 @@ krb5_error_code kdb_samba_db_sign_auth_data(krb5_context context,
+@@ -318,24 +329,21 @@ krb5_error_code kdb_samba_db_sign_auth_data(krb5_context context,
+ 	krbtgt = krbtgt == NULL ? local_krbtgt : krbtgt;
  	krbtgt_key = krbtgt_key == NULL ? local_krbtgt_key : krbtgt_key;
- #endif
  
 -	/* FIXME: We don't support S4U yet */
 -	if (flags & KRB5_KDB_FLAGS_S4U) {
@@ -179,7 +178,7 @@ index 9197551ed61..944324d9a2f 100644
  				     client,
  				     server,
  				     krbtgt,
-@@ -363,14 +371,28 @@ krb5_error_code kdb_samba_db_sign_auth_data(krb5_context context,
+@@ -347,14 +355,28 @@ krb5_error_code kdb_samba_db_sign_auth_data(krb5_context context,
  		if (code != 0) {
  			goto done;
  		}
@@ -209,7 +208,7 @@ index 9197551ed61..944324d9a2f 100644
  	}
  
  	if (pac == NULL) {
-@@ -379,7 +401,7 @@ krb5_error_code kdb_samba_db_sign_auth_data(krb5_context context,
+@@ -363,7 +385,7 @@ krb5_error_code kdb_samba_db_sign_auth_data(krb5_context context,
  	}
  
  	code = krb5_pac_sign(context, pac, authtime, client_princ,
@@ -218,7 +217,7 @@ index 9197551ed61..944324d9a2f 100644
  	if (code != 0) {
  		DBG_ERR("krb5_pac_sign failed: %d\n", code);
  		goto done;
-@@ -405,11 +427,6 @@ krb5_error_code kdb_samba_db_sign_auth_data(krb5_context context,
+@@ -389,11 +411,6 @@ krb5_error_code kdb_samba_db_sign_auth_data(krb5_context context,
  					      KRB5_AUTHDATA_IF_RELEVANT,
  					      authdata,
  					      signed_auth_data);
@@ -230,7 +229,7 @@ index 9197551ed61..944324d9a2f 100644
  
  done:
  	krb5_pac_free(context, pac);
-@@ -432,32 +449,13 @@ krb5_error_code kdb_samba_db_check_allowed_to_delegate(krb5_context context,
+@@ -416,32 +433,13 @@ krb5_error_code kdb_samba_db_check_allowed_to_delegate(krb5_context context,
  	 * server; -> delegating service
  	 * proxy; -> target principal
  	 */
@@ -265,10 +264,10 @@ index 9197551ed61..944324d9a2f 100644
  
  
 diff --git a/source4/kdc/mit_samba.c b/source4/kdc/mit_samba.c
-index 54dcd545ea1..f23327c9613 100644
+index 0a0d3a98315..5f35c6025bf 100644
 --- a/source4/kdc/mit_samba.c
 +++ b/source4/kdc/mit_samba.c
-@@ -467,7 +467,6 @@ int mit_samba_get_pac(struct mit_samba_context *smb_ctx,
+@@ -493,7 +493,6 @@ int mit_samba_get_pac(struct mit_samba_context *smb_ctx,
  krb5_error_code mit_samba_reget_pac(struct mit_samba_context *ctx,
  				    krb5_context context,
  				    int flags,
@@ -276,7 +275,7 @@ index 54dcd545ea1..f23327c9613 100644
  				    krb5_db_entry *client,
  				    krb5_db_entry *server,
  				    krb5_db_entry *krbtgt,
-@@ -615,7 +614,7 @@ krb5_error_code mit_samba_reget_pac(struct mit_samba_context *ctx,
+@@ -641,7 +640,7 @@ krb5_error_code mit_samba_reget_pac(struct mit_samba_context *ctx,
  								  context,
  								  *pac,
  								  server->princ,
@@ -285,7 +284,7 @@ index 54dcd545ea1..f23327c9613 100644
  								  deleg_blob);
  		if (!NT_STATUS_IS_OK(nt_status)) {
  			DEBUG(0, ("Update delegation info failed: %s\n",
-@@ -937,41 +936,17 @@ int mit_samba_check_client_access(struct mit_samba_context *ctx,
+@@ -963,41 +962,17 @@ int mit_samba_check_client_access(struct mit_samba_context *ctx,
  }
  
  int mit_samba_check_s4u2proxy(struct mit_samba_context *ctx,
@@ -362,12 +361,13 @@ index ba824557bd5..5aadf206443 100644
  int mit_samba_kpasswd_change_password(struct mit_samba_context *ctx,
  				      char *pwd,
 -- 
-2.25.4
+2.31.1
 
-From ff1b225493ede3d43cfad571770dacb73f75ec42 Mon Sep 17 00:00:00 2001
+
+From b2ada81ed9f89f6b38fb0a9e54811408676671d0 Mon Sep 17 00:00:00 2001
 From: Isaac Boukris <iboukris@gmail.com>
 Date: Fri, 27 Sep 2019 18:35:30 +0300
-Subject: [PATCH 5/7] krb5-mit: enable S4U client support for MIT build
+Subject: [PATCH 2/3] krb5-mit: enable S4U client support for MIT build
 
 Signed-off-by: Isaac Boukris <iboukris@gmail.com>
 Pair-Programmed-With: Andreas Schneider <asn@samba.org>
@@ -375,7 +375,7 @@ Pair-Programmed-With: Andreas Schneider <asn@samba.org>
  lib/krb5_wrap/krb5_samba.c            | 185 ++++++++++++++++++++++++++
  lib/krb5_wrap/krb5_samba.h            |   2 -
  source4/auth/kerberos/kerberos_util.c |  11 --
- 4 files changed, 185 insertions(+), 14 deletions(-)
+ 3 files changed, 185 insertions(+), 13 deletions(-)
 
 diff --git a/lib/krb5_wrap/krb5_samba.c b/lib/krb5_wrap/krb5_samba.c
 index 20ce86c708d..e72ab3c30f7 100644
@@ -574,7 +574,7 @@ index 20ce86c708d..e72ab3c30f7 100644
  
  #if !defined(HAVE_KRB5_MAKE_PRINCIPAL) && defined(HAVE_KRB5_BUILD_PRINCIPAL_ALLOC_VA)
 diff --git a/lib/krb5_wrap/krb5_samba.h b/lib/krb5_wrap/krb5_samba.h
-index ca9a893e4f7..3264ce5eb3b 100644
+index 9550447b2c5..ee3931c7544 100644
 --- a/lib/krb5_wrap/krb5_samba.h
 +++ b/lib/krb5_wrap/krb5_samba.h
 @@ -252,7 +252,6 @@ krb5_error_code smb_krb5_kinit_password_ccache(krb5_context ctx,
@@ -639,14 +639,13 @@ index 544d9d853cc..c14d8c72d8c 100644
  				ret = smb_krb5_kinit_password_ccache(smb_krb5_context->krb5_context,
  								     ccache,
 -- 
-2.25.4
+2.31.1
 
 
-
-From cf1b9bdc09180d68e2b30258839d2f78b7af9c62 Mon Sep 17 00:00:00 2001
+From bc5e97074739d29320a3e890575353fbfd452047 Mon Sep 17 00:00:00 2001
 From: Isaac Boukris <iboukris@gmail.com>
 Date: Sat, 19 Sep 2020 14:16:20 +0200
-Subject: [PATCH 7/7] wip: for canonicalization with new MIT kdc code
+Subject: [PATCH 3/3] wip: for canonicalization with new MIT kdc code
 
 ---
  source4/heimdal/lib/hdb/hdb.h | 1 +
@@ -696,10 +695,10 @@ index a560a1cd84b..c27b6a8ef4c 100644
  		ret = smb_krb5_make_principal(context, &entry_ex->entry.principal, lpcfg_realm(lp_ctx), samAccountName, NULL);
  		if (ret) {
 diff --git a/source4/kdc/mit_samba.c b/source4/kdc/mit_samba.c
-index f23327c9613..4084e893cc2 100644
+index 5f35c6025bf..20ee2c2b89e 100644
 --- a/source4/kdc/mit_samba.c
 +++ b/source4/kdc/mit_samba.c
-@@ -198,6 +198,9 @@ int mit_samba_get_principal(struct mit_samba_context *ctx,
+@@ -224,6 +224,9 @@ int mit_samba_get_principal(struct mit_samba_context *ctx,
  	if (kflags & KRB5_KDB_FLAG_CANONICALIZE) {
  		sflags |= SDB_F_CANON;
  	}
@@ -722,5 +721,5 @@ index c929acccce6..a9115ec23d7 100644
  void sdb_free_entry(struct sdb_entry_ex *e);
  void free_sdb_entry(struct sdb_entry *s);
 -- 
-2.25.4
+2.31.1
 
