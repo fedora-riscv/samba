@@ -129,7 +129,7 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%global baserelease 10
+%global baserelease 11
 
 %global samba_version 4.15.0
 %global talloc_version 2.3.3
@@ -137,7 +137,7 @@
 %global tevent_version 0.11.0
 %global ldb_version 2.4.0
 # This should be rc1 or nil
-%global pre_release rc5
+%global pre_release rc6
 
 %global samba_release %{baserelease}
 %if "x%{?pre_release}" != "x"
@@ -2813,6 +2813,7 @@ fi
 %{python3_sitearch}/samba/tests/dcerpc/__pycache__/binding.*.pyc
 %{python3_sitearch}/samba/tests/dcerpc/__pycache__/dnsserver.*.pyc
 %{python3_sitearch}/samba/tests/dcerpc/__pycache__/integer.*.pyc
+%{python3_sitearch}/samba/tests/dcerpc/__pycache__/lsa.*.pyc
 %{python3_sitearch}/samba/tests/dcerpc/__pycache__/mdssvc.*.pyc
 %{python3_sitearch}/samba/tests/dcerpc/__pycache__/misc.*.pyc
 %{python3_sitearch}/samba/tests/dcerpc/__pycache__/raw_protocol.*.pyc
@@ -2832,6 +2833,7 @@ fi
 %{python3_sitearch}/samba/tests/dcerpc/createtrustrelax.py
 %{python3_sitearch}/samba/tests/dcerpc/dnsserver.py
 %{python3_sitearch}/samba/tests/dcerpc/integer.py
+%{python3_sitearch}/samba/tests/dcerpc/lsa.py
 %{python3_sitearch}/samba/tests/dcerpc/mdssvc.py
 %{python3_sitearch}/samba/tests/dcerpc/misc.py
 %{python3_sitearch}/samba/tests/dcerpc/raw_protocol.py
@@ -2901,6 +2903,7 @@ fi
 %{python3_sitearch}/samba/tests/krb5/__pycache__/as_canonicalization_tests.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/as_req_tests.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/compatability_tests.*.pyc
+%{python3_sitearch}/samba/tests/krb5/__pycache__/fast_tests.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/kcrypto.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/kdc_base_test.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/kdc_tests.*.pyc
@@ -2919,6 +2922,7 @@ fi
 %{python3_sitearch}/samba/tests/krb5/as_canonicalization_tests.py
 %{python3_sitearch}/samba/tests/krb5/as_req_tests.py
 %{python3_sitearch}/samba/tests/krb5/compatability_tests.py
+%{python3_sitearch}/samba/tests/krb5/fast_tests.py
 %{python3_sitearch}/samba/tests/krb5/kcrypto.py
 %{python3_sitearch}/samba/tests/krb5/kdc_base_test.py
 %{python3_sitearch}/samba/tests/krb5/kdc_tests.py
@@ -4071,6 +4075,10 @@ fi
 %endif
 
 %changelog
+* Thu Sep 09 2021 Guenther Deschner <gdeschner@redhat.com> - 4.15.0-0.11.rc6
+- Update to Samba 4.15.0rc6
+- resolves: #2002546
+
 * Tue Sep 07 2021 Guenther Deschner <gdeschner@redhat.com> - 4.15.0-0.10.rc5
 - Update to Samba 4.15.0rc5
 - resolves: #2001827
