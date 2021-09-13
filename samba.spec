@@ -129,7 +129,7 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%global baserelease 11
+%global baserelease 12
 
 %global samba_version 4.15.0
 %global talloc_version 2.3.3
@@ -137,7 +137,7 @@
 %global tevent_version 0.11.0
 %global ldb_version 2.4.0
 # This should be rc1 or nil
-%global pre_release rc6
+%global pre_release rc7
 
 %global samba_release %{baserelease}
 %if "x%{?pre_release}" != "x"
@@ -4075,6 +4075,10 @@ fi
 %endif
 
 %changelog
+* Mon Sep 13 2021 Guenther Deschner <gdeschner@redhat.com> - 4.15.0-0.12.rc7
+- Update to Samba 4.15.0rc7
+- resolves: #2003740
+
 * Thu Sep 09 2021 Guenther Deschner <gdeschner@redhat.com> - 4.15.0-0.11.rc6
 - Update to Samba 4.15.0rc6
 - resolves: #2002546
