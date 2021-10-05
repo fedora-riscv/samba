@@ -117,7 +117,7 @@
 
 %global main_release 0
 
-%global samba_version 4.14.7
+%global samba_version 4.14.8
 %global talloc_version 2.3.2
 %global tdb_version 1.4.3
 %global tevent_version 0.10.2
@@ -2276,6 +2276,7 @@ fi
 %{python3_sitearch}/samba/dcerpc/idmap.*.so
 %{python3_sitearch}/samba/dcerpc/initshutdown.*.so
 %{python3_sitearch}/samba/dcerpc/irpc.*.so
+%{python3_sitearch}/samba/dcerpc/krb5ccache.*.so
 %{python3_sitearch}/samba/dcerpc/krb5pac.*.so
 %{python3_sitearch}/samba/dcerpc/lsa.*.so
 %{python3_sitearch}/samba/dcerpc/messaging.*.so
@@ -2700,6 +2701,7 @@ fi
 %{python3_sitearch}/samba/tests/dcerpc/__pycache__/binding.*.pyc
 %{python3_sitearch}/samba/tests/dcerpc/__pycache__/dnsserver.*.pyc
 %{python3_sitearch}/samba/tests/dcerpc/__pycache__/integer.*.pyc
+%{python3_sitearch}/samba/tests/dcerpc/__pycache__/lsa.*.pyc
 %{python3_sitearch}/samba/tests/dcerpc/__pycache__/mdssvc.*.pyc
 %{python3_sitearch}/samba/tests/dcerpc/__pycache__/misc.*.pyc
 %{python3_sitearch}/samba/tests/dcerpc/__pycache__/raw_protocol.*.pyc
@@ -2719,6 +2721,7 @@ fi
 %{python3_sitearch}/samba/tests/dcerpc/createtrustrelax.py
 %{python3_sitearch}/samba/tests/dcerpc/dnsserver.py
 %{python3_sitearch}/samba/tests/dcerpc/integer.py
+%{python3_sitearch}/samba/tests/dcerpc/lsa.py
 %{python3_sitearch}/samba/tests/dcerpc/mdssvc.py
 %{python3_sitearch}/samba/tests/dcerpc/misc.py
 %{python3_sitearch}/samba/tests/dcerpc/raw_protocol.py
@@ -2782,28 +2785,42 @@ fi
 %dir %{python3_sitearch}/samba/tests/krb5
 %dir %{python3_sitearch}/samba/tests/krb5/__pycache__
 %{python3_sitearch}/samba/tests/krb5/__pycache__/as_canonicalization_tests.*.pyc
+%{python3_sitearch}/samba/tests/krb5/__pycache__/as_req_tests.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/compatability_tests.*.pyc
+%{python3_sitearch}/samba/tests/krb5/__pycache__/fast_tests.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/kcrypto.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/kdc_base_test.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/kdc_tests.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/kdc_tgs_tests.*.pyc
+%{python3_sitearch}/samba/tests/krb5/__pycache__/ms_kile_client_principal_lookup_tests.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/raw_testcase.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/rfc4120_constants.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/rfc4120_pyasn1.*.pyc
+%{python3_sitearch}/samba/tests/krb5/__pycache__/test_ccache.*.pyc
+%{python3_sitearch}/samba/tests/krb5/__pycache__/test_ldap.*.pyc
+%{python3_sitearch}/samba/tests/krb5/__pycache__/test_rpc.*.pyc
+%{python3_sitearch}/samba/tests/krb5/__pycache__/test_smb.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/simple_tests.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/s4u_tests.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/xrealm_tests.*.pyc
 %{python3_sitearch}/samba/tests/krb5/as_canonicalization_tests.py
+%{python3_sitearch}/samba/tests/krb5/as_req_tests.py
 %{python3_sitearch}/samba/tests/krb5/compatability_tests.py
+%{python3_sitearch}/samba/tests/krb5/fast_tests.py
 %{python3_sitearch}/samba/tests/krb5/kcrypto.py
 %{python3_sitearch}/samba/tests/krb5/kdc_base_test.py
 %{python3_sitearch}/samba/tests/krb5/kdc_tests.py
 %{python3_sitearch}/samba/tests/krb5/kdc_tgs_tests.py
+%{python3_sitearch}/samba/tests/krb5/ms_kile_client_principal_lookup_tests.py
 %{python3_sitearch}/samba/tests/krb5/raw_testcase.py
 %{python3_sitearch}/samba/tests/krb5/rfc4120_constants.py
 %{python3_sitearch}/samba/tests/krb5/rfc4120_pyasn1.py
 %{python3_sitearch}/samba/tests/krb5/simple_tests.py
 %{python3_sitearch}/samba/tests/krb5/s4u_tests.py
+%{python3_sitearch}/samba/tests/krb5/test_ccache.py
+%{python3_sitearch}/samba/tests/krb5/test_ldap.py
+%{python3_sitearch}/samba/tests/krb5/test_rpc.py
+%{python3_sitearch}/samba/tests/krb5/test_smb.py
 %{python3_sitearch}/samba/tests/krb5/xrealm_tests.py
 %{python3_sitearch}/samba/tests/krb5_credentials.py
 %{python3_sitearch}/samba/tests/ldap_raw.py
@@ -3920,6 +3937,9 @@ fi
 %endif
 
 %changelog
+* Tue Oct 05 2021 Guenther Deschner <gdeschner@redhat.com> - 4.14.8-0
+- Update to Samba 4.14.8
+
 * Tue Aug 24 2021 Guenther Deschner <gdeschner@redhat.com> - 4.14.7-0
 - Update to Samba 4.14.7
 
