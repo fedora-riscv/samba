@@ -129,13 +129,13 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%global baserelease 13
+%global baserelease 0
 
-%global samba_version 4.15.0
+%global samba_version 4.15.1
 %global talloc_version 2.3.3
 %global tdb_version 1.4.4
 %global tevent_version 0.11.0
-%global ldb_version 2.4.0
+%global ldb_version 2.4.1
 # This should be rc1 or nil
 %global pre_release %nil
 
@@ -2912,6 +2912,8 @@ fi
 %{python3_sitearch}/samba/tests/krb5/__pycache__/raw_testcase.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/rfc4120_constants.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/rfc4120_pyasn1.*.pyc
+%{python3_sitearch}/samba/tests/krb5/__pycache__/rodc_tests*.pyc
+%{python3_sitearch}/samba/tests/krb5/__pycache__/salt_tests.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/simple_tests.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/s4u_tests.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/test_ccache.*.pyc
@@ -2931,6 +2933,8 @@ fi
 %{python3_sitearch}/samba/tests/krb5/raw_testcase.py
 %{python3_sitearch}/samba/tests/krb5/rfc4120_constants.py
 %{python3_sitearch}/samba/tests/krb5/rfc4120_pyasn1.py
+%{python3_sitearch}/samba/tests/krb5/rodc_tests.py
+%{python3_sitearch}/samba/tests/krb5/salt_tests.py
 %{python3_sitearch}/samba/tests/krb5/simple_tests.py
 %{python3_sitearch}/samba/tests/krb5/test_ccache.py
 %{python3_sitearch}/samba/tests/krb5/test_ldap.py
@@ -4075,6 +4079,10 @@ fi
 %endif
 
 %changelog
+* Wed Oct 27 2021 Guenther Deschner <gdeschner@redhat.com> - 4.15.1-0
+- Update to Samba 4.15.1
+- resolves: #2017847
+
 * Mon Sep 20 2021 Guenther Deschner <gdeschner@redhat.com> - 4.15.0-13
 - Update to Samba 4.15.0
 - resolves: #2005817
