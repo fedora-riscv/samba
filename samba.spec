@@ -117,11 +117,11 @@
 
 %global main_release 0
 
-%global samba_version 4.14.8
+%global samba_version 4.14.9
 %global talloc_version 2.3.2
 %global tdb_version 1.4.3
 %global tevent_version 0.10.2
-%global ldb_version 2.3.0
+%global ldb_version 2.3.1
 # This should be rc1 or nil
 %global pre_release %nil
 
@@ -3937,6 +3937,9 @@ fi
 %endif
 
 %changelog
+* Wed Oct 27 2021 Guenther Deschner <gdeschner@redhat.com> - 4.14.9-0
+- Update to Samba 4.14.9
+
 * Tue Oct 05 2021 Guenther Deschner <gdeschner@redhat.com> - 4.14.8-0
 - Update to Samba 4.14.8
 
