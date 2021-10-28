@@ -2800,6 +2800,8 @@ fi
 %{python3_sitearch}/samba/tests/krb5/__pycache__/test_ldap.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/test_rpc.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/test_smb.*.pyc
+%{python3_sitearch}/samba/tests/krb5/__pycache__/rodc_tests*.pyc
+%{python3_sitearch}/samba/tests/krb5/__pycache__/salt_tests.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/simple_tests.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/s4u_tests.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/xrealm_tests.*.pyc
@@ -2815,6 +2817,8 @@ fi
 %{python3_sitearch}/samba/tests/krb5/raw_testcase.py
 %{python3_sitearch}/samba/tests/krb5/rfc4120_constants.py
 %{python3_sitearch}/samba/tests/krb5/rfc4120_pyasn1.py
+%{python3_sitearch}/samba/tests/krb5/rodc_tests.py
+%{python3_sitearch}/samba/tests/krb5/salt_tests.py
 %{python3_sitearch}/samba/tests/krb5/simple_tests.py
 %{python3_sitearch}/samba/tests/krb5/s4u_tests.py
 %{python3_sitearch}/samba/tests/krb5/test_ccache.py
