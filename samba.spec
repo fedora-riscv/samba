@@ -10,11 +10,11 @@
 
 %define main_release 0
 
-%define samba_version 4.13.12
+%define samba_version 4.13.13
 %define talloc_version 2.3.1
 %define tdb_version 1.4.3
 %define tevent_version 0.10.2
-%define ldb_version 2.2.1
+%define ldb_version 2.2.2
 # This should be rc1 or nil
 %define pre_release %nil
 
@@ -2533,7 +2533,9 @@ fi
 %{python3_sitearch}/samba/tests/krb5/__pycache__/raw_testcase.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/rfc4120_constants.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/rfc4120_pyasn1.*.pyc
+%{python3_sitearch}/samba/tests/krb5/__pycache__/rodc_tests*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/s4u_tests.*.pyc
+%{python3_sitearch}/samba/tests/krb5/__pycache__/salt_tests.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/simple_tests.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/test_ccache.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/test_ldap.*.pyc
@@ -2552,7 +2554,9 @@ fi
 %{python3_sitearch}/samba/tests/krb5/raw_testcase.py
 %{python3_sitearch}/samba/tests/krb5/rfc4120_constants.py
 %{python3_sitearch}/samba/tests/krb5/rfc4120_pyasn1.py
+%{python3_sitearch}/samba/tests/krb5/rodc_tests.py
 %{python3_sitearch}/samba/tests/krb5/s4u_tests.py
+%{python3_sitearch}/samba/tests/krb5/salt_tests.py
 %{python3_sitearch}/samba/tests/krb5/simple_tests.py
 %{python3_sitearch}/samba/tests/krb5/test_ccache.py
 %{python3_sitearch}/samba/tests/krb5/test_ldap.py
@@ -3656,6 +3660,9 @@ fi
 %endif
 
 %changelog
+* Fri Oct 29 2021 Guenther Deschner <gdeschner@redhat.com> - 4.13.13-0
+- Update to Samba 4.13.13
+
 * Wed Sep 22 2021 Guenther Deschner <gdeschner@redhat.com> - 4.13.12-0
 - Update to Samba 4.13.12
 
