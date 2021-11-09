@@ -117,11 +117,11 @@
 
 %global main_release 0
 
-%global samba_version 4.14.9
+%global samba_version 4.14.10
 %global talloc_version 2.3.2
 %global tdb_version 1.4.3
 %global tevent_version 0.10.2
-%global ldb_version 2.3.1
+%global ldb_version 2.3.2
 # This should be rc1 or nil
 %global pre_release %nil
 
@@ -1697,6 +1697,7 @@ fi
 %{_libdir}/samba/libcommon-auth-samba4.so
 %{_libdir}/samba/libctdb-event-client-samba4.so
 %{_libdir}/samba/libdbwrap-samba4.so
+%{_libdir}/samba/libdcerpc-pkt-auth-samba4.so
 %{_libdir}/samba/libdcerpc-samba-samba4.so
 %{_libdir}/samba/libevents-samba4.so
 %{_libdir}/samba/libflag-mapping-samba4.so
@@ -2562,6 +2563,7 @@ fi
 %{python3_sitearch}/samba/tests/__pycache__/dns_tkey.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/dns_wildcard.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/dsdb.*.pyc
+%{python3_sitearch}/samba/tests/__pycache__/dsdb_api.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/dsdb_lock.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/dsdb_schema_attributes.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/docs.*.pyc
@@ -2580,6 +2582,8 @@ fi
 %{python3_sitearch}/samba/tests/__pycache__/krb5_credentials.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/ldap_raw.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/ldap_referrals.*.pyc
+%{python3_sitearch}/samba/tests/__pycache__/ldap_spn.*.pyc
+%{python3_sitearch}/samba/tests/__pycache__/ldap_upn_sam_account.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/loadparm.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/libsmb.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/lsa_string.*.pyc
@@ -2747,6 +2751,7 @@ fi
 %{python3_sitearch}/samba/tests/dns_tkey.py
 %{python3_sitearch}/samba/tests/dns_wildcard.py
 %{python3_sitearch}/samba/tests/dsdb.py
+%{python3_sitearch}/samba/tests/dsdb_api.py
 %{python3_sitearch}/samba/tests/dsdb_lock.py
 %{python3_sitearch}/samba/tests/dsdb_schema_attributes.py
 %{python3_sitearch}/samba/tests/docs.py
@@ -2784,6 +2789,7 @@ fi
 %{python3_sitearch}/samba/tests/kcc/ldif_import_export.py
 %dir %{python3_sitearch}/samba/tests/krb5
 %dir %{python3_sitearch}/samba/tests/krb5/__pycache__
+%{python3_sitearch}/samba/tests/krb5/__pycache__/alias_tests.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/as_canonicalization_tests.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/as_req_tests.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/compatability_tests.*.pyc
@@ -2796,8 +2802,10 @@ fi
 %{python3_sitearch}/samba/tests/krb5/__pycache__/raw_testcase.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/rfc4120_constants.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/rfc4120_pyasn1.*.pyc
+%{python3_sitearch}/samba/tests/krb5/__pycache__/spn_tests.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/test_ccache.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/test_ldap.*.pyc
+%{python3_sitearch}/samba/tests/krb5/__pycache__/test_min_domain_uid.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/test_rpc.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/test_smb.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/rodc_tests*.pyc
@@ -2805,6 +2813,7 @@ fi
 %{python3_sitearch}/samba/tests/krb5/__pycache__/simple_tests.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/s4u_tests.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/xrealm_tests.*.pyc
+%{python3_sitearch}/samba/tests/krb5/alias_tests.py
 %{python3_sitearch}/samba/tests/krb5/as_canonicalization_tests.py
 %{python3_sitearch}/samba/tests/krb5/as_req_tests.py
 %{python3_sitearch}/samba/tests/krb5/compatability_tests.py
@@ -2820,15 +2829,19 @@ fi
 %{python3_sitearch}/samba/tests/krb5/rodc_tests.py
 %{python3_sitearch}/samba/tests/krb5/salt_tests.py
 %{python3_sitearch}/samba/tests/krb5/simple_tests.py
+%{python3_sitearch}/samba/tests/krb5/spn_tests.py
 %{python3_sitearch}/samba/tests/krb5/s4u_tests.py
 %{python3_sitearch}/samba/tests/krb5/test_ccache.py
 %{python3_sitearch}/samba/tests/krb5/test_ldap.py
+%{python3_sitearch}/samba/tests/krb5/test_min_domain_uid.py
 %{python3_sitearch}/samba/tests/krb5/test_rpc.py
 %{python3_sitearch}/samba/tests/krb5/test_smb.py
 %{python3_sitearch}/samba/tests/krb5/xrealm_tests.py
 %{python3_sitearch}/samba/tests/krb5_credentials.py
 %{python3_sitearch}/samba/tests/ldap_raw.py
 %{python3_sitearch}/samba/tests/ldap_referrals.py
+%{python3_sitearch}/samba/tests/ldap_spn.py
+%{python3_sitearch}/samba/tests/ldap_upn_sam_account.py
 %{python3_sitearch}/samba/tests/libsmb.py
 %{python3_sitearch}/samba/tests/loadparm.py
 %{python3_sitearch}/samba/tests/lsa_string.py
@@ -3941,6 +3954,17 @@ fi
 %endif
 
 %changelog
+* Tue Nov 09 2021 Guenther Deschner <gdeschner@redhat.com> - 4.14.10-0
+- Update to Samba 4.14.10
+- resolves: #2019660, #2021711 - Security fixes for CVE-2016-2124
+- resolves: #2019672, #2021716 - Security fixes for CVE-2020-25717
+- resolves: #2019726, #2021718 - Security fixes for CVE-2020-25718
+- resolves: #2019732, #2021719 - Security fixes for CVE-2020-25719
+- resolves: #2021728, #2021729 - Security fixes for CVE-2020-25721
+- resolves: #2019764, #2021721 - Security fixes for CVE-2020-25722
+- resolves: #2021726, #2021727 - Security fixes for CVE-2021-3738
+- resolves: #2019666, #2021715 - Security fixes for CVE-2021-23192
+
 * Wed Oct 27 2021 Guenther Deschner <gdeschner@redhat.com> - 4.14.9-0
 - Update to Samba 4.14.9
 
