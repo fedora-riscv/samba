@@ -115,7 +115,7 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%global main_release 0
+%global main_release 1
 
 %global samba_version 4.14.10
 %global talloc_version 2.3.2
@@ -185,6 +185,7 @@ Source14:       samba.pamd
 Source201:      README.downgrade
 
 Patch0:         samba-s4u.patch
+Patch1:         samba-4.14-fix-winbind-no-trusted-domain.patch
 
 Requires(pre): /usr/sbin/groupadd
 Requires(post): systemd
@@ -3954,6 +3955,10 @@ fi
 %endif
 
 %changelog
+* Thu Nov 11 2021 Guenther Deschner <gdeschner@redhat.com> - 4.14.10-1
+- Fix winbind trusted domain regression
+- related: #2021716
+
 * Tue Nov 09 2021 Guenther Deschner <gdeschner@redhat.com> - 4.14.10-0
 - Update to Samba 4.14.10
 - resolves: #2019660, #2021711 - Security fixes for CVE-2016-2124
