@@ -129,7 +129,7 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%global baserelease 0
+%global baserelease 1
 
 %global samba_version 4.15.2
 %global talloc_version 2.3.3
@@ -201,6 +201,7 @@ Source201:      README.downgrade
 Patch0:         samba-s4u.patch
 Patch1:         samba-ctdb-etcd-reclock.patch
 Patch2:         samba-4.15.1-winexe.patch
+Patch3:         samba-4.15-fix-winbind-no-trusted-domain.patch
 
 Requires(pre): /usr/sbin/groupadd
 Requires(post): systemd
@@ -4092,6 +4093,10 @@ fi
 %endif
 
 %changelog
+* Thu Nov 11 2021 Guenther Deschner <gdeschner@redhat.com> - 4.15.2-1
+- Fix winbind trusted domain regression
+- related: #2021716
+
 * Tue Nov 09 2021 Guenther Deschner <gdeschner@redhat.com> - 4.15.2-0
 - Update to Samba 4.15.2
 - resolves: #2019660, #2021711 - Security fixes for CVE-2016-2124
