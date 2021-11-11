@@ -1,0 +1,981 @@
+From 96d6bd4feb27b9b003aac44ef2ab7ef0a288272d Mon Sep 17 00:00:00 2001
+From: Ralph Boehme <slow@samba.org>
+Date: Wed, 10 Nov 2021 20:18:07 +0100
+Subject: [PATCH 1/8] source3: move lib/substitute.c functions out of proto.h
+
+BUG: https://bugzilla.samba.org/show_bug.cgi?id=14897
+
+Signed-off-by: Ralph Boehme <slow@samba.org>
+---
+ source3/auth/auth_generic.c                 |  1 +
+ source3/auth/auth_ntlmssp.c                 |  1 +
+ source3/auth/auth_util.c                    |  1 +
+ source3/include/proto.h                     | 33 -----------
+ source3/lib/substitute.c                    |  1 +
+ source3/lib/substitute.h                    | 63 +++++++++++++++++++++
+ source3/modules/vfs_expand_msdfs.c          |  1 +
+ source3/modules/vfs_full_audit.c            |  1 +
+ source3/modules/vfs_recycle.c               |  1 +
+ source3/modules/vfs_unityed_media.c         |  1 +
+ source3/modules/vfs_virusfilter_utils.c     |  1 +
+ source3/nmbd/nmbd.c                         |  1 +
+ source3/nmbd/nmbd_synclists.c               |  1 +
+ source3/param/loadparm.c                    |  1 +
+ source3/passdb/passdb.c                     |  1 +
+ source3/passdb/pdb_ldap.c                   |  1 +
+ source3/printing/print_generic.c            |  1 +
+ source3/printing/printing.c                 |  1 +
+ source3/rpc_server/lsa/srv_lsa_nt.c         |  1 +
+ source3/rpc_server/netlogon/srv_netlog_nt.c |  1 +
+ source3/rpc_server/srvsvc/srv_srvsvc_nt.c   |  1 +
+ source3/smbd/ipc.c                          |  1 +
+ source3/smbd/lanman.c                       |  1 +
+ source3/smbd/message.c                      |  1 +
+ source3/smbd/msdfs.c                        |  1 +
+ source3/smbd/process.c                      |  1 +
+ source3/smbd/reply.c                        |  1 +
+ source3/smbd/server.c                       |  1 +
+ source3/smbd/service.c                      |  1 +
+ source3/smbd/sesssetup.c                    |  1 +
+ source3/smbd/share_access.c                 |  1 +
+ source3/smbd/smb2_server.c                  |  1 +
+ source3/smbd/smb2_sesssetup.c               |  1 +
+ source3/smbd/trans2.c                       |  1 +
+ source3/smbd/uid.c                          |  1 +
+ source3/torture/torture.c                   |  1 +
+ source3/utils/net_sam.c                     |  1 +
+ source3/winbindd/wb_getpwsid.c              |  1 +
+ source3/winbindd/winbindd.c                 |  1 +
+ 39 files changed, 100 insertions(+), 33 deletions(-)
+ create mode 100644 source3/lib/substitute.h
+
+diff --git a/source3/auth/auth_generic.c b/source3/auth/auth_generic.c
+index fc7a7549e8e..ff51307e43a 100644
+--- a/source3/auth/auth_generic.c
++++ b/source3/auth/auth_generic.c
+@@ -36,6 +36,7 @@
+ #include "auth/credentials/credentials.h"
+ #include "lib/param/loadparm.h"
+ #include "librpc/gen_ndr/dcerpc.h"
++#include "source3/lib/substitute.h"
+ 
+ static NTSTATUS auth3_generate_session_info_pac(struct auth4_context *auth_ctx,
+ 						TALLOC_CTX *mem_ctx,
+diff --git a/source3/auth/auth_ntlmssp.c b/source3/auth/auth_ntlmssp.c
+index 676aa9d892c..f2deca09aa6 100644
+--- a/source3/auth/auth_ntlmssp.c
++++ b/source3/auth/auth_ntlmssp.c
+@@ -25,6 +25,7 @@
+ #include "auth.h"
+ #include "libcli/security/security.h"
+ #include "lib/util/tevent_ntstatus.h"
++#include "source3/lib/substitute.h"
+ 
+ NTSTATUS auth3_generate_session_info(struct auth4_context *auth_context,
+ 				     TALLOC_CTX *mem_ctx,
+diff --git a/source3/auth/auth_util.c b/source3/auth/auth_util.c
+index dec854d85c3..4527dedc49d 100644
+--- a/source3/auth/auth_util.c
++++ b/source3/auth/auth_util.c
+@@ -38,6 +38,7 @@
+ #include "rpc_client/util_netlogon.h"
+ #include "source4/auth/auth.h"
+ #include "auth/auth_util.h"
++#include "source3/lib/substitute.h"
+ 
+ #undef DBGC_CLASS
+ #define DBGC_CLASS DBGC_AUTH
+diff --git a/source3/include/proto.h b/source3/include/proto.h
+index eb45179aebb..a96c2c8d110 100644
+--- a/source3/include/proto.h
++++ b/source3/include/proto.h
+@@ -139,39 +139,6 @@ int smbrun_no_sanitize(const char *cmd, int *outfd, char * const *env);
+ int smbrun(const char *cmd, int *outfd, char * const *env);
+ int smbrunsecret(const char *cmd, const char *secret);
+ 
+-/* The following definitions come from lib/substitute.c  */
+-
+-bool set_local_machine_name(const char *local_name, bool perm);
+-const char *get_local_machine_name(void);
+-bool set_remote_machine_name(const char *remote_name, bool perm);
+-const char *get_remote_machine_name(void);
+-void sub_set_smb_name(const char *name);
+-void set_current_user_info(const char *smb_name, const char *unix_name,
+-			   const char *domain);
+-void sub_set_socket_ids(const char *peeraddr, const char *peername,
+-			const char *sockaddr);
+-const char *get_current_username(void);
+-void standard_sub_basic(const char *smb_name, const char *domain_name,
+-			char *str, size_t len);
+-char *talloc_sub_basic(TALLOC_CTX *mem_ctx, const char *smb_name,
+-		       const char *domain_name, const char *str);
+-char *talloc_sub_specified(TALLOC_CTX *mem_ctx,
+-			const char *input_string,
+-			const char *username,
+-			const char *grpname,
+-			const char *domain,
+-			uid_t uid,
+-			gid_t gid);
+-char *talloc_sub_advanced(TALLOC_CTX *mem_ctx,
+-			  const char *servicename, const char *user,
+-			  const char *connectpath, gid_t gid,
+-			  const char *str);
+-char *talloc_sub_full(TALLOC_CTX *mem_ctx,
+-			  const char *servicename, const char *user,
+-			  const char *connectpath, gid_t gid,
+-			  const char *smb_name, const char *domain_name,
+-			  const char *str);
+-
+ /* The following definitions come from lib/sysquotas.c  */
+ 
+ int sys_get_quota(const char *path, enum SMB_QUOTA_TYPE qtype, unid_t id, SMB_DISK_QUOTA *dp);
+diff --git a/source3/lib/substitute.c b/source3/lib/substitute.c
+index b98a0acf1cb..a941b89f82a 100644
+--- a/source3/lib/substitute.c
++++ b/source3/lib/substitute.c
+@@ -20,6 +20,7 @@
+ 
+ 
+ #include "includes.h"
++#include "substitute.h"
+ #include "system/passwd.h"
+ #include "secrets.h"
+ #include "auth.h"
+diff --git a/source3/lib/substitute.h b/source3/lib/substitute.h
+new file mode 100644
+index 00000000000..2056d163dd7
+--- /dev/null
++++ b/source3/lib/substitute.h
+@@ -0,0 +1,63 @@
++/*
++   Unix SMB/CIFS implementation.
++   string substitution functions
++   Copyright (C) Andrew Tridgell 1992-2000
++   Copyright (C) Gerald Carter   2006
++
++   This program is free software; you can redistribute it and/or modify
++   it under the terms of the GNU General Public License as published by
++   the Free Software Foundation; either version 3 of the License, or
++   (at your option) any later version.
++
++   This program is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++   GNU General Public License for more details.
++
++   You should have received a copy of the GNU General Public License
++   along with this program.  If not, see <http://www.gnu.org/licenses/>.
++*/
++
++#ifndef SUBSTITUTE_H
++#define SUBSTITUTE_H
++
++bool set_local_machine_name(const char *local_name, bool perm);
++const char *get_local_machine_name(void);
++bool set_remote_machine_name(const char *remote_name, bool perm);
++const char *get_remote_machine_name(void);
++void sub_set_socket_ids(const char *peeraddr, const char *peername,
++			const char *sockaddr);
++void set_current_user_info(const char *smb_name,
++			   const char *unix_name,
++			   const char *domain);
++const char *get_current_username(void);
++void standard_sub_basic(const char *smb_name,
++			const char *domain_name,
++			char *str,
++			size_t len);
++char *talloc_sub_basic(TALLOC_CTX *mem_ctx,
++			const char *smb_name,
++			const char *domain_name,
++			const char *str);
++char *talloc_sub_specified(TALLOC_CTX *mem_ctx,
++			const char *input_string,
++			const char *username,
++			const char *grpname,
++			const char *domain,
++			uid_t uid,
++			gid_t gid);
++char *talloc_sub_advanced(TALLOC_CTX *ctx,
++			const char *servicename,
++			const char *user,
++			const char *connectpath,
++			gid_t gid,
++			const char *str);
++char *talloc_sub_full(TALLOC_CTX *ctx,
++			const char *servicename,
++			const char *user,
++			const char *connectpath,
++			gid_t gid,
++			const char *smb_name,
++			const char *domain_name,
++			const char *str);
++#endif
+diff --git a/source3/modules/vfs_expand_msdfs.c b/source3/modules/vfs_expand_msdfs.c
+index 34e7051dca5..fe3c6f47462 100644
+--- a/source3/modules/vfs_expand_msdfs.c
++++ b/source3/modules/vfs_expand_msdfs.c
+@@ -25,6 +25,7 @@
+ #include "auth.h"
+ #include "../lib/tsocket/tsocket.h"
+ #include "msdfs.h"
++#include "source3/lib/substitute.h"
+ 
+ #undef DBGC_CLASS
+ #define DBGC_CLASS DBGC_VFS
+diff --git a/source3/modules/vfs_full_audit.c b/source3/modules/vfs_full_audit.c
+index ceda99d4568..c8dbc8c07bb 100644
+--- a/source3/modules/vfs_full_audit.c
++++ b/source3/modules/vfs_full_audit.c
+@@ -73,6 +73,7 @@
+ #include "passdb/machine_sid.h"
+ #include "lib/util/tevent_ntstatus.h"
+ #include "lib/util/string_wrappers.h"
++#include "source3/lib/substitute.h"
+ 
+ static int vfs_full_audit_debug_level = DBGC_VFS;
+ 
+diff --git a/source3/modules/vfs_recycle.c b/source3/modules/vfs_recycle.c
+index 1c18f232c32..7cbc938a57c 100644
+--- a/source3/modules/vfs_recycle.c
++++ b/source3/modules/vfs_recycle.c
+@@ -27,6 +27,7 @@
+ #include "system/filesys.h"
+ #include "../librpc/gen_ndr/ndr_netlogon.h"
+ #include "auth.h"
++#include "source3/lib/substitute.h"
+ 
+ #define ALLOC_CHECK(ptr, label) do { if ((ptr) == NULL) { DEBUG(0, ("recycle.bin: out of memory!\n")); errno = ENOMEM; goto label; } } while(0)
+ 
+diff --git a/source3/modules/vfs_unityed_media.c b/source3/modules/vfs_unityed_media.c
+index 62a1456b996..fbd4d968172 100644
+--- a/source3/modules/vfs_unityed_media.c
++++ b/source3/modules/vfs_unityed_media.c
+@@ -62,6 +62,7 @@
+ #include "../lib/tsocket/tsocket.h"
+ #include "lib/util/smb_strtox.h"
+ #include <libgen.h>
++#include "source3/lib/substitute.h"
+ 
+ #define UM_PARAM_TYPE_NAME "unityed_media"
+ 
+diff --git a/source3/modules/vfs_virusfilter_utils.c b/source3/modules/vfs_virusfilter_utils.c
+index c7f8089ffc7..b8b44eb203b 100644
+--- a/source3/modules/vfs_virusfilter_utils.c
++++ b/source3/modules/vfs_virusfilter_utils.c
+@@ -25,6 +25,7 @@ struct iovec;
+ #include "lib/util/iov_buf.h"
+ #include <tevent.h>
+ #include "lib/tsocket/tsocket.h"
++#include "source3/lib/substitute.h"
+ 
+ int virusfilter_debug_class = DBGC_VFS;
+ 
+diff --git a/source3/nmbd/nmbd.c b/source3/nmbd/nmbd.c
+index 44121e9915c..7470897587e 100644
+--- a/source3/nmbd/nmbd.c
++++ b/source3/nmbd/nmbd.c
+@@ -29,6 +29,7 @@
+ #include "util_cluster.h"
+ #include "lib/gencache.h"
+ #include "lib/global_contexts.h"
++#include "source3/lib/substitute.h"
+ 
+ int ClientNMB       = -1;
+ int ClientDGRAM     = -1;
+diff --git a/source3/nmbd/nmbd_synclists.c b/source3/nmbd/nmbd_synclists.c
+index a65cbb87e0e..d291927fbc8 100644
+--- a/source3/nmbd/nmbd_synclists.c
++++ b/source3/nmbd/nmbd_synclists.c
+@@ -33,6 +33,7 @@
+ #include "libsmb/clirap.h"
+ #include "../libcli/smb/smbXcli_base.h"
+ #include "lib/util/string_wrappers.h"
++#include "source3/lib/substitute.h"
+ 
+ struct sync_record {
+ 	struct sync_record *next, *prev;
+diff --git a/source3/param/loadparm.c b/source3/param/loadparm.c
+index f54c08cc4a5..b56fd20e410 100644
+--- a/source3/param/loadparm.c
++++ b/source3/param/loadparm.c
+@@ -76,6 +76,7 @@
+ #include "lib/crypto/gnutls_helpers.h"
+ #include "lib/util/string_wrappers.h"
+ #include "auth/credentials/credentials.h"
++#include "source3/lib/substitute.h"
+ 
+ #ifdef HAVE_SYS_SYSCTL_H
+ #include <sys/sysctl.h>
+diff --git a/source3/passdb/passdb.c b/source3/passdb/passdb.c
+index 068c5a5ea70..863f260ea90 100644
+--- a/source3/passdb/passdb.c
++++ b/source3/passdb/passdb.c
+@@ -33,6 +33,7 @@
+ #include "auth/credentials/credentials.h"
+ #include "lib/param/param.h"
+ #include "lib/util/string_wrappers.h"
++#include "source3/lib/substitute.h"
+ 
+ #undef DBGC_CLASS
+ #define DBGC_CLASS DBGC_PASSDB
+diff --git a/source3/passdb/pdb_ldap.c b/source3/passdb/pdb_ldap.c
+index e6d8a84c60f..93da28b1941 100644
+--- a/source3/passdb/pdb_ldap.c
++++ b/source3/passdb/pdb_ldap.c
+@@ -56,6 +56,7 @@
+ #include "lib/util_sid_passdb.h"
+ #include "lib/util/smb_strtox.h"
+ #include "lib/util/string_wrappers.h"
++#include "source3/lib/substitute.h"
+ 
+ #undef DBGC_CLASS
+ #define DBGC_CLASS DBGC_PASSDB
+diff --git a/source3/printing/print_generic.c b/source3/printing/print_generic.c
+index 743c311bbd5..8798a4cf34a 100644
+--- a/source3/printing/print_generic.c
++++ b/source3/printing/print_generic.c
+@@ -20,6 +20,7 @@
+ #include "includes.h"
+ #include "printing.h"
+ #include "smbd/proto.h"
++#include "source3/lib/substitute.h"
+ 
+ extern userdom_struct current_user_info;
+ 
+diff --git a/source3/printing/printing.c b/source3/printing/printing.c
+index 499334df03f..67d798fbb21 100644
+--- a/source3/printing/printing.c
++++ b/source3/printing/printing.c
+@@ -40,6 +40,7 @@
+ #include "lib/util/string_wrappers.h"
+ #include "lib/global_contexts.h"
+ #include "source3/printing/rap_jobid.h"
++#include "source3/lib/substitute.h"
+ 
+ extern userdom_struct current_user_info;
+ 
+diff --git a/source3/rpc_server/lsa/srv_lsa_nt.c b/source3/rpc_server/lsa/srv_lsa_nt.c
+index d6d606ddeca..57f981cb358 100644
+--- a/source3/rpc_server/lsa/srv_lsa_nt.c
++++ b/source3/rpc_server/lsa/srv_lsa_nt.c
+@@ -53,6 +53,7 @@
+ #include "librpc/rpc/dcesrv_core.h"
+ #include "librpc/rpc/dcerpc_helper.h"
+ #include "lib/param/loadparm.h"
++#include "source3/lib/substitute.h"
+ 
+ #include "lib/crypto/gnutls_helpers.h"
+ #include <gnutls/gnutls.h>
+diff --git a/source3/rpc_server/netlogon/srv_netlog_nt.c b/source3/rpc_server/netlogon/srv_netlog_nt.c
+index eaacd8dbc6a..2906fa3f30f 100644
+--- a/source3/rpc_server/netlogon/srv_netlog_nt.c
++++ b/source3/rpc_server/netlogon/srv_netlog_nt.c
+@@ -49,6 +49,7 @@
+ #include "lib/param/param.h"
+ #include "libsmb/dsgetdcname.h"
+ #include "lib/util/util_str_escape.h"
++#include "source3/lib/substitute.h"
+ 
+ extern userdom_struct current_user_info;
+ 
+diff --git a/source3/rpc_server/srvsvc/srv_srvsvc_nt.c b/source3/rpc_server/srvsvc/srv_srvsvc_nt.c
+index 8576e9d2ce2..fc27a459634 100644
+--- a/source3/rpc_server/srvsvc/srv_srvsvc_nt.c
++++ b/source3/rpc_server/srvsvc/srv_srvsvc_nt.c
+@@ -42,6 +42,7 @@
+ #include "messages.h"
+ #include "serverid.h"
+ #include "lib/global_contexts.h"
++#include "source3/lib/substitute.h"
+ 
+ extern const struct generic_mapping file_generic_mapping;
+ 
+diff --git a/source3/smbd/ipc.c b/source3/smbd/ipc.c
+index f1c8ea0c2ed..cf3b7c91c22 100644
+--- a/source3/smbd/ipc.c
++++ b/source3/smbd/ipc.c
+@@ -29,6 +29,7 @@
+ #include "smbd/globals.h"
+ #include "smbprofile.h"
+ #include "rpc_server/srv_pipe_hnd.h"
++#include "source3/lib/substitute.h"
+ 
+ #define NERR_notsupported 50
+ 
+diff --git a/source3/smbd/lanman.c b/source3/smbd/lanman.c
+index 9194113e768..eb8148753b9 100644
+--- a/source3/smbd/lanman.c
++++ b/source3/smbd/lanman.c
+@@ -45,6 +45,7 @@
+ #include "rpc_server/rpc_ncacn_np.h"
+ #include "lib/util/string_wrappers.h"
+ #include "source3/printing/rap_jobid.h"
++#include "source3/lib/substitute.h"
+ 
+ #ifdef CHECK_TYPES
+ #undef CHECK_TYPES
+diff --git a/source3/smbd/message.c b/source3/smbd/message.c
+index b9728946889..7185bec1289 100644
+--- a/source3/smbd/message.c
++++ b/source3/smbd/message.c
+@@ -27,6 +27,7 @@
+ #include "smbd/smbd.h"
+ #include "smbd/globals.h"
+ #include "smbprofile.h"
++#include "source3/lib/substitute.h"
+ 
+ extern userdom_struct current_user_info;
+ 
+diff --git a/source3/smbd/msdfs.c b/source3/smbd/msdfs.c
+index 995ed815d90..fd002e98071 100644
+--- a/source3/smbd/msdfs.c
++++ b/source3/smbd/msdfs.c
+@@ -34,6 +34,7 @@
+ #include "librpc/gen_ndr/ndr_dfsblobs.h"
+ #include "lib/tsocket/tsocket.h"
+ #include "lib/global_contexts.h"
++#include "source3/lib/substitute.h"
+ 
+ /**********************************************************************
+  Parse a DFS pathname of the form \hostname\service\reqpath
+diff --git a/source3/smbd/process.c b/source3/smbd/process.c
+index 03409742752..5015c143a04 100644
+--- a/source3/smbd/process.c
++++ b/source3/smbd/process.c
+@@ -46,6 +46,7 @@
+ #include "libcli/smb/smbXcli_base.h"
+ #include "lib/util/time_basic.h"
+ #include "smb1_utils.h"
++#include "source3/lib/substitute.h"
+ 
+ /* Internal message queue for deferred opens. */
+ struct pending_message_list {
+diff --git a/source3/smbd/reply.c b/source3/smbd/reply.c
+index 042e7f2329e..f85d1122a07 100644
+--- a/source3/smbd/reply.c
++++ b/source3/smbd/reply.c
+@@ -50,6 +50,7 @@
+ #include "libcli/smb/smb2_posix.h"
+ #include "lib/util/string_wrappers.h"
+ #include "source3/printing/rap_jobid.h"
++#include "source3/lib/substitute.h"
+ 
+ /****************************************************************************
+  Ensure we check the path in *exactly* the same way as W2K for a findfirst/findnext
+diff --git a/source3/smbd/server.c b/source3/smbd/server.c
+index d7f5b4b73c0..d02ff1bd883 100644
+--- a/source3/smbd/server.c
++++ b/source3/smbd/server.c
+@@ -60,6 +60,7 @@
+ #include "rpc_server/fssd.h"
+ #include "rpc_server/mdssd.h"
+ #include "lib/global_contexts.h"
++#include "source3/lib/substitute.h"
+ 
+ #ifdef CLUSTER_SUPPORT
+ #include "ctdb_protocol.h"
+diff --git a/source3/smbd/service.c b/source3/smbd/service.c
+index afdea38b016..ef7c14d92d0 100644
+--- a/source3/smbd/service.c
++++ b/source3/smbd/service.c
+@@ -34,6 +34,7 @@
+ #include "lib/afs/afs_funcs.h"
+ #include "lib/util_path.h"
+ #include "lib/util/string_wrappers.h"
++#include "source3/lib/substitute.h"
+ 
+ bool canonicalize_connect_path(connection_struct *conn)
+ {
+diff --git a/source3/smbd/sesssetup.c b/source3/smbd/sesssetup.c
+index 2bd527ce80e..1705b8920b6 100644
+--- a/source3/smbd/sesssetup.c
++++ b/source3/smbd/sesssetup.c
+@@ -34,6 +34,7 @@
+ #include "auth/gensec/gensec.h"
+ #include "../libcli/smb/smb_signing.h"
+ #include "lib/util/string_wrappers.h"
++#include "source3/lib/substitute.h"
+ 
+ /****************************************************************************
+  Add the standard 'Samba' signature to the end of the session setup.
+diff --git a/source3/smbd/share_access.c b/source3/smbd/share_access.c
+index debe4fc6385..c44c4bd8c69 100644
+--- a/source3/smbd/share_access.c
++++ b/source3/smbd/share_access.c
+@@ -23,6 +23,7 @@
+ #include "../libcli/security/security.h"
+ #include "passdb/lookup_sid.h"
+ #include "auth.h"
++#include "source3/lib/substitute.h"
+ 
+ /*
+  * We dropped NIS support in 2021, but need to keep configs working.
+diff --git a/source3/smbd/smb2_server.c b/source3/smbd/smb2_server.c
+index f359db0729d..f6b376e5a07 100644
+--- a/source3/smbd/smb2_server.c
++++ b/source3/smbd/smb2_server.c
+@@ -33,6 +33,7 @@
+ #include "lib/util/iov_buf.h"
+ #include "auth.h"
+ #include "libcli/smb/smbXcli_base.h"
++#include "source3/lib/substitute.h"
+ 
+ #if defined(LINUX)
+ /* SIOCOUTQ TIOCOUTQ are the same */
+diff --git a/source3/smbd/smb2_sesssetup.c b/source3/smbd/smb2_sesssetup.c
+index 38049e8535f..14b806bc007 100644
+--- a/source3/smbd/smb2_sesssetup.c
++++ b/source3/smbd/smb2_sesssetup.c
+@@ -28,6 +28,7 @@
+ #include "../lib/tsocket/tsocket.h"
+ #include "../libcli/security/security.h"
+ #include "../lib/util/tevent_ntstatus.h"
++#include "source3/lib/substitute.h"
+ 
+ #include "lib/crypto/gnutls_helpers.h"
+ #include <gnutls/gnutls.h>
+diff --git a/source3/smbd/trans2.c b/source3/smbd/trans2.c
+index cd6b61429c5..a86ac3228e3 100644
+--- a/source3/smbd/trans2.c
++++ b/source3/smbd/trans2.c
+@@ -45,6 +45,7 @@
+ #include "smb1_utils.h"
+ #include "libcli/smb/smb2_posix.h"
+ #include "lib/util/string_wrappers.h"
++#include "source3/lib/substitute.h"
+ 
+ #define DIR_ENTRY_SAFETY_MARGIN 4096
+ 
+diff --git a/source3/smbd/uid.c b/source3/smbd/uid.c
+index b0d7f21c200..52918c4f181 100644
+--- a/source3/smbd/uid.c
++++ b/source3/smbd/uid.c
+@@ -26,6 +26,7 @@
+ #include "passdb/lookup_sid.h"
+ #include "auth.h"
+ #include "../auth/auth_util.h"
++#include "source3/lib/substitute.h"
+ 
+ /* what user is current? */
+ extern struct current_user current_user;
+diff --git a/source3/torture/torture.c b/source3/torture/torture.c
+index 79a9c65073c..d3e0e3cf095 100644
+--- a/source3/torture/torture.c
++++ b/source3/torture/torture.c
+@@ -51,6 +51,7 @@
+ #include "lib/param/param.h"
+ #include "auth/gensec/gensec.h"
+ #include "lib/util/string_wrappers.h"
++#include "source3/lib/substitute.h"
+ 
+ #include <gnutls/gnutls.h>
+ #include <gnutls/crypto.h>
+diff --git a/source3/utils/net_sam.c b/source3/utils/net_sam.c
+index 6a2c6c861f9..17cc47b2ddd 100644
+--- a/source3/utils/net_sam.c
++++ b/source3/utils/net_sam.c
+@@ -33,6 +33,7 @@
+ #include "idmap.h"
+ #include "lib/util/smb_strtox.h"
+ #include "lib/util/string_wrappers.h"
++#include "source3/lib/substitute.h"
+ 
+ /*
+  * Set a user's data
+diff --git a/source3/winbindd/wb_getpwsid.c b/source3/winbindd/wb_getpwsid.c
+index fb0351ec201..7f168bdda7a 100644
+--- a/source3/winbindd/wb_getpwsid.c
++++ b/source3/winbindd/wb_getpwsid.c
+@@ -22,6 +22,7 @@
+ #include "librpc/gen_ndr/ndr_winbind_c.h"
+ #include "../libcli/security/security.h"
+ #include "lib/util/string_wrappers.h"
++#include "source3/lib/substitute.h"
+ 
+ struct wb_getpwsid_state {
+ 	struct tevent_context *ev;
+diff --git a/source3/winbindd/winbindd.c b/source3/winbindd/winbindd.c
+index 25d8b723010..290454619a4 100644
+--- a/source3/winbindd/winbindd.c
++++ b/source3/winbindd/winbindd.c
+@@ -51,6 +51,7 @@
+ #include "lib/gencache.h"
+ #include "rpc_server/rpc_config.h"
+ #include "lib/global_contexts.h"
++#include "source3/lib/substitute.h"
+ 
+ #undef DBGC_CLASS
+ #define DBGC_CLASS DBGC_WINBIND
+-- 
+2.33.1
+
+
+From 1184733a1628c1187a215956195ca806419db16d Mon Sep 17 00:00:00 2001
+From: Ralph Boehme <slow@samba.org>
+Date: Thu, 11 Nov 2021 05:23:09 +0100
+Subject: [PATCH 2/8] samba-bgqd: fix startup and logging
+
+Let samba-bgqd use the new POPT_COMMON_DAEMON infrastructure.
+
+The calls to setup_logging() can safely be removed as this is already taken care
+of by samba_cmdline_init().
+
+To avoid a logfile basename of ".log" when using "%m", we add a call to
+set_remote_machine_name().
+
+BUG: https://bugzilla.samba.org/show_bug.cgi?id=14897
+
+Signed-off-by: Ralph Boehme <slow@samba.org>
+---
+ source3/printing/samba-bgqd.c | 35 ++++++++++-------------------------
+ 1 file changed, 10 insertions(+), 25 deletions(-)
+
+diff --git a/source3/printing/samba-bgqd.c b/source3/printing/samba-bgqd.c
+index 8ac6ec525b2..2cd6a8e007a 100644
+--- a/source3/printing/samba-bgqd.c
++++ b/source3/printing/samba-bgqd.c
+@@ -40,6 +40,7 @@
+ #include "source3/lib/util_procid.h"
+ #include "source3/auth/proto.h"
+ #include "source3/printing/queue_process.h"
++#include "source3/lib/substitute.h"
+ 
+ static void watch_handler(struct tevent_req *req)
+ {
+@@ -235,6 +236,7 @@ static int closeall_except_fd_params(
+ 
+ int main(int argc, const char *argv[])
+ {
++	struct samba_cmdline_daemon_cfg *cmdline_daemon_cfg = NULL;
+ 	const struct loadparm_substitution *lp_sub =
+ 		loadparm_s3_global_substitution();
+ 	const char *progname = getprogname();
+@@ -245,8 +247,6 @@ int main(int argc, const char *argv[])
+ 	struct tevent_req *watch_req = NULL;
+ 	struct tevent_signal *sigterm_handler = NULL;
+ 	struct bq_state *bq = NULL;
+-	int foreground = 0;
+-	int no_process_group = 0;
+ 	int log_stdout = 0;
+ 	int ready_signal_fd = -1;
+ 	int watch_fd = -1;
+@@ -259,21 +259,7 @@ int main(int argc, const char *argv[])
+ 	struct poptOption long_options[] = {
+ 		POPT_AUTOHELP
+ 		POPT_COMMON_SAMBA
+-		{
+-			.longName   = "foreground",
+-			.shortName  = 'F',
+-			.argInfo    = POPT_ARG_NONE,
+-			.arg        = &foreground,
+-			.descrip    = "Run daemon in foreground "
+-				      "(for daemontools, etc.)",
+-		},
+-		{
+-			.longName   = "no-process-group",
+-			.shortName  = '\0',
+-			.argInfo    = POPT_ARG_NONE,
+-			.arg        = &no_process_group,
+-			.descrip    = "Don't create a new process group" ,
+-		},
++		POPT_COMMON_DAEMON
+ 
+ 		/*
+ 		 * File descriptor to write the PID of the helper
+@@ -311,6 +297,7 @@ int main(int argc, const char *argv[])
+ 	frame = talloc_stackframe();
+ 
+ 	umask(0);
++	set_remote_machine_name("smbd-bgqd", true);
+ 
+ 	ok = samba_cmdline_init(frame,
+ 				SAMBA_CMDLINE_CONFIG_SERVER,
+@@ -320,6 +307,8 @@ int main(int argc, const char *argv[])
+ 		exit(ENOMEM);
+ 	}
+ 
++	cmdline_daemon_cfg = samba_cmdline_get_daemon_cfg();
++
+ 	pc = samba_popt_get_context(progname,
+ 				    argc,
+ 				    argv,
+@@ -340,16 +329,12 @@ int main(int argc, const char *argv[])
+ 
+ 	log_stdout = (debug_get_log_type() == DEBUG_STDOUT);
+ 
+-	if (foreground) {
++	if (!cmdline_daemon_cfg->fork) {
+ 		daemon_status(progname, "Starting process ... ");
+ 	} else {
+-		become_daemon(true, no_process_group, log_stdout);
+-	}
+-
+-	if (log_stdout) {
+-		setup_logging(progname, DEBUG_STDOUT);
+-	} else {
+-		setup_logging(progname, DEBUG_FILE);
++		become_daemon(true,
++			      cmdline_daemon_cfg->no_process_group,
++			      log_stdout);
+ 	}
+ 
+ 	BlockSignals(true, SIGPIPE);
+-- 
+2.33.1
+
+
+From 1a0a1ccbe888332ea134b16bfac0d0d011bf1f4c Mon Sep 17 00:00:00 2001
+From: Ralph Boehme <slow@samba.org>
+Date: Wed, 10 Nov 2021 18:27:08 +0100
+Subject: [PATCH 3/8] winbindd: remove is_default_dyn_LOGFILEBASE() logic
+
+Handling of -l commandline parameter is already implemented by lib/cmdline/.
+
+is_default_dyn_LOGFILEBASE() == true is the default case and this causes us to
+temporarily overwrite the configured logfile with LOGFILEBASE/log.winbindd until
+winbindd_reload_services_file() restores it.
+
+BUG: https://bugzilla.samba.org/show_bug.cgi?id=14897
+
+Signed-off-by: Ralph Boehme <slow@samba.org>
+---
+ source3/winbindd/winbindd.c | 9 ---------
+ 1 file changed, 9 deletions(-)
+
+diff --git a/source3/winbindd/winbindd.c b/source3/winbindd/winbindd.c
+index 290454619a4..58c5ffbced4 100644
+--- a/source3/winbindd/winbindd.c
++++ b/source3/winbindd/winbindd.c
+@@ -1717,15 +1717,6 @@ int main(int argc, const char **argv)
+ 
+ 	poptFreeContext(pc);
+ 
+-	if (is_default_dyn_LOGFILEBASE()) {
+-		char *lfile = NULL;
+-		if (asprintf(&lfile,"%s/log.winbindd",
+-				get_dyn_LOGFILEBASE()) > 0) {
+-			lp_set_logfile(lfile);
+-			SAFE_FREE(lfile);
+-		}
+-	}
+-
+ 	reopen_logs();
+ 
+ 	DEBUG(0,("winbindd version %s started.\n", samba_version_string()));
+-- 
+2.33.1
+
+
+From bcbf9fb6669933cc3dcf1f615d2885c542a08035 Mon Sep 17 00:00:00 2001
+From: Ralph Boehme <slow@samba.org>
+Date: Wed, 10 Nov 2021 14:13:11 +0100
+Subject: [PATCH 4/8] lib/debug: fix fd check before dup'ing to stderr
+
+Before I added per-class logfile and we had only one fd for the logfile the code
+looked like this:
+
+        /* Take over stderr to catch output into logs */
+        if (state.fd > 0) {
+                if (dup2(state.fd, 2) == -1) {
+                        /* Close stderr too, if dup2 can't point it -
+                           at the logfile.  There really isn't much
+                           that can be done on such a fundamental
+                           failure... */
+                        close_low_fd(2);
+                }
+        }
+
+In the current code the equivalent to state.fd is dbgc_config[DBGC_ALL].fd.
+
+BUG: https://bugzilla.samba.org/show_bug.cgi?id=14897
+
+Signed-off-by: Ralph Boehme <slow@samba.org>
+---
+ lib/util/debug.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/lib/util/debug.c b/lib/util/debug.c
+index 4fd17679227..b271608621a 100644
+--- a/lib/util/debug.c
++++ b/lib/util/debug.c
+@@ -1125,7 +1125,6 @@ bool reopen_logs_internal(void)
+ {
+ 	struct debug_backend *b = NULL;
+ 	mode_t oldumask;
+-	int new_fd = 0;
+ 	size_t i;
+ 	bool ok;
+ 
+@@ -1190,7 +1189,7 @@ bool reopen_logs_internal(void)
+ 	 * If log file was opened or created successfully, take over stderr to
+ 	 * catch output into logs.
+ 	 */
+-	if (new_fd != -1) {
++	if (dbgc_config[DBGC_ALL].fd > 0) {
+ 		if (dup2(dbgc_config[DBGC_ALL].fd, 2) == -1) {
+ 			/* Close stderr too, if dup2 can't point it -
+ 			   at the logfile.  There really isn't much
+-- 
+2.33.1
+
+
+From 9f76bd48d87eb03c66dfe942b4a84e997a8fe8ba Mon Sep 17 00:00:00 2001
+From: Ralph Boehme <slow@samba.org>
+Date: Mon, 8 Nov 2021 19:41:50 +0100
+Subject: [PATCH 5/8] lib/debug: in debug_set_logfile() call
+ reopen_logs_internal()
+
+This simplifies the logging API for callers that typically would want to set
+logging by just setup_logging() once without bothering that typically
+configuration is loaded (via some lpcfg_load*() or lp_load*() varient) which
+will only then pick up the configured logfile from smb.conf without actually
+applying the new logifle to the logging subsytem.
+
+Therefor our daemons will additionally call reopen_logs() explicitly in their
+startup code after config is loaded, eg
+
+	setup_logging(getprogname(), DEBUG_FILE);
+	...
+	lpcfg_load(lp_ctx, config_file);
+	...
+	reopen_logs();
+
+By calling reopen_logs_internal() implicitly from debug_set_logfile() there's no
+need to call reopen_logs() explicitly anymore to apply the logfile.
+
+As reopen_logs() will also apply other logging configuration options, we have to
+keep the explicit calls in the daemon code. But at least this allows consistent
+logging setup wrt to the logfile in the new cmdline library.
+
+BUG: https://bugzilla.samba.org/show_bug.cgi?id=14897
+
+Signed-off-by: Ralph Boehme <slow@samba.org>
+---
+ lib/util/debug.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/lib/util/debug.c b/lib/util/debug.c
+index b271608621a..171b5e15008 100644
+--- a/lib/util/debug.c
++++ b/lib/util/debug.c
+@@ -1018,6 +1018,8 @@ void debug_set_logfile(const char *name)
+ 	}
+ 	TALLOC_FREE(dbgc_config[DBGC_ALL].logfile);
+ 	dbgc_config[DBGC_ALL].logfile = talloc_strdup(NULL, name);
++
++	reopen_logs_internal();
+ }
+ 
+ static void debug_close_fd(int fd)
+-- 
+2.33.1
+
+
+From b80911bc1a306cac479ee3feabdcea124946cdde Mon Sep 17 00:00:00 2001
+From: Ralph Boehme <slow@samba.org>
+Date: Mon, 8 Nov 2021 12:08:47 +0100
+Subject: [PATCH 6/8] lib/cmdline: fix indentation
+
+s/whitespace/tab/
+
+BUG: https://bugzilla.samba.org/show_bug.cgi?id=14897
+
+Signed-off-by: Ralph Boehme <slow@samba.org>
+---
+ lib/cmdline/cmdline_s3.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/cmdline/cmdline_s3.c b/lib/cmdline/cmdline_s3.c
+index 1f8d9ed5eb5..639d403aed3 100644
+--- a/lib/cmdline/cmdline_s3.c
++++ b/lib/cmdline/cmdline_s3.c
+@@ -55,7 +55,7 @@ static bool _samba_cmdline_load_config_s3(void)
+ 	case SAMBA_CMDLINE_CONFIG_CLIENT:
+ 		ok = lp_load_client(config_file);
+ 		break;
+-        case SAMBA_CMDLINE_CONFIG_SERVER:
++	case SAMBA_CMDLINE_CONFIG_SERVER:
+ 	{
+ 		const struct samba_cmdline_daemon_cfg *cmdline_daemon_cfg =
+ 			samba_cmdline_get_daemon_cfg();
+-- 
+2.33.1
+
+
+From a6b6b0b6e6dfcd2c8e2c2085d20cd16c51e3b379 Mon Sep 17 00:00:00 2001
+From: Ralph Boehme <slow@samba.org>
+Date: Mon, 8 Nov 2021 12:09:16 +0100
+Subject: [PATCH 7/8] lib/cmdline: remember config_type in samba_cmdline_init()
+
+BUG: https://bugzilla.samba.org/show_bug.cgi?id=14897
+
+Signed-off-by: Ralph Boehme <slow@samba.org>
+---
+ lib/cmdline/cmdline_s4.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/lib/cmdline/cmdline_s4.c b/lib/cmdline/cmdline_s4.c
+index 61c1b96ba8d..6ef6f59db49 100644
+--- a/lib/cmdline/cmdline_s4.c
++++ b/lib/cmdline/cmdline_s4.c
+@@ -25,6 +25,7 @@
+ #include "cmdline_private.h"
+ 
+ static bool _require_smbconf;
++static enum samba_cmdline_config_type _config_type;
+ 
+ static bool _samba_cmdline_load_config_s4(void)
+ {
+@@ -81,6 +82,7 @@ bool samba_cmdline_init(TALLOC_CTX *mem_ctx,
+ 		return false;
+ 	}
+ 	_require_smbconf = require_smbconf;
++	_config_type = config_type;
+ 
+ 	creds = cli_credentials_init(mem_ctx);
+ 	if (creds == NULL) {
+-- 
+2.33.1
+
+
+From e1d6ab1b0dbd8ff30019edf804c4766b066db4b7 Mon Sep 17 00:00:00 2001
+From: Ralph Boehme <slow@samba.org>
+Date: Mon, 8 Nov 2021 12:09:43 +0100
+Subject: [PATCH 8/8] lib/cmdline: setup default file logging for servers
+
+BUG: https://bugzilla.samba.org/show_bug.cgi?id=14897
+RN: samba process doesn't log to logfile
+
+Signed-off-by: Ralph Boehme <slow@samba.org>
+---
+ lib/cmdline/cmdline_s4.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+
+diff --git a/lib/cmdline/cmdline_s4.c b/lib/cmdline/cmdline_s4.c
+index 6ef6f59db49..29e9f34bbe2 100644
+--- a/lib/cmdline/cmdline_s4.c
++++ b/lib/cmdline/cmdline_s4.c
+@@ -44,6 +44,20 @@ static bool _samba_cmdline_load_config_s4(void)
+ 		}
+ 	}
+ 
++	switch (_config_type) {
++	case SAMBA_CMDLINE_CONFIG_SERVER: {
++		const struct samba_cmdline_daemon_cfg *cmdline_daemon_cfg =
++			samba_cmdline_get_daemon_cfg();
++
++		if (!cmdline_daemon_cfg->interactive) {
++			setup_logging(getprogname(), DEBUG_FILE);
++		}
++		break;
++	}
++	default:
++		break;
++	}
++
+ 	config_file = get_dyn_CONFIGFILE();
+ 	ok = lpcfg_load(lp_ctx, config_file);
+ 	if (!ok) {
+-- 
+2.33.1
+

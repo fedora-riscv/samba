@@ -202,6 +202,7 @@ Patch0:         samba-s4u.patch
 Patch1:         samba-ctdb-etcd-reclock.patch
 Patch2:         samba-4.15.1-winexe.patch
 Patch3:         samba-4.15-fix-winbind-no-trusted-domain.patch
+Patch4:         samba-4.15-logfile.patch
 
 Requires(pre): /usr/sbin/groupadd
 Requires(post): systemd
@@ -4096,6 +4097,7 @@ fi
 * Thu Nov 11 2021 Guenther Deschner <gdeschner@redhat.com> - 4.15.2-1
 - Fix winbind trusted domain regression
 - related: #2021716
+- Fix logfile handling
 
 * Tue Nov 09 2021 Guenther Deschner <gdeschner@redhat.com> - 4.15.2-0
 - Update to Samba 4.15.2
