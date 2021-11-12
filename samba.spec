@@ -8,7 +8,7 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%define main_release 1
+%define main_release 2
 
 %define samba_version 4.13.14
 %define talloc_version 2.3.1
@@ -137,6 +137,7 @@ Patch1:         samba-s4u.patch
 # Generate the patchset using: git format-patch -l1 --stdout -N > samba-4.13-redhat.patch
 Patch2:         samba-4.13-redhat.patch
 Patch3:         samba-4.13-fix-winbind-no-trusted-domain.patch
+Patch4:         samba-4.13-ipa-dc-schannel.patch
 
 Requires(pre): /usr/sbin/groupadd
 Requires(post): systemd
@@ -3675,6 +3676,9 @@ fi
 %endif
 
 %changelog
+* Sat Nov 13 2021 Guenther Deschner <gdeschner@redhat.com> - 4.13.14-2
+- Fix IPA DC schannel support
+
 * Thu Nov 11 2021 Guenther Deschner <gdeschner@redhat.com> - 4.13.14-1
 - Fix winbind trusted domain regression
 - related: #2021716
