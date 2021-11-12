@@ -1,0 +1,45 @@
+From 3fc4d1d3998f3956a84c855cb60a9dcb335e1f59 Mon Sep 17 00:00:00 2001
+From: Alexander Bokovoy <ab@samba.org>
+Date: Fri, 12 Nov 2021 19:06:01 +0200
+Subject: [PATCH] IPA DC: add missing checks
+
+When introducing FreeIPA support, two places were forgotten:
+
+ - schannel gensec module needs to be aware of IPA DC
+ - _lsa_QueryInfoPolicy should treat IPA DC as PDC
+
+BUG: https://bugzilla.samba.org/show_bug.cgi?id=14903
+
+Signed-off-by: Alexander Bokovoy <ab@samba.org>
+---
+ auth/gensec/schannel.c              | 1 +
+ source3/rpc_server/lsa/srv_lsa_nt.c | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/auth/gensec/schannel.c b/auth/gensec/schannel.c
+index 0cdae141ead..6ebbe8f3179 100644
+--- a/auth/gensec/schannel.c
++++ b/auth/gensec/schannel.c
+@@ -1080,6 +1080,7 @@ static NTSTATUS schannel_server_start(struct gensec_security *gensec_security)
+ 	case ROLE_DOMAIN_BDC:
+ 	case ROLE_DOMAIN_PDC:
+ 	case ROLE_ACTIVE_DIRECTORY_DC:
++	case ROLE_IPA_DC:
+ 		return NT_STATUS_OK;
+ 	default:
+ 		return NT_STATUS_NOT_IMPLEMENTED;
+diff --git a/source3/rpc_server/lsa/srv_lsa_nt.c b/source3/rpc_server/lsa/srv_lsa_nt.c
+index 8d71b5252ab..ea92a22cbc9 100644
+--- a/source3/rpc_server/lsa/srv_lsa_nt.c
++++ b/source3/rpc_server/lsa/srv_lsa_nt.c
+@@ -683,6 +683,7 @@ NTSTATUS _lsa_QueryInfoPolicy(struct pipes_struct *p,
+ 		switch (lp_server_role()) {
+ 			case ROLE_DOMAIN_PDC:
+ 			case ROLE_DOMAIN_BDC:
++			case ROLE_IPA_DC:
+ 				name = get_global_sam_name();
+ 				sid = dom_sid_dup(p->mem_ctx, get_global_sam_sid());
+ 				if (!sid) {
+-- 
+2.33.1
+
