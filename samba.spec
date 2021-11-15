@@ -1147,6 +1147,7 @@ export LDFLAGS="%{__global_ldflags} -fuse-ld=gold"
 %endif
         --with-profiling-data \
         --with-systemd \
+        --with-quotas \
         --systemd-install-services \
         --with-systemddir=/usr/lib/systemd/system \
         --systemd-smb-extra=%{_systemd_extra} \
