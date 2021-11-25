@@ -19,6 +19,9 @@
 # ctdb is enabled by default, you can disable it with: --without clustering
 %bcond_without clustering
 
+# Define _make_verbose if it doesn't exist (RHEL8)
+%{!?_make_verbose:%define _make_verbose V=1 VERBOSE=1}
+
 # Build with Active Directory Domain Controller support by default on Fedora
 %if 0%{?fedora}
 %bcond_without dc
