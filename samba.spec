@@ -486,8 +486,10 @@ Requires: libwbclient = %{samba_depver}
 Requires: python3-%{name} = %{samba_depver}
 # samba-tool needs tdbbackup
 Requires: tdb-tools
-# samba-tool needs mdb_copy
+%if %{with dc}
+# samba-tool needs mdb_copy for domain backup or upgrade provision
 Requires: lmdb
+%endif
 
 Provides: bundled(libreplace)
 
