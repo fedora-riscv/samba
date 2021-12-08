@@ -132,9 +132,9 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%global baserelease 3
+%global baserelease 0
 
-%global samba_version 4.15.2
+%global samba_version 4.15.3
 %global talloc_version 2.3.3
 %global tdb_version 1.4.4
 %global tevent_version 0.11.0
@@ -203,11 +203,6 @@ Source201:      README.downgrade
 
 Patch0:         samba-s4u.patch
 Patch1:         samba-ctdb-etcd-reclock.patch
-Patch2:         samba-4.15.1-winexe.patch
-Patch3:         samba-4.15-fix-winbind-no-trusted-domain.patch
-Patch4:         samba-4.15-logfile.patch
-Patch5:         samba-4.15.2-smbclient_anonymous.patch
-Patch6:         samba-4.15-ipa-dc-schannel.patch
 
 Requires(pre): /usr/sbin/groupadd
 Requires(post): systemd
@@ -2934,6 +2929,7 @@ fi
 %{python3_sitearch}/samba/tests/krb5/__pycache__/spn_tests.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/s4u_tests.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/test_ccache.*.pyc
+%{python3_sitearch}/samba/tests/krb5/__pycache__/test_idmap_nss.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/test_ldap.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/test_min_domain_uid.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/test_rpc.*.pyc
@@ -2957,6 +2953,7 @@ fi
 %{python3_sitearch}/samba/tests/krb5/simple_tests.py
 %{python3_sitearch}/samba/tests/krb5/spn_tests.py
 %{python3_sitearch}/samba/tests/krb5/test_ccache.py
+%{python3_sitearch}/samba/tests/krb5/test_idmap_nss.py
 %{python3_sitearch}/samba/tests/krb5/test_ldap.py
 %{python3_sitearch}/samba/tests/krb5/test_min_domain_uid.py
 %{python3_sitearch}/samba/tests/krb5/test_rpc.py
@@ -4102,6 +4099,10 @@ fi
 %endif
 
 %changelog
+* Wed Dec 08 2021 Pavel Filipenský <pfilipen@redhat.com> - 4.15.3-0
+- Update to Samba 4.15.3
+- resolves: #2030382
+
 * Sat Nov 13 2021 Guenther Deschner <gdeschner@redhat.com> - 4.15.2-3
 - Fix IPA DC schannel support
 
