@@ -606,6 +606,7 @@ Samba VFS module for Ceph distributed storage system integration.
 Summary: Samba VFS module for io_uring
 Requires: %{name} = %{samba_depver}
 Requires: %{name}-libs = %{samba_depver}
+Requires: %{name}-client-libs = %{samba_depver}
 
 Provides: bundled(libreplace)
 
@@ -942,6 +943,7 @@ necessary to communicate to the Winbind Daemon
 Summary: Samba Winexe Windows Binary
 License: GPLv3
 Requires: %{name}-client-libs = %{samba_depver}
+Requires: %{name}-common-libs = %{samba_depver}
 
 Provides: bundled(libreplace)
 
