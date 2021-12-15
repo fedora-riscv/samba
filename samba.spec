@@ -132,7 +132,7 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%global baserelease 0
+%global baserelease 1
 
 %global samba_version 4.15.3
 %global talloc_version 2.3.3
@@ -203,6 +203,7 @@ Source201:      README.downgrade
 
 Patch0:         samba-s4u.patch
 Patch1:         samba-ctdb-etcd-reclock.patch
+Patch2:         samba-glibc-dns.patch
 
 Requires(pre): /usr/sbin/groupadd
 Requires(post): systemd
@@ -4101,6 +4102,10 @@ fi
 %endif
 
 %changelog
+* Wed Dec 15 2021 Pavel Filipenský <pfilipen@redhat.com> - 4.15.3-1
+- Fix resolv_wrapper with glibc 2.34
+- resolves: #2019669
+
 * Wed Dec 08 2021 Pavel Filipenský <pfilipen@redhat.com> - 4.15.3-0
 - Update to Samba 4.15.3
 - resolves: #2030382
