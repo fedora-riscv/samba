@@ -132,9 +132,9 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%global baserelease 1
+%global baserelease 0
 
-%global samba_version 4.15.3
+%global samba_version 4.15.4
 %global talloc_version 2.3.3
 %global tdb_version 1.4.4
 %global tevent_version 0.11.0
@@ -4102,6 +4102,11 @@ fi
 %endif
 
 %changelog
+* Thu Jan 20 2022 Pavel Filipenský <pfilipen@redhat.com> - 4.15.4-0
+- Update to Samba 4.15.4
+- resolves: #2009673, #2039034 - Security fixes for CVE-2021-20316
+- resolves: #2042518
+
 * Wed Dec 15 2021 Pavel Filipenský <pfilipen@redhat.com> - 4.15.3-1
 - Fix resolv_wrapper with glibc 2.34
 - resolves: #2019669
