@@ -4096,7 +4096,7 @@ fi
 %endif
 
 %changelog
-* Wed Jan 20 2022 Pavel Filipenský <pfilipen@redhat.com> - 4.15.4-0
+* Thu Jan 20 2022 Pavel Filipenský <pfilipen@redhat.com> - 4.15.4-0
 - Update to Samba 4.15.4
 - resolves: #2009673, #2039034 - Security fixes for CVE-2021-20316
 - resolves: #2042518
