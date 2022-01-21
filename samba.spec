@@ -1106,7 +1106,8 @@ xzcat %{SOURCE0} | gpgv2 --quiet --keyring %{SOURCE2} %{SOURCE1} -
 export python_LDFLAGS="$(echo %{__global_ldflags} | sed -e 's/-Wl,-z,defs//g')"
 
 # Use the gold linker
-export LDFLAGS="%{__global_ldflags} -fuse-ld=gold"
+# See https://bugzilla.redhat.com/show_bug.cgi?id=2043178 ; For f36 do not use ld.gold till it is fixed
+#export LDFLAGS="%%{__global_ldflags} -fuse-ld=gold"
 
 %configure \
         --enable-fhs \
