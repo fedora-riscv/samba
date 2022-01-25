@@ -134,13 +134,13 @@
 
 %global baserelease 0
 
-%global samba_version 4.15.4
+%global samba_version 4.16.0
 %global talloc_version 2.3.3
-%global tdb_version 1.4.4
+%global tdb_version 1.4.6
 %global tevent_version 0.11.0
-%global ldb_version 2.4.1
+%global ldb_version 2.5.0
 # This should be rc1 or nil
-%global pre_release %nil
+%global pre_release rc1
 
 %global samba_release %{baserelease}
 %if "x%{?pre_release}" != "x"
@@ -202,8 +202,6 @@ Source14:       samba.pamd
 Source201:      README.downgrade
 
 Patch0:         samba-s4u.patch
-Patch1:         samba-ctdb-etcd-reclock.patch
-Patch2:         samba-glibc-dns.patch
 
 Requires(pre): /usr/sbin/groupadd
 Requires(post): systemd
@@ -1614,11 +1612,21 @@ fi
 %{_libdir}/samba/vfs/nfs4acl_xattr.so
 %endif
 
+%dir %{_libexecdir}/samba
 %{_libexecdir}/samba/samba-bgqd
+%{_libexecdir}/samba/samba-dcerpcd
+%{_libexecdir}/samba/rpcd_classic
+%{_libexecdir}/samba/rpcd_epmapper
+%{_libexecdir}/samba/rpcd_fsrvp
+%{_libexecdir}/samba/rpcd_lsad
+%{_libexecdir}/samba/rpcd_mdssvc
+%{_libexecdir}/samba/rpcd_rpcecho
+%{_libexecdir}/samba/rpcd_spoolss
+%{_libexecdir}/samba/rpcd_winreg
 
 %dir %{_datadir}/samba
-%dir %{_datadir}/samba/mdssvc
-%{_datadir}/samba/mdssvc/elasticsearch_mappings.json
+#%%dir %%{_datadir}/samba/mdssvc
+#%%{_datadir}/samba/mdssvc/elasticsearch_mappings.json
 
 %{_unitdir}/nmb.service
 %{_unitdir}/smb.service
@@ -1628,6 +1636,7 @@ fi
 %{_mandir}/man1/smbstatus.1*
 %{_mandir}/man8/eventlogadm.8*
 %{_mandir}/man8/samba-bgqd.8*
+%{_mandir}/man8/samba-dcerpcd.8*
 %{_mandir}/man8/smbd.8*
 %{_mandir}/man8/nmbd.8*
 %{_mandir}/man8/vfs_acl_tdb.8*
@@ -1642,6 +1651,7 @@ fi
 %{_mandir}/man8/vfs_crossrename.8*
 %{_mandir}/man8/vfs_default_quota.8*
 %{_mandir}/man8/vfs_dirsort.8*
+%{_mandir}/man8/vfs_expand_msdfs.8*
 %{_mandir}/man8/vfs_extd_audit.8*
 %{_mandir}/man8/vfs_fake_perms.8*
 %{_mandir}/man8/vfs_fileid.8*
@@ -1852,7 +1862,7 @@ fi
 
 %if %{without libwbclient}
 %{_libdir}/samba/libwbclient.so.*
-%{_libdir}/samba/libwinbind-client-samba4.so
+#%%{_libdir}/samba/libwinbind-client-samba4.so
 #endif without libwbclient
 %endif
 
@@ -2232,6 +2242,9 @@ fi
 %{_libdir}/samba/libshares-samba4.so
 %{_libdir}/samba/libsmbpasswdparser-samba4.so
 %{_libdir}/samba/libxattr-tdb-samba4.so
+%{_libdir}/samba/libREG-FULL-samba4.so
+%{_libdir}/samba/libRPC-SERVER-LOOP-samba4.so
+%{_libdir}/samba/libRPC-WORKER-samba4.so
 
 ### LIBSMBCLIENT
 %if %{with libsmbclient}
@@ -2251,7 +2264,7 @@ fi
 %if %{with libwbclient}
 %files -n libwbclient
 %{_libdir}/samba/wbclient/libwbclient.so.*
-%{_libdir}/samba/libwinbind-client-samba4.so
+#%%{_libdir}/samba/libwinbind-client-samba4.so
 
 ### LIBWBCLIENT-DEVEL
 %files -n libwbclient-devel
@@ -2322,7 +2335,11 @@ fi
 %{python3_sitearch}/samba/__pycache__/drs_utils.*.pyc
 %{python3_sitearch}/samba/__pycache__/getopt.*.pyc
 %{python3_sitearch}/samba/__pycache__/gpclass.*.pyc
+%{python3_sitearch}/samba/__pycache__/gp_cert_auto_enroll_ext.*.pyc
+%{python3_sitearch}/samba/__pycache__/gp_chromium_ext.*.pyc
 %{python3_sitearch}/samba/__pycache__/gp_ext_loader.*.pyc
+%{python3_sitearch}/samba/__pycache__/gp_firefox_ext.*.pyc
+%{python3_sitearch}/samba/__pycache__/gp_firewalld_ext.*.pyc
 %{python3_sitearch}/samba/__pycache__/gp_gnome_settings_ext.*.pyc
 %{python3_sitearch}/samba/__pycache__/gp_msgs_ext.*.pyc
 %{python3_sitearch}/samba/__pycache__/gp_scripts_ext.*.pyc
@@ -2438,7 +2455,11 @@ fi
 %{python3_sitearch}/samba/emulate/__init__.py
 %{python3_sitearch}/samba/emulate/traffic.py
 %{python3_sitearch}/samba/emulate/traffic_packets.py
+%{python3_sitearch}/samba/gp_cert_auto_enroll_ext.py
+%{python3_sitearch}/samba/gp_chromium_ext.py
 %{python3_sitearch}/samba/gp_ext_loader.py
+%{python3_sitearch}/samba/gp_firefox_ext.py
+%{python3_sitearch}/samba/gp_firewalld_ext.py
 %{python3_sitearch}/samba/gp_msgs_ext.py
 %{python3_sitearch}/samba/gp_smb_conf_ext.py
 %{python3_sitearch}/samba/gp_sudoers_ext.py
@@ -2755,6 +2776,7 @@ fi
 %{python3_sitearch}/samba/tests/__pycache__/smbd_base.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/smbd_fuzztest.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/source.*.pyc
+%{python3_sitearch}/samba/tests/__pycache__/source_chars.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/strings.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/subunitrun.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/tdb_util.*.pyc
@@ -2924,14 +2946,15 @@ fi
 %{python3_sitearch}/samba/tests/krb5/__pycache__/kdc_tests.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/kdc_tgs_tests.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/ms_kile_client_principal_lookup_tests.*.pyc
+%{python3_sitearch}/samba/tests/krb5/__pycache__/pac_align_tests.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/raw_testcase.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/rfc4120_constants.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/rfc4120_pyasn1.*.pyc
-%{python3_sitearch}/samba/tests/krb5/__pycache__/rodc_tests*.pyc
-%{python3_sitearch}/samba/tests/krb5/__pycache__/salt_tests.*.pyc
+%{python3_sitearch}/samba/tests/krb5/__pycache__/rodc_tests.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/simple_tests.*.pyc
-%{python3_sitearch}/samba/tests/krb5/__pycache__/spn_tests.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/s4u_tests.*.pyc
+%{python3_sitearch}/samba/tests/krb5/__pycache__/salt_tests.*.pyc
+%{python3_sitearch}/samba/tests/krb5/__pycache__/spn_tests.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/test_ccache.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/test_idmap_nss.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/test_ldap.*.pyc
@@ -2949,25 +2972,26 @@ fi
 %{python3_sitearch}/samba/tests/krb5/kdc_tests.py
 %{python3_sitearch}/samba/tests/krb5/kdc_tgs_tests.py
 %{python3_sitearch}/samba/tests/krb5/ms_kile_client_principal_lookup_tests.py
+%{python3_sitearch}/samba/tests/krb5/pac_align_tests.py
 %{python3_sitearch}/samba/tests/krb5/raw_testcase.py
 %{python3_sitearch}/samba/tests/krb5/rfc4120_constants.py
 %{python3_sitearch}/samba/tests/krb5/rfc4120_pyasn1.py
 %{python3_sitearch}/samba/tests/krb5/rodc_tests.py
-%{python3_sitearch}/samba/tests/krb5/salt_tests.py
 %{python3_sitearch}/samba/tests/krb5/simple_tests.py
-%{python3_sitearch}/samba/tests/krb5/spn_tests.py
-%{python3_sitearch}/samba/tests/krb5/test_ccache.py
 %{python3_sitearch}/samba/tests/krb5/test_idmap_nss.py
+%{python3_sitearch}/samba/tests/krb5/test_ccache.py
 %{python3_sitearch}/samba/tests/krb5/test_ldap.py
 %{python3_sitearch}/samba/tests/krb5/test_min_domain_uid.py
 %{python3_sitearch}/samba/tests/krb5/test_rpc.py
 %{python3_sitearch}/samba/tests/krb5/test_smb.py
 %{python3_sitearch}/samba/tests/krb5/s4u_tests.py
+%{python3_sitearch}/samba/tests/krb5/salt_tests.py
+%{python3_sitearch}/samba/tests/krb5/spn_tests.py
 %{python3_sitearch}/samba/tests/krb5/xrealm_tests.py
 %{python3_sitearch}/samba/tests/krb5_credentials.py
 %{python3_sitearch}/samba/tests/ldap_raw.py
-%{python3_sitearch}/samba/tests/ldap_referrals.py
 %{python3_sitearch}/samba/tests/ldap_spn.py
+%{python3_sitearch}/samba/tests/ldap_referrals.py
 %{python3_sitearch}/samba/tests/ldap_upn_sam_account.py
 %{python3_sitearch}/samba/tests/libsmb.py
 %{python3_sitearch}/samba/tests/loadparm.py
@@ -3031,6 +3055,7 @@ fi
 %{python3_sitearch}/samba/tests/samba_tool/__pycache__/help.*.pyc
 %{python3_sitearch}/samba/tests/samba_tool/__pycache__/join.*.pyc
 %{python3_sitearch}/samba/tests/samba_tool/__pycache__/join_lmdb_size.*.pyc
+%{python3_sitearch}/samba/tests/samba_tool/__pycache__/join_member.*.pyc
 %{python3_sitearch}/samba/tests/samba_tool/__pycache__/ntacl.*.pyc
 %{python3_sitearch}/samba/tests/samba_tool/__pycache__/ou.*.pyc
 %{python3_sitearch}/samba/tests/samba_tool/__pycache__/passwordsettings.*.pyc
@@ -3067,6 +3092,7 @@ fi
 %{python3_sitearch}/samba/tests/samba_tool/help.py
 %{python3_sitearch}/samba/tests/samba_tool/join.py
 %{python3_sitearch}/samba/tests/samba_tool/join_lmdb_size.py
+%{python3_sitearch}/samba/tests/samba_tool/join_member.py
 %{python3_sitearch}/samba/tests/samba_tool/ntacl.py
 %{python3_sitearch}/samba/tests/samba_tool/ou.py
 %{python3_sitearch}/samba/tests/samba_tool/passwordsettings.py
@@ -3098,6 +3124,7 @@ fi
 %{python3_sitearch}/samba/tests/smbd_base.py
 %{python3_sitearch}/samba/tests/smbd_fuzztest.py
 %{python3_sitearch}/samba/tests/source.py
+%{python3_sitearch}/samba/tests/source_chars.py
 %{python3_sitearch}/samba/tests/strings.py
 %{python3_sitearch}/samba/tests/subunitrun.py
 %{python3_sitearch}/samba/tests/tdb_util.py
@@ -3119,7 +3146,6 @@ fi
 %{_mandir}/man1/masktest.1*
 %{_mandir}/man1/ndrdump.1*
 %{_mandir}/man1/smbtorture.1*
-%{_mandir}/man1/vfstest.1*
 
 %if %{with testsuite}
 # files to ignore in testsuite mode
@@ -4103,6 +4129,10 @@ fi
 %endif
 
 %changelog
+* Tue Jan 25 2022 Pavel Filipenský <pfilipen@redhat.com> - 4.16.0rc1
+- Update to Samba 4.16.0rc1
+- resolves: #2042518
+
 * Thu Jan 20 2022 Pavel Filipenský <pfilipen@redhat.com> - 4.15.4-0
 - Update to Samba 4.15.4
 - resolves: #2009673, #2039034 - Security fixes for CVE-2021-20316
