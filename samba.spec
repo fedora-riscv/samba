@@ -52,7 +52,9 @@
 # Build vfs_ceph module and ctdb cepth mutex helper by default on 64bit Fedora
 %if 0%{?fedora}
 
-%ifarch aarch64 ppc64le s390x x86_64
+# ppc64le excluded pending resolution of https://gcc.gnu.org/bugzilla/show_bug.cgi?id=104172
+#%%ifarch aarch64 ppc64le s390x x86_64
+%ifarch aarch64 s390x x86_64
 %bcond_without vfs_cephfs
 %bcond_without ceph_mutex
 %else
@@ -4129,6 +4131,9 @@ fi
 %endif
 
 %changelog
+* Wed Jan 26 2022 Pavel Filipenský <pfilipen@redhat.com> - 4.16.0rc1
+- Exclude temporarily ceph on ppc64le to fix failing build
+
 * Tue Jan 25 2022 Pavel Filipenský <pfilipen@redhat.com> - 4.16.0rc1
 - Update to Samba 4.16.0rc1
 - resolves: #2042518
