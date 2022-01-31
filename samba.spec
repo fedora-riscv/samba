@@ -131,7 +131,7 @@
 
 %global baserelease 0
 
-%global samba_version 4.15.4
+%global samba_version 4.15.5
 %global talloc_version 2.3.3
 %global tdb_version 1.4.4
 %global tevent_version 0.11.0
@@ -4096,6 +4096,12 @@ fi
 %endif
 
 %changelog
+* Mon Jan 31 2022 Guenther Deschner <gdeschner@redhat.com> - 4.15.5-0
+- Update to Samba 4.15.5
+- resolves: #2046120, #2048566 - Security fixes for CVE-2021-44141
+- resolves: #2046146, #2048570 - Security fixes for CVE-2021-44142
+- resolves: #2046134, #2048568 - Security fixes for CVE-2022-0336
+
 * Thu Jan 20 2022 Pavel Filipenský <pfilipen@redhat.com> - 4.15.4-0
 - Update to Samba 4.15.4
 - resolves: #2009673, #2039034 - Security fixes for CVE-2021-20316
