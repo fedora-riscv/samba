@@ -134,7 +134,7 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%global baserelease 0
+%global baserelease 1
 
 %global samba_version 4.16.0
 %global talloc_version 2.3.3
@@ -142,7 +142,7 @@
 %global tevent_version 0.11.0
 %global ldb_version 2.5.0
 # This should be rc1 or nil
-%global pre_release rc1
+%global pre_release rc2
 
 %global samba_release %{baserelease}
 %if "x%{?pre_release}" != "x"
@@ -4131,6 +4131,13 @@ fi
 %endif
 
 %changelog
+* Tue Feb 01 2022 Pavel Filipenský <pfilipen@redhat.com> - 4.16.0rc2
+- Update to Samba 4.16.0rc2
+- resolves: #2046120, #2048566 - Security fixes for CVE-2021-44141
+- resolves: #2046146, #2048570 - Security fixes for CVE-2021-44142
+- resolves: #2046134, #2048568 - Security fixes for CVE-2022-0336
+- resolves: #2042518
+
 * Wed Jan 26 2022 Pavel Filipenský <pfilipen@redhat.com> - 4.16.0rc1
 - Exclude temporarily ceph on ppc64le to fix failing build
 
