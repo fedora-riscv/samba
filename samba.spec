@@ -1627,8 +1627,8 @@ fi
 %{_libexecdir}/samba/rpcd_winreg
 
 %dir %{_datadir}/samba
-#%%dir %%{_datadir}/samba/mdssvc
-#%%{_datadir}/samba/mdssvc/elasticsearch_mappings.json
+%dir %{_datadir}/samba/mdssvc
+%{_datadir}/samba/mdssvc/elasticsearch_mappings.json
 
 %{_unitdir}/nmb.service
 %{_unitdir}/smb.service
