@@ -71,7 +71,7 @@
 
 # Build vfs_gluster module by default on 64bit Fedora
 %global is_rhgs 0
-%if "%{dist}" == ".el8rhgs" || "%{dist}" == ".el9rhgs"
+%if "%{dist}" == ".el7rhgs" || "%{dist}" == ".el8rhgs"
 %global is_rhgs 1
 %endif
 
