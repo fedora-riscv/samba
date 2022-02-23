@@ -129,7 +129,7 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%global baserelease 0
+%global baserelease 1
 
 %global samba_version 4.15.5
 %global talloc_version 2.3.3
@@ -487,6 +487,8 @@ Requires: python3-%{name} = %{samba_depver}
 # samba-tool needs tdbbackup
 Requires: tdb-tools
 %if %{with dc}
+# samba-tool needs python3-samba-dc on a full build
+Requires: python3-%{name}-dc = %{samba_depver}
 # samba-tool needs mdb_copy for domain backup or upgrade provision
 Requires: lmdb
 %endif
@@ -4099,6 +4101,9 @@ fi
 %endif
 
 %changelog
+* Wed Feb 23 2022 Andreas Schneider <asn@redhat.com> - 4.15.5-1
+- resolves: rhbz#2036443 - Fix samba-tool on builds with samba-dc
+
 * Mon Jan 31 2022 Guenther Deschner <gdeschner@redhat.com> - 4.15.5-0
 - Update to Samba 4.15.5
 - resolves: #2046120, #2048566 - Security fixes for CVE-2021-44141
