@@ -134,7 +134,7 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%global baserelease 2
+%global baserelease 3
 
 %global samba_version 4.16.0
 %global talloc_version 2.3.3
@@ -490,6 +490,8 @@ Requires: python3-%{name} = %{samba_depver}
 # samba-tool needs tdbbackup
 Requires: tdb-tools
 %if %{with dc}
+# samba-tool needs python3-samba-dc on a full build
+Requires: python3-%{name}-dc = %{samba_depver}
 # samba-tool needs mdb_copy for domain backup or upgrade provision
 Requires: lmdb
 %endif
@@ -4131,6 +4133,9 @@ fi
 %endif
 
 %changelog
+* Wed Feb 23 2022 Andreas Schneider <asn@redhat.com> - 4.16.0-0.3.rc3
+- resolves: rhbz#2036443 - Fix samba-tool on builds with samba-dc
+
 * Tue Feb 15 2022 Pavel Filipenský <pfilipen@redhat.com> - 4.16.0rc3
 - Update to Samba 4.16.0rc3
 - resolves: #2042518
