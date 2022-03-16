@@ -129,13 +129,13 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%global baserelease 1
+%global baserelease 0
 
-%global samba_version 4.15.5
+%global samba_version 4.15.6
 %global talloc_version 2.3.3
 %global tdb_version 1.4.4
 %global tevent_version 0.11.0
-%global ldb_version 2.4.1
+%global ldb_version 2.4.2
 # This should be rc1 or nil
 %global pre_release %nil
 
@@ -200,7 +200,6 @@ Source201:      README.downgrade
 
 Patch0:         samba-s4u.patch
 Patch1:         samba-ctdb-etcd-reclock.patch
-Patch2:         samba-glibc-dns.patch
 
 Requires(pre): /usr/sbin/groupadd
 Requires(post): systemd
@@ -4101,6 +4100,9 @@ fi
 %endif
 
 %changelog
+* Wed Mar 16 2022 Pavel Filipenský <pfilipen@redhat.com> -  4.15.6-0
+- Update to Samba 4.15.6
+
 * Wed Feb 23 2022 Andreas Schneider <asn@redhat.com> - 4.15.5-1
 - resolves: rhbz#2036443 - Fix samba-tool on builds with samba-dc
 
