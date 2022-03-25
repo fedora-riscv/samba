@@ -134,7 +134,7 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%global baserelease 6
+%global baserelease 7
 
 %global samba_version 4.16.0
 %global talloc_version 2.3.3
@@ -4133,6 +4133,9 @@ fi
 %endif
 
 %changelog
+* Fri Mar 25 2022 Sandro Mani <manisandro@gmail.com> - 2:4.16.0-7
+- Rebuild with mingw-gcc-12
+
 * Tue Mar 22 2022 Guenther Deschner <gdeschner@redhat.com> - 4.16.0-6
 - Update to Samba 4.16.0
 - resolves: #2066290
