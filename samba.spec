@@ -117,8 +117,8 @@
 
 %global main_release 0
 
-%global samba_version 4.14.12
-%global talloc_version 2.3.2
+%global samba_version 4.14.13
+%global talloc_version 2.3.3
 %global tdb_version 1.4.3
 %global tevent_version 0.10.2
 %global ldb_version 2.3.2
@@ -3956,6 +3956,9 @@ fi
 %endif
 
 %changelog
+* Mon Apr 04 2022 Guenther Deschner <gdeschner@redhat.com> - 4.14.13-0
+- Update to Samba 4.14.13
+
 * Mon Jan 31 2022 Pavel Filipenský <pfilipen@redhat.com> - 4.14.12-0
 - Update to Samba 4.14.12
 - resolves: #2046120, #2048566 - Security fixes for CVE-2021-44141
