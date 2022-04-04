@@ -1,0 +1,77 @@
+From 41d3efebcf6abab9119f9b0f97c86c1c48739fee Mon Sep 17 00:00:00 2001
+From: Andreas Schneider <asn@samba.org>
+Date: Mon, 4 Apr 2022 11:24:04 +0200
+Subject: [PATCH 1/2] waf: Check for GnuTLS earlier
+
+As GnuTLS is an essential part we need to check for it early so we can react on
+GnuTLS features in other wscripts.
+
+Signed-off-by: Andreas Schneider <asn@samba.org>
+---
+ wscript | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/wscript b/wscript
+index d8220b35095..5b85d9a1682 100644
+--- a/wscript
++++ b/wscript
+@@ -189,6 +189,8 @@ def configure(conf):
+     conf.RECURSE('dynconfig')
+     conf.RECURSE('selftest')
+ 
++    conf.PROCESS_SEPARATE_RULE('system_gnutls')
++
+     conf.CHECK_CFG(package='zlib', minversion='1.2.3',
+                    args='--cflags --libs',
+                    mandatory=True)
+@@ -297,8 +299,6 @@ def configure(conf):
+     if not conf.CONFIG_GET('KRB5_VENDOR'):
+         conf.PROCESS_SEPARATE_RULE('embedded_heimdal')
+ 
+-    conf.PROCESS_SEPARATE_RULE('system_gnutls')
+-
+     conf.RECURSE('source4/dsdb/samdb/ldb_modules')
+     conf.RECURSE('source4/ntvfs/sysdep')
+     conf.RECURSE('lib/util')
+-- 
+2.35.1
+
+
+From 63701a28116afc1550c23cb5f7b9d6e366fd1270 Mon Sep 17 00:00:00 2001
+From: Andreas Schneider <asn@samba.org>
+Date: Mon, 4 Apr 2022 11:25:31 +0200
+Subject: [PATCH 2/2] third_party:waf: Do not recurse in aesni-intel if GnuTLS
+ provides the cipher
+
+Signed-off-by: Andreas Schneider <asn@samba.org>
+---
+ third_party/wscript | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/third_party/wscript b/third_party/wscript
+index 1f4bc1ce1d7..a17c15bcaa7 100644
+--- a/third_party/wscript
++++ b/third_party/wscript
+@@ -5,7 +5,8 @@ from waflib import Options
+ def configure(conf):
+     conf.RECURSE('cmocka')
+     conf.RECURSE('popt')
+-    conf.RECURSE('aesni-intel')
++    if not conf.CONFIG_SET('HAVE_GNUTLS_AES_CMAC'):
++        conf.RECURSE('aesni-intel')
+     if conf.CONFIG_GET('ENABLE_SELFTEST'):
+         conf.RECURSE('socket_wrapper')
+         conf.RECURSE('nss_wrapper')
+@@ -18,7 +19,8 @@ def configure(conf):
+ def build(bld):
+     bld.RECURSE('cmocka')
+     bld.RECURSE('popt')
+-    bld.RECURSE('aesni-intel')
++    if not bld.CONFIG_SET('HAVE_GNUTLS_AES_CMAC'):
++        bld.RECURSE('aesni-intel')
+     if bld.CONFIG_GET('SOCKET_WRAPPER'):
+         bld.RECURSE('socket_wrapper')
+     if bld.CONFIG_GET('NSS_WRAPPER'):
+-- 
+2.35.1
+
