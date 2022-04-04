@@ -118,10 +118,10 @@
 %global main_release 0
 
 %global samba_version 4.14.13
-%global talloc_version 2.3.3
+%global talloc_version 2.3.2
 %global tdb_version 1.4.3
 %global tevent_version 0.10.2
-%global ldb_version 2.3.2
+%global ldb_version 2.3.3
 # This should be rc1 or nil
 %global pre_release %nil
 
