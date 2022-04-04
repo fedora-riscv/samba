@@ -204,6 +204,8 @@ Source14:       samba.pamd
 Source201:      README.downgrade
 
 Patch0:         samba-s4u.patch
+# https://gitlab.com/samba-team/samba/-/merge_requests/2477
+Patch1:         samba-4.16-waf-crypto.patch
 
 Requires(pre): /usr/sbin/groupadd
 Requires(post): systemd
@@ -1061,6 +1063,11 @@ Support for using an existing CEPH cluster as a mutex helper for CTDB
 %prep
 xzcat %{SOURCE0} | gpgv2 --quiet --keyring %{SOURCE2} %{SOURCE1} -
 %autosetup -n samba-%{version}%{pre_release} -p1
+
+# Ensure we rely on GnuTLS and do not build any other crypto code shipping with
+# the sources.
+rm -rf third_party/{aesni-intel,heimdal}
+rm -f lib/crypto/{aes,rijndael}*.c
 
 %build
 %if %{with includelibs}
