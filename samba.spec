@@ -134,12 +134,12 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%global baserelease 6
+%global baserelease 0
 
-%global samba_version 4.16.0
+%global samba_version 4.16.1
 %global talloc_version 2.3.3
 %global tdb_version 1.4.6
-%global tevent_version 0.11.0
+%global tevent_version 0.12.0
 %global ldb_version 2.5.0
 # This should be rc1 or nil
 %global pre_release %nil
@@ -4133,6 +4133,10 @@ fi
 %endif
 
 %changelog
+* Mon May 02 2022 Pavel Filipenský <pfilipen@redhat.com> - 4.16.1-0
+- Update to Samba 4.16.1
+- resolves: #2080915
+
 * Tue Mar 22 2022 Guenther Deschner <gdeschner@redhat.com> - 4.16.0-6
 - Update to Samba 4.16.0
 - resolves: #2066290
