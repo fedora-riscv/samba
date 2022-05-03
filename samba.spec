@@ -1873,7 +1873,6 @@ fi
 
 %if %{without libwbclient}
 %{_libdir}/samba/libwbclient.so.*
-#%%{_libdir}/samba/libwinbind-client-samba4.so
 #endif without libwbclient
 %endif
 
@@ -2275,7 +2274,6 @@ fi
 %if %{with libwbclient}
 %files -n libwbclient
 %{_libdir}/samba/wbclient/libwbclient.so.*
-#%%{_libdir}/samba/libwinbind-client-samba4.so
 
 ### LIBWBCLIENT-DEVEL
 %files -n libwbclient-devel
