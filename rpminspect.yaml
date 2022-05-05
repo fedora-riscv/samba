@@ -7,6 +7,7 @@ badfuncs:
         - /usr/lib*/libsmbconf.so.*
         - /usr/lib*/samba/libgse-samba4.so
         - /usr/lib*/samba/libsamba-sockets-samba4.so
+        - /usr/lib*/samba/service/nbtd.so
         - /usr/libexec/ctdb/smnotify
         - /usr/sbin/nmbd
 
