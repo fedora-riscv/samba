@@ -134,7 +134,7 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%global baserelease 0
+%global baserelease 1
 
 %global samba_version 4.16.1
 %global talloc_version 2.3.3
@@ -428,7 +428,7 @@ SMB/CIFS clients.
 Summary: Files used by both Samba servers and clients
 BuildArch: noarch
 
-Requires(post): systemd
+Requires(post): (systemd-standalone-tmpfiles or systemd)
 Recommends:     logrotate
 
 Provides: samba4-common = %{samba_depver}
@@ -4138,6 +4138,9 @@ fi
 %endif
 
 %changelog
+* Thu May 05 2022 Tomas Popela <tpopela@redhat.com> - 4.16.1-1
+- Don't require full systemd for tmp files handling in samba-common
+
 * Mon May 02 2022 Pavel Filipenský <pfilipen@redhat.com> - 4.16.1-0
 - Update to Samba 4.16.1
 - resolves: #2080915
