@@ -134,7 +134,7 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%global baserelease 1
+%global baserelease 2
 
 %global samba_version 4.16.1
 %global talloc_version 2.3.3
@@ -509,6 +509,8 @@ SMB/CIFS clients.
 %package dc
 Summary: Samba AD Domain Controller
 Requires: %{name} = %{samba_depver}
+Requires: %{name}-client-libs = %{samba_depver}
+Requires: %{name}-common-libs = %{samba_depver}
 Requires: %{name}-libs = %{samba_depver}
 Requires: %{name}-dc-provision = %{samba_depver}
 Requires: %{name}-dc-libs = %{samba_depver}
@@ -549,6 +551,7 @@ The samba-dc-provision package provides files to setup a domain controller
 ### DC-LIBS
 %package dc-libs
 Summary: Samba AD Domain Controller Libraries
+Requires: %{name}-client-libs = %{samba_depver}
 Requires: %{name}-common-libs = %{samba_depver}
 Requires: %{name}-libs = %{samba_depver}
 
@@ -564,9 +567,11 @@ link against the SMB, RPC and other protocols.
 ### DC-BIND
 %package dc-bind-dlz
 Summary: Bind DLZ module for Samba AD
+Requires: %{name}-client-libs = %{samba_depver}
 Requires: %{name}-common = %{samba_depver}
 Requires: %{name}-dc-libs = %{samba_depver}
 Requires: %{name}-dc = %{samba_depver}
+Requires: %{name}-libs = %{samba_depver}
 Requires: bind
 
 Provides: bundled(libreplace)
@@ -582,6 +587,9 @@ name server related details of Samba AD.
 Summary: Developer tools for Samba libraries
 Requires: %{name}-libs = %{samba_depver}
 Requires: %{name}-client-libs = %{samba_depver}
+%if %{with dc}
+Requires: %{name}-dc-libs = %{samba_depver}
+%endif
 
 Provides: samba4-devel = %{samba_depver}
 Obsoletes: samba4-devel < %{samba_depver}
@@ -596,6 +604,7 @@ libraries in the Samba suite.
 %package vfs-cephfs
 Summary: Samba VFS module for Ceph distributed storage system
 Requires: %{name} = %{samba_depver}
+Requires: %{name}-client-libs = %{samba_depver}
 Requires: %{name}-libs = %{samba_depver}
 
 Provides: bundled(libreplace)
@@ -732,6 +741,9 @@ Requires: %{name} = %{samba_depver}
 Requires: %{name}-client-libs = %{samba_depver}
 Requires: %{name}-common-libs = %{samba_depver}
 Requires: %{name}-libs = %{samba_depver}
+%if %{with dc}
+Requires: %{name}-dc-libs = %{samba_depver}
+%endif
 Requires: python3-talloc
 Requires: python3-tevent
 Requires: python3-tdb
@@ -770,6 +782,8 @@ If you want to run full set of Samba tests, you need to install this package.
 %if %{with dc} || %{with testsuite}
 %package -n python3-samba-dc
 Summary: Samba Python libraries for Samba AD
+Requires: %{name}-client-libs = %{samba_depver}
+Requires: %{name}-dc-libs = %{samba_depver}
 Requires: python3-%{name} = %{samba_depver}
 
 %description -n python3-samba-dc
@@ -1023,6 +1037,7 @@ and use CTDB instead.
 Summary: CTDB PCP pmda support
 Requires: ctdb = %{samba_depver}
 Requires: pcp-libs
+Requires: %{name}-client-libs = %{samba_depver}
 
 %description -n ctdb-pcp-pmda
 Performance Co-Pilot (PCP) support for CTDB
@@ -4138,6 +4153,9 @@ fi
 %endif
 
 %changelog
+* Fri May 06 2022 Pavel Filipenský <pfilipen@redhat.com> - 4.16.1-2
+- Update requires for packages
+
 * Thu May 05 2022 Tomas Popela <tpopela@redhat.com> - 4.16.1-1
 - Don't require full systemd for tmp files handling in samba-common
 
