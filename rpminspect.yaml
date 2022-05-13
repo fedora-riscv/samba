@@ -15,3 +15,6 @@ runpath:
     allowed_paths:
         - /usr/lib/samba
         - /usr/lib64/samba
+
+abidiff:
+    suppression_file: samba.abignore
