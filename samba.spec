@@ -134,7 +134,7 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%global baserelease 4
+%global baserelease 5
 
 %global samba_version 4.16.1
 %global talloc_version 2.3.3
@@ -200,6 +200,7 @@ Source11:       smb.conf.vendor
 Source12:       smb.conf.example
 Source13:       pam_winbind.conf
 Source14:       samba.pamd
+Source15:       samba.abignore
 
 Source201:      README.downgrade
 
@@ -4153,6 +4154,9 @@ fi
 %endif
 
 %changelog
+* Fri May 13 2022 Pavel Filipenský <pfilipen@redhat.com> - 4.16.1-5
+- Fix rpminspect abidiff
+
 * Fri May 06 2022 Pavel Filipenský <pfilipen@redhat.com> - 4.16.1-2
 - Update requires for packages
 
