@@ -134,7 +134,7 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%global baserelease 5
+%global baserelease 6
 
 %global samba_version 4.16.1
 %global talloc_version 2.3.3
@@ -4154,6 +4154,9 @@ fi
 %endif
 
 %changelog
+* Tue May 31 2022 Jitka Plesnikova <jplesnik@redhat.com> - 2:4.16.1-6
+- Perl 5.36 rebuild
+
 * Fri May 13 2022 Pavel Filipenský <pfilipen@redhat.com> - 4.16.1-5
 - Fix rpminspect abidiff
 
