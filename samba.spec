@@ -1099,7 +1099,7 @@ rm -f lib/crypto/{aes,rijndael}*.c
 #endif with includelibs
 %endif
 
-%global _samba_libraries !zlib,!popt%{_talloc_lib}%{_tevent_lib}%{_tdb_lib}%{_ldb_lib}
+%global _samba_libraries !popt%{_talloc_lib}%{_tevent_lib}%{_tdb_lib}%{_ldb_lib}
 
 %global _samba_idmap_modules idmap_ad,idmap_rid,idmap_ldap,idmap_hash,idmap_tdb2
 %global _samba_pdb_modules pdb_tdbsam,pdb_ldap,pdb_smbpasswd,pdb_wbc_sam,pdb_samba4
