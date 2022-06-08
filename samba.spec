@@ -430,7 +430,9 @@ Summary: Files used by both Samba servers and clients
 BuildArch: noarch
 
 Requires(post): (systemd-standalone-tmpfiles or systemd)
+%if 0%{?fedora}
 Recommends:     logrotate
+%endif
 
 Provides: samba4-common = %{samba_depver}
 Obsoletes: samba4-common < %{samba_depver}
@@ -4154,6 +4156,9 @@ fi
 %endif
 
 %changelog
+* Wed Jun 08 2022 Andreas Schneider <asn@redhat.com> - 4.16.1-7
+- resolves: rhbz#2093833 - Remove weak dependency for logrotate for CentOS/RHEL
+
 * Tue May 31 2022 Jitka Plesnikova <jplesnik@redhat.com> - 2:4.16.1-6
 - Perl 5.36 rebuild
 
