@@ -134,13 +134,13 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%global baserelease 6
+%global baserelease 0
 
-%global samba_version 4.16.1
+%global samba_version 4.16.2
 %global talloc_version 2.3.3
 %global tdb_version 1.4.6
 %global tevent_version 0.12.0
-%global ldb_version 2.5.0
+%global ldb_version 2.5.1
 # This should be rc1 or nil
 %global pre_release %nil
 
@@ -4156,6 +4156,10 @@ fi
 %endif
 
 %changelog
+* Mon Jun 13 2022 Guenther Deschner <gdeschner@redhat.com> - 4.16.2-0
+- Update to Samba 4.16.2
+- resolves: #2096167
+
 * Wed Jun 08 2022 Andreas Schneider <asn@redhat.com> - 4.16.1-7
 - resolves: rhbz#2093833 - Remove weak dependency for logrotate for CentOS/RHEL
 
