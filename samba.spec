@@ -365,12 +365,18 @@ BuildRequires: lmdb-devel
 %if %{with dc} || %{with testsuite}
 BuildRequires: bind
 BuildRequires: krb5-server >= %{required_mit_krb5}
-BuildRequires: ldb-tools
 BuildRequires: python3-gpg
 BuildRequires: python3-markdown
 BuildRequires: python3-setproctitle
 BuildRequires: python3-cryptography
+
+%if %{without includelibs}
 BuildRequires: tdb-tools
+BuildRequires: ldb-tools
+#endif without includelibs
+%endif
+
+#endif with dc || with testsuite
 %endif
 
 # filter out perl requirements pulled in from examples in the docdir.
