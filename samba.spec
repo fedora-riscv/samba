@@ -135,7 +135,7 @@
 %global talloc_version 2.3.3
 %global tdb_version 1.4.4
 %global tevent_version 0.11.0
-%global ldb_version 2.4.2
+%global ldb_version 2.4.3
 # This should be rc1 or nil
 %global pre_release %nil
 
