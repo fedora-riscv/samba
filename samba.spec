@@ -131,7 +131,7 @@
 
 %global baserelease 0
 
-%global samba_version 4.15.7
+%global samba_version 4.15.8
 %global talloc_version 2.3.3
 %global tdb_version 1.4.4
 %global tevent_version 0.11.0
@@ -4100,6 +4100,9 @@ fi
 %endif
 
 %changelog
+* Tue Jun 28 2022 Pavel Filipenský <pfilipen@redhat.com> - 4.15.8-0
+- Update to Samba 4.15.8
+
 * Tue Apr 26 2022 Guenther Deschner <gdeschner@redhat.com> - 4.15.7-0
 - Update to Samba 4.15.7
 
