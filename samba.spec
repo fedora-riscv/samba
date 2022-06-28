@@ -2057,6 +2057,7 @@ fi
 %{_libdir}/samba/bind9/dlz_bind9_12.so
 %{_libdir}/samba/bind9/dlz_bind9_14.so
 %{_libdir}/samba/bind9/dlz_bind9_16.so
+%{_libdir}/samba/bind9/dlz_bind9_18.so
 #endif with dc
 %endif
 
