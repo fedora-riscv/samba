@@ -136,7 +136,7 @@
 
 %global baserelease 0
 
-%global samba_version 4.16.2
+%global samba_version 4.16.3
 %global talloc_version 2.3.3
 %global tdb_version 1.4.6
 %global tevent_version 0.12.0
@@ -2096,6 +2096,7 @@ fi
 %{_libdir}/samba/bind9/dlz_bind9_12.so
 %{_libdir}/samba/bind9/dlz_bind9_14.so
 %{_libdir}/samba/bind9/dlz_bind9_16.so
+%{_libdir}/samba/bind9/dlz_bind9_18.so
 #endif with dc
 %endif
 
@@ -4154,6 +4155,9 @@ fi
 %endif
 
 %changelog
+* Mon Jul 18 2022 Andreas Schneider <asn@redhat.com> - 4.16.3-1
+- Update to version 4.16.3
+
 * Mon Jun 13 2022 Guenther Deschner <gdeschner@redhat.com> - 4.16.2-0
 - Update to Samba 4.16.2
 - resolves: #2096167
