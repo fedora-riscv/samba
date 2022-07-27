@@ -131,11 +131,11 @@
 
 %global baserelease 0
 
-%global samba_version 4.15.8
+%global samba_version 4.15.9
 %global talloc_version 2.3.3
 %global tdb_version 1.4.4
 %global tevent_version 0.11.0
-%global ldb_version 2.4.3
+%global ldb_version 2.4.4
 # This should be rc1 or nil
 %global pre_release %nil
 
@@ -2921,6 +2921,7 @@ fi
 %{python3_sitearch}/samba/tests/krb5/__pycache__/kdc_base_test.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/kdc_tests.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/kdc_tgs_tests.*.pyc
+%{python3_sitearch}/samba/tests/krb5/__pycache__/kpasswd_tests.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/ms_kile_client_principal_lookup_tests.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/raw_testcase.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/rfc4120_constants.*.pyc
@@ -2946,6 +2947,7 @@ fi
 %{python3_sitearch}/samba/tests/krb5/kdc_base_test.py
 %{python3_sitearch}/samba/tests/krb5/kdc_tests.py
 %{python3_sitearch}/samba/tests/krb5/kdc_tgs_tests.py
+%{python3_sitearch}/samba/tests/krb5/kpasswd_tests.py
 %{python3_sitearch}/samba/tests/krb5/ms_kile_client_principal_lookup_tests.py
 %{python3_sitearch}/samba/tests/krb5/raw_testcase.py
 %{python3_sitearch}/samba/tests/krb5/rfc4120_constants.py
@@ -4101,6 +4103,12 @@ fi
 %endif
 
 %changelog
+* Wed Jul 27 2022 Guenther Deschner <gdeschner@redhat.com> - 4.15.9-0
+- resolves: #2108196, #2111729 - Security fixes for CVE-2022-32742
+- resolves: #2108205, #2111731 - Security fixes for CVE-2022-32744
+- resolves: #2108211, #2111732 - Security fixes for CVE-2022-32745
+- resolves: #2108215, #2111734 - Security fixes for CVE-2022-32746
+
 * Tue Jun 28 2022 Pavel Filipenský <pfilipen@redhat.com> - 4.15.8-0
 - Update to Samba 4.15.8
 
