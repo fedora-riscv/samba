@@ -1,0 +1,36 @@
+From 37b1f282d1b549063d2fca07caca812292be1d3b Mon Sep 17 00:00:00 2001
+From: Andreas Schneider <asn@samba.org>
+Date: Fri, 29 Jul 2022 10:08:24 +0200
+Subject: [PATCH] lib:replace: Remove <sys/mount.h> from filesys.h
+
+You need to be careful if you include <sys/mount.h> or <linux/mount.h>
+at least since glibc 2.36.
+
+Details at:
+https://sourceware.org/glibc/wiki/Release/2.36#Usage_of_.3Clinux.2Fmount.h.3E_and_.3Csys.2Fmount.h.3E
+
+BUG: https://bugzilla.samba.org/show_bug.cgi?id=15132
+
+Signed-off-by: Andreas Schneider <asn@samba.org>
+---
+ lib/replace/system/filesys.h | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/lib/replace/system/filesys.h b/lib/replace/system/filesys.h
+index 034e5d5886c..190c6b90f93 100644
+--- a/lib/replace/system/filesys.h
++++ b/lib/replace/system/filesys.h
+@@ -36,10 +36,6 @@
+ #include <sys/param.h>
+ #endif
+ 
+-#ifdef HAVE_SYS_MOUNT_H
+-#include <sys/mount.h>
+-#endif
+-
+ #ifdef HAVE_MNTENT_H
+ #include <mntent.h>
+ #endif
+-- 
+2.37.1
+
