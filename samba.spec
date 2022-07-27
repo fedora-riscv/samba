@@ -134,13 +134,13 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%global baserelease 2
+%global baserelease 0
 
-%global samba_version 4.16.3
+%global samba_version 4.16.4
 %global talloc_version 2.3.3
 %global tdb_version 1.4.6
 %global tevent_version 0.12.0
-%global ldb_version 2.5.1
+%global ldb_version 2.5.2
 # This should be rc1 or nil
 %global pre_release %nil
 
@@ -4163,6 +4163,13 @@ fi
 %endif
 
 %changelog
+* Wed Jul 27 2022 Guenther Deschner <gdeschner@redhat.com> - 4.16.4-0
+- resolves: #2111490 - Update to version 4.16.4
+- resolves: #X, #Y - Security fixes for CVE-2022-32742
+- resolves: #X, #Y - Security fixes for CVE-2022-32744
+- resolves: #X, #Y - Security fixes for CVE-2022-32745
+- resolves: #X, #Y - Security fixes for CVE-2022-32746
+
 * Sat Jul 23 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2:4.16.3-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
 
