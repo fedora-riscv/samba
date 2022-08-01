@@ -134,7 +134,7 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%global baserelease 0
+%global baserelease 1
 
 %global samba_version 4.16.4
 %global talloc_version 2.3.3
@@ -4167,6 +4167,9 @@ fi
 %endif
 
 %changelog
+* Mon Aug 01 2022 Frantisek Zatloukal <fzatlouk@redhat.com> - 2:4.16.4-1
+- Rebuilt for ICU 71.1
+
 * Wed Jul 27 2022 Guenther Deschner <gdeschner@redhat.com> - 4.16.4-0
 - resolves: #2111490 - Update to version 4.16.4
 - resolves: #2108196, #2111729 - Security fixes for CVE-2022-32742
