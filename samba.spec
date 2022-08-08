@@ -134,15 +134,15 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%global baserelease 1
+%global baserelease 0
 
-%global samba_version 4.16.4
-%global talloc_version 2.3.3
-%global tdb_version 1.4.6
-%global tevent_version 0.12.0
-%global ldb_version 2.5.2
+%global samba_version 4.17.0
+%global talloc_version 2.3.4
+%global tdb_version 1.4.7
+%global tevent_version 0.13.0
+%global ldb_version 2.6.1
 # This should be rc1 or nil
-%global pre_release %nil
+%global pre_release rc1
 
 %global samba_release %{baserelease}
 %if "x%{?pre_release}" != "x"
@@ -204,11 +204,8 @@ Source15:       samba.abignore
 
 Source201:      README.downgrade
 
-Patch0:         samba-s4u.patch
-# https://gitlab.com/samba-team/samba/-/merge_requests/2477
-Patch1:         samba-4.16-waf-crypto.patch
-# https://gitlab.com/samba-team/samba/-/merge_requests/2647
-Patch2:         samba-mount_h.patch
+#FIXME
+#Patch0:         samba-s4u.patch
 
 Requires(pre): /usr/sbin/groupadd
 Requires(post): systemd
@@ -1194,6 +1191,9 @@ export python_LDFLAGS="$(echo %{__global_ldflags} | sed -e 's/-Wl,-z,defs//g')"
         --systemd-smb-extra=%{_systemd_extra} \
         --systemd-nmb-extra=%{_systemd_extra} \
         --systemd-winbind-extra=%{_systemd_extra} \
+%if %{with clustering}
+        --systemd-ctdb-extra=%{_systemd_extra} \
+%endif
         --systemd-samba-extra=%{_systemd_extra}
 
 # Do not use %%make_build, make is just a wrapper around waf in Samba!
@@ -1278,10 +1278,6 @@ install -m 0644 ctdb/config/ctdb.conf %{buildroot}%{_sysconfdir}/ctdb/ctdb.conf
 %endif
 
 install -m 0644 %{SOURCE201} packaging/README.downgrade
-
-%if %{with clustering}
-install -m 0644 ctdb/config/ctdb.service %{buildroot}%{_unitdir}
-%endif
 
 # NetworkManager online/offline script
 install -d -m 0755 %{buildroot}%{_prefix}/lib/NetworkManager/dispatcher.d/
@@ -2370,18 +2366,6 @@ fi
 %{python3_sitearch}/samba/__pycache__/dnsresolver.*.pyc
 %{python3_sitearch}/samba/__pycache__/drs_utils.*.pyc
 %{python3_sitearch}/samba/__pycache__/getopt.*.pyc
-%{python3_sitearch}/samba/__pycache__/gpclass.*.pyc
-%{python3_sitearch}/samba/__pycache__/gp_cert_auto_enroll_ext.*.pyc
-%{python3_sitearch}/samba/__pycache__/gp_chromium_ext.*.pyc
-%{python3_sitearch}/samba/__pycache__/gp_ext_loader.*.pyc
-%{python3_sitearch}/samba/__pycache__/gp_firefox_ext.*.pyc
-%{python3_sitearch}/samba/__pycache__/gp_firewalld_ext.*.pyc
-%{python3_sitearch}/samba/__pycache__/gp_gnome_settings_ext.*.pyc
-%{python3_sitearch}/samba/__pycache__/gp_msgs_ext.*.pyc
-%{python3_sitearch}/samba/__pycache__/gp_scripts_ext.*.pyc
-%{python3_sitearch}/samba/__pycache__/gp_sec_ext.*.pyc
-%{python3_sitearch}/samba/__pycache__/gp_smb_conf_ext.*.pyc
-%{python3_sitearch}/samba/__pycache__/gp_sudoers_ext.*.pyc
 %{python3_sitearch}/samba/__pycache__/graph.*.pyc
 %{python3_sitearch}/samba/__pycache__/hostconfig.*.pyc
 %{python3_sitearch}/samba/__pycache__/idmap.*.pyc
@@ -2399,14 +2383,6 @@ fi
 %{python3_sitearch}/samba/__pycache__/trust_utils.*.pyc
 %{python3_sitearch}/samba/__pycache__/upgrade.*.pyc
 %{python3_sitearch}/samba/__pycache__/upgradehelpers.*.pyc
-%{python3_sitearch}/samba/__pycache__/vgp_access_ext.*.pyc
-%{python3_sitearch}/samba/__pycache__/vgp_files_ext.*.pyc
-%{python3_sitearch}/samba/__pycache__/vgp_issue_ext.*.pyc
-%{python3_sitearch}/samba/__pycache__/vgp_motd_ext.*.pyc
-%{python3_sitearch}/samba/__pycache__/vgp_openssh_ext.*.pyc
-%{python3_sitearch}/samba/__pycache__/vgp_startup_scripts_ext.*.pyc
-%{python3_sitearch}/samba/__pycache__/vgp_sudoers_ext.*.pyc
-%{python3_sitearch}/samba/__pycache__/vgp_symlink_ext.*.pyc
 %{python3_sitearch}/samba/__pycache__/xattr.*.pyc
 %{python3_sitearch}/samba/_glue.*.so
 %{python3_sitearch}/samba/_ldb.*.so
@@ -2468,11 +2444,6 @@ fi
 %{python3_sitearch}/samba/dsdb_dns.*.so
 %{python3_sitearch}/samba/gensec.*.so
 %{python3_sitearch}/samba/getopt.py
-%{python3_sitearch}/samba/gpclass.py
-%{python3_sitearch}/samba/gp_gnome_settings_ext.py
-%{python3_sitearch}/samba/gp_scripts_ext.py
-%{python3_sitearch}/samba/gp_sec_ext.py
-%{python3_sitearch}/samba/gpo.*.so
 %{python3_sitearch}/samba/graph.py
 %{python3_sitearch}/samba/hostconfig.py
 %{python3_sitearch}/samba/idmap.py
@@ -2491,14 +2462,49 @@ fi
 %{python3_sitearch}/samba/emulate/__init__.py
 %{python3_sitearch}/samba/emulate/traffic.py
 %{python3_sitearch}/samba/emulate/traffic_packets.py
-%{python3_sitearch}/samba/gp_cert_auto_enroll_ext.py
-%{python3_sitearch}/samba/gp_chromium_ext.py
-%{python3_sitearch}/samba/gp_ext_loader.py
-%{python3_sitearch}/samba/gp_firefox_ext.py
-%{python3_sitearch}/samba/gp_firewalld_ext.py
-%{python3_sitearch}/samba/gp_msgs_ext.py
-%{python3_sitearch}/samba/gp_smb_conf_ext.py
-%{python3_sitearch}/samba/gp_sudoers_ext.py
+%dir %{python3_sitearch}/samba/gp
+%dir %{python3_sitearch}/samba/gp/__pycache__
+%{python3_sitearch}/samba/gp/__pycache__/gpclass.*.pyc
+%{python3_sitearch}/samba/gp/__pycache__/gp_cert_auto_enroll_ext.*.pyc
+%{python3_sitearch}/samba/gp/__pycache__/gp_chromium_ext.*.pyc
+%{python3_sitearch}/samba/gp/__pycache__/gp_ext_loader.*.pyc
+%{python3_sitearch}/samba/gp/__pycache__/gp_firefox_ext.*.pyc
+%{python3_sitearch}/samba/gp/__pycache__/gp_firewalld_ext.*.pyc
+%{python3_sitearch}/samba/gp/__pycache__/gp_gnome_settings_ext.*.pyc
+%{python3_sitearch}/samba/gp/__pycache__/gp_msgs_ext.*.pyc
+%{python3_sitearch}/samba/gp/__pycache__/gp_scripts_ext.*.pyc
+%{python3_sitearch}/samba/gp/__pycache__/gp_sec_ext.*.pyc
+%{python3_sitearch}/samba/gp/__pycache__/gp_smb_conf_ext.*.pyc
+%{python3_sitearch}/samba/gp/__pycache__/gp_sudoers_ext.*.pyc
+%{python3_sitearch}/samba/gp/__pycache__/vgp_access_ext.*.pyc
+%{python3_sitearch}/samba/gp/__pycache__/vgp_files_ext.*.pyc
+%{python3_sitearch}/samba/gp/__pycache__/vgp_issue_ext.*.pyc
+%{python3_sitearch}/samba/gp/__pycache__/vgp_motd_ext.*.pyc
+%{python3_sitearch}/samba/gp/__pycache__/vgp_openssh_ext.*.pyc
+%{python3_sitearch}/samba/gp/__pycache__/vgp_startup_scripts_ext.*.pyc
+%{python3_sitearch}/samba/gp/__pycache__/vgp_sudoers_ext.*.pyc
+%{python3_sitearch}/samba/gp/__pycache__/vgp_symlink_ext.*.pyc
+%{python3_sitearch}/samba/gp/gpclass.py
+%{python3_sitearch}/samba/gp/gp_gnome_settings_ext.py
+%{python3_sitearch}/samba/gp/gp_scripts_ext.py
+%{python3_sitearch}/samba/gp/gp_sec_ext.py
+%{python3_sitearch}/samba/gp/gpo.*.so
+%{python3_sitearch}/samba/gp/gp_cert_auto_enroll_ext.py
+%{python3_sitearch}/samba/gp/gp_chromium_ext.py
+%{python3_sitearch}/samba/gp/gp_ext_loader.py
+%{python3_sitearch}/samba/gp/gp_firefox_ext.py
+%{python3_sitearch}/samba/gp/gp_firewalld_ext.py
+%{python3_sitearch}/samba/gp/gp_msgs_ext.py
+%{python3_sitearch}/samba/gp/gp_smb_conf_ext.py
+%{python3_sitearch}/samba/gp/gp_sudoers_ext.py
+%{python3_sitearch}/samba/gp/vgp_access_ext.py
+%{python3_sitearch}/samba/gp/vgp_files_ext.py
+%{python3_sitearch}/samba/gp/vgp_issue_ext.py
+%{python3_sitearch}/samba/gp/vgp_motd_ext.py
+%{python3_sitearch}/samba/gp/vgp_openssh_ext.py
+%{python3_sitearch}/samba/gp/vgp_startup_scripts_ext.py
+%{python3_sitearch}/samba/gp/vgp_sudoers_ext.py
+%{python3_sitearch}/samba/gp/vgp_symlink_ext.py
 %dir %{python3_sitearch}/samba/gp_parse
 %{python3_sitearch}/samba/gp_parse/__init__.py
 %dir %{python3_sitearch}/samba/gp_parse/__pycache__
@@ -2607,14 +2613,6 @@ fi
 %{python3_sitearch}/samba/trust_utils.py
 %{python3_sitearch}/samba/upgrade.py
 %{python3_sitearch}/samba/upgradehelpers.py
-%{python3_sitearch}/samba/vgp_access_ext.py
-%{python3_sitearch}/samba/vgp_files_ext.py
-%{python3_sitearch}/samba/vgp_issue_ext.py
-%{python3_sitearch}/samba/vgp_motd_ext.py
-%{python3_sitearch}/samba/vgp_openssh_ext.py
-%{python3_sitearch}/samba/vgp_startup_scripts_ext.py
-%{python3_sitearch}/samba/vgp_sudoers_ext.py
-%{python3_sitearch}/samba/vgp_symlink_ext.py
 %{python3_sitearch}/samba/werror.*.so
 %{python3_sitearch}/samba/xattr.py
 %{python3_sitearch}/samba/xattr_native.*.so
@@ -4167,6 +4165,9 @@ fi
 %endif
 
 %changelog
+* Mon Aug 08 2022 Guenther Deschner <gdeschner@redhat.com> - 4.17.0rc1-0
+- resolves: #2116503 - Update to version 4.17.0rc1
+
 * Mon Aug 01 2022 Frantisek Zatloukal <fzatlouk@redhat.com> - 2:4.16.4-1
 - Rebuilt for ICU 71.1
 
