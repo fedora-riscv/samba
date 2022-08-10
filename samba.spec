@@ -134,20 +134,22 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%global baserelease 0
-
 %global samba_version 4.17.0
-%global talloc_version 2.3.4
-%global tdb_version 1.4.7
-%global tevent_version 0.13.0
-%global ldb_version 2.6.1
-# This should be rc1 or nil
+%global baserelease 0
+# This should be rc1 or %%nil
 %global pre_release rc1
 
 %global samba_release %{baserelease}
 %if "x%{?pre_release}" != "x"
 %global samba_release 0.%{baserelease}.%{pre_release}
 %endif
+
+%global talloc_version 2.3.4
+%global tdb_version 1.4.7
+%global tevent_version 0.13.0
+%global ldb_version 2.6.1
+
+%global required_mit_krb5 1.19
 
 # This is a network daemon, do a hardened build
 # Enables PIE and full RELRO protection
@@ -164,8 +166,6 @@
 %if 0%{?__isa_bits} == 64
 %global libwbc_alternatives_suffix -64
 %endif
-
-%global required_mit_krb5 1.19
 
 %global _systemd_extra "Environment=KRB5CCNAME=FILE:/run/samba/krb5cc_samba"
 
