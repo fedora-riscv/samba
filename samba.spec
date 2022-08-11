@@ -135,7 +135,7 @@
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
 %global samba_version 4.17.0
-%global baserelease 0
+%global baserelease 1
 # This should be rc1 or %%nil
 %global pre_release rc1
 
@@ -143,6 +143,30 @@
 %if "x%{?pre_release}" != "x"
 %global samba_release 0.%{baserelease}.%{pre_release}
 %endif
+
+
+# If one of those versions change, we need to make sure we rebuilt or adapt
+# projects comsuming those. This is e.g. sssd, openchange, evolution-mapi, ...
+%global libdcerpc_binding_so_version 0
+%global libdcerpc_server_core_so_version 0
+%global libdcerpc_so_version 0
+%global libndr_krb5pac_so_version 0
+%global libndr_nbt_so_version 0
+%global libndr_so_version 3
+%global libndr_standard_so_version 0
+%global libnetapi_so_version 1
+%global libsamba_credentials_so_version 1
+%global libsamba_errors_so_version 1
+%global libsamba_hostconfig_so_version 0
+%global libsamba_passdb_so_version 0
+%global libsamba_util_so_version 0
+%global libsamdb_so_version 0
+%global libsmbconf_so_version 0
+%global libsmbldap_so_version 2
+%global libtevent_util_so_version 0
+
+%global libsmbclient_so_version 0
+%global libwbclient_so_version 0
 
 %global talloc_version 2.3.4
 %global tdb_version 1.4.7
@@ -1791,23 +1815,23 @@ fi
 
 ### CLIENT-LIBS
 %files client-libs
-%{_libdir}/libdcerpc-binding.so.*
-%{_libdir}/libdcerpc-server-core.so.*
-%{_libdir}/libdcerpc.so.*
-%{_libdir}/libndr-krb5pac.so.*
-%{_libdir}/libndr-nbt.so.*
-%{_libdir}/libndr-standard.so.*
-%{_libdir}/libndr.so.*
-%{_libdir}/libnetapi.so.*
-%{_libdir}/libsamba-credentials.so.*
-%{_libdir}/libsamba-errors.so.*
-%{_libdir}/libsamba-hostconfig.so.*
-%{_libdir}/libsamba-passdb.so.*
-%{_libdir}/libsamba-util.so.*
-%{_libdir}/libsamdb.so.*
-%{_libdir}/libsmbconf.so.*
-%{_libdir}/libsmbldap.so.*
-%{_libdir}/libtevent-util.so.*
+%{_libdir}/libdcerpc-binding.so.%{libdcerpc_binding_so_version}*
+%{_libdir}/libdcerpc-server-core.so.%{libdcerpc_server_core_so_version}*
+%{_libdir}/libdcerpc.so.%{libdcerpc_so_version}*
+%{_libdir}/libndr-krb5pac.so.%{libndr_krb5pac_so_version}*
+%{_libdir}/libndr-nbt.so.%{libndr_nbt_so_version}*
+%{_libdir}/libndr-standard.so.%{libndr_standard_so_version}*
+%{_libdir}/libndr.so.%{libndr_so_version}*
+%{_libdir}/libnetapi.so.%{libnetapi_so_version}*
+%{_libdir}/libsamba-credentials.so.%{libsamba_credentials_so_version}*
+%{_libdir}/libsamba-errors.so.%{libsamba_errors_so_version}*
+%{_libdir}/libsamba-hostconfig.so.%{libsamba_hostconfig_so_version}*
+%{_libdir}/libsamba-passdb.so.%{libsamba_passdb_so_version}*
+%{_libdir}/libsamba-util.so.%{libsamba_util_so_version}*
+%{_libdir}/libsamdb.so.%{libsamdb_so_version}*
+%{_libdir}/libsmbconf.so.%{libsmbconf_so_version}*
+%{_libdir}/libsmbldap.so.%{libsmbldap_so_version}*
+%{_libdir}/libtevent-util.so.%{libtevent_util_so_version}*
 
 %dir %{_libdir}/samba
 %{_libdir}/samba/libCHARSET3-samba4.so
@@ -1896,7 +1920,7 @@ fi
 %endif
 
 %if %{without libsmbclient}
-%{_libdir}/samba/libsmbclient.so.*
+%{_libdir}/samba/libsmbclient.so.%{libsmbclient_so_version}*
 %{_mandir}/man7/libsmbclient.7*
 #endif without libsmbclient
 %endif
@@ -2293,7 +2317,7 @@ fi
 ### LIBWBCLIENT
 %if %{with libwbclient}
 %files -n libwbclient
-%{_libdir}/samba/wbclient/libwbclient.so.*
+%{_libdir}/samba/wbclient/libwbclient.so.%{libwbclient_so_version}*
 
 ### LIBWBCLIENT-DEVEL
 %files -n libwbclient-devel
@@ -4184,6 +4208,9 @@ fi
 %endif
 
 %changelog
+* Wed Aug 10 2022 Andreas Schneider <asn@redhat.com> - 4.17.0rc1-1
+- Make sure we detect if SO version numbers of public libraries change.
+
 * Mon Aug 08 2022 Guenther Deschner <gdeschner@redhat.com> - 4.17.0rc1-0
 - resolves: #2116503 - Update to version 4.17.0rc1
 
