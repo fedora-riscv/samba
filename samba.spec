@@ -135,9 +135,9 @@
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
 %global samba_version 4.17.0
-%global baserelease 1
+%global baserelease 2
 # This should be rc1 or %%nil
-%global pre_release rc1
+%global pre_release rc2
 
 %global samba_release %{baserelease}
 %if "x%{?pre_release}" != "x"
@@ -4208,6 +4208,9 @@ fi
 %endif
 
 %changelog
+* Wed Aug 17 2022 Guenther Deschner <gdeschner@redhat.com> - 4.17.0rc2-2
+- resolves: #2118818 - Update to version 4.17.0rc2
+
 * Wed Aug 10 2022 Andreas Schneider <asn@redhat.com> - 4.17.0rc1-1
 - Make sure we detect if SO version numbers of public libraries change.
 
