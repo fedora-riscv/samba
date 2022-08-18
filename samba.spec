@@ -135,7 +135,7 @@
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
 %global samba_version 4.17.0
-%global baserelease 2
+%global baserelease 3
 # This should be rc1 or %%nil
 %global pre_release rc2
 
@@ -229,9 +229,6 @@ Source15:       samba.abignore
 Source201:      README.downgrade
 
 Requires(pre): /usr/sbin/groupadd
-Requires(post): systemd
-Requires(preun): systemd
-Requires(postun): systemd
 
 Requires(pre): %{name}-common = %{samba_depver}
 Requires: %{name}-common = %{samba_depver}
@@ -4208,6 +4205,9 @@ fi
 %endif
 
 %changelog
+* Thu Aug 18 2022 Kalev Lember <klember@redhat.com> - 2:4.17.0-0.3.rc2
+- Avoid requiring systemd as per updated packaging guidelines
+
 * Wed Aug 17 2022 Guenther Deschner <gdeschner@redhat.com> - 4.17.0rc2-2
 - resolves: #2118818 - Update to version 4.17.0rc2
 
