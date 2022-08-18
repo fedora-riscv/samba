@@ -135,7 +135,7 @@
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
 %global samba_version 4.17.0
-%global baserelease 4
+%global baserelease 5
 # This should be rc1 or %%nil
 %global pre_release rc3
 
@@ -509,6 +509,7 @@ Summary: Tools for Samba servers and clients
 Requires: samba-common-libs = %{samba_depver}
 Requires: samba-client-libs = %{samba_depver}
 Requires: samba-libs = %{samba_depver}
+Requires: samba-ldb-ldap-modules = %{samba_depver}
 %if %{with libwbclient}
 Requires: libwbclient = %{samba_depver}
 %endif
@@ -537,6 +538,7 @@ Summary: Samba AD Domain Controller
 Requires: %{name} = %{samba_depver}
 Requires: %{name}-client-libs = %{samba_depver}
 Requires: %{name}-common-libs = %{samba_depver}
+Requires: %{name}-common-tools = %{samba_depver}
 Requires: %{name}-libs = %{samba_depver}
 Requires: %{name}-dc-provision = %{samba_depver}
 Requires: %{name}-dc-libs = %{samba_depver}
@@ -692,6 +694,15 @@ Requires(postun): %{_sbindir}/update-alternatives
 If you need Kerberos for print jobs to a printer connection to cups via the SMB
 backend, then you need to install that package. It will allow cups to access
 the Kerberos credentials cache of the user issuing the print job.
+
+### LDB-LDAP-MODULES
+%package ldb-ldap-modules
+Summary: Samba ldap modules for ldb
+Requires: %{name}-client-libs = %{samba_depver}
+
+%description ldb-ldap-modules
+This package contains the ldb ldap modules required by samba-tool and
+samba-gpupdate.
 
 ### LIBS
 %package libs
@@ -2026,10 +2037,8 @@ fi
 %{_libdir}/samba/ldb/extended_dn_out.so
 %{_libdir}/samba/ldb/extended_dn_store.so
 %{_libdir}/samba/ldb/group_audit_log.so
-%{_libdir}/samba/ldb/ildap.so
 %{_libdir}/samba/ldb/instancetype.so
 %{_libdir}/samba/ldb/lazy_commit.so
-%{_libdir}/samba/ldb/ldbsamba_extensions.so
 %{_libdir}/samba/ldb/linked_attributes.so
 %{_libdir}/samba/ldb/new_partition.so
 %{_libdir}/samba/ldb/objectclass.so
@@ -2280,6 +2289,11 @@ fi
 %files krb5-printing
 %attr(0700,root,root) %{_libexecdir}/samba/smbspool_krb5_wrapper
 %{_mandir}/man8/smbspool_krb5_wrapper.8*
+
+### LDB-LDAP-MODULES
+%files ldb-ldap-modules
+%{_libdir}/samba/ldb/ldbsamba_extensions.so
+%{_libdir}/samba/ldb/ildap.so
 
 ### LIBS
 %files libs
@@ -4205,7 +4219,10 @@ fi
 %endif
 
 %changelog
-* Tue Aug 23 2022 Pavel Filipenský <pfilipen@redhat.com> - 4.17.0-0.6.rc3
+* Thu Aug 25 2022 Andreas Schneider <asn@redhat.com> - 4.17.0-0.5.rc2
+- Split out a samba-ldb-ldap-modules subpackage
+
+* Tue Aug 23 2022 Pavel Filipenský <pfilipen@redhat.com> - 4.17.0-0.4.rc3
 - resolves: #2118818 - Update to version 4.17.0rc3
 
 * Thu Aug 18 2022 Kalev Lember <klember@redhat.com> - 2:4.17.0-0.3.rc2
