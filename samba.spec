@@ -135,7 +135,7 @@
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
 %global samba_version 4.17.0
-%global baserelease 5
+%global baserelease 6
 # This should be rc1 or %%nil
 %global pre_release rc3
 
@@ -678,6 +678,22 @@ Provides: bundled(libreplace)
 
 %description vfs-glusterfs
 Samba VFS module for GlusterFS integration.
+%endif
+
+### GPUPDATE
+%if %{with dc}
+%package gpupdate
+Summary: Samba GPO support for clients
+Requires: cepces
+Requires: certmonger
+Requires: %{name}-ldb-ldap-modules = %{samba_depver}
+Requires: python3-%{name} = %{samba_depver}
+
+%description gpupdate
+This package provides the samba-gpupdate tool to apply Group Policy Objects
+(GPO) on Samba clients.
+
+# /with dc
 %endif
 
 ### KRB5-PRINTING
@@ -2012,7 +2028,6 @@ fi
 %{_sbindir}/samba
 %{_sbindir}/samba_dnsupdate
 %{_sbindir}/samba_downgrade_db
-%{_sbindir}/samba-gpupdate
 %{_sbindir}/samba_kcc
 %{_sbindir}/samba_spnupdate
 %{_sbindir}/samba_upgradedns
@@ -2073,7 +2088,6 @@ fi
 %dir /var/lib/samba/sysvol
 %{_mandir}/man8/samba.8*
 %{_mandir}/man8/samba_downgrade_db.8*
-%{_mandir}/man8/samba-gpupdate.8*
 %dir %{_datadir}/samba/admx
 %{_datadir}/samba/admx/samba.admx
 %dir %{_datadir}/samba/admx/en-US
@@ -2283,6 +2297,13 @@ fi
 %files vfs-glusterfs
 %{_libdir}/samba/vfs/glusterfs.so
 %{_mandir}/man8/vfs_glusterfs.8*
+%endif
+
+### GPUPDATE
+%if %{with dc}
+%files gpupdate
+%{_mandir}/man8/samba-gpupdate.8*
+%{_sbindir}/samba-gpupdate
 %endif
 
 ### KRB5-PRINTING
@@ -4219,6 +4240,9 @@ fi
 %endif
 
 %changelog
+* Thu Aug 25 2022 Andreas Schneider <asn@redhat.com> - 4.17.0-0.6.rc2
+- Create a samba-gpupdate sub-package for GPO client support
+
 * Thu Aug 25 2022 Andreas Schneider <asn@redhat.com> - 4.17.0-0.5.rc2
 - Split out a samba-ldb-ldap-modules subpackage
 
