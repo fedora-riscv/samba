@@ -135,9 +135,9 @@
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
 %global samba_version 4.17.0
-%global baserelease 3
+%global baserelease 4
 # This should be rc1 or %%nil
-%global pre_release rc2
+%global pre_release rc3
 
 %global samba_release %{baserelease}
 %if "x%{?pre_release}" != "x"
@@ -4205,6 +4205,9 @@ fi
 %endif
 
 %changelog
+* Tue Aug 23 2022 Pavel Filipenský <pfilipen@redhat.com> - 4.17.0-0.6.rc3
+- resolves: #2118818 - Update to version 4.17.0rc3
+
 * Thu Aug 18 2022 Kalev Lember <klember@redhat.com> - 2:4.17.0-0.3.rc2
 - Avoid requiring systemd as per updated packaging guidelines
 
