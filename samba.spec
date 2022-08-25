@@ -135,7 +135,7 @@
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
 %global samba_version 4.17.0
-%global baserelease 7
+%global baserelease 8
 # This should be rc1 or %%nil
 %global pre_release rc3
 
@@ -4239,6 +4239,9 @@ fi
 %endif
 
 %changelog
+* Thu Aug 25 2022 Adam Williamson <awilliam@redhat.com> - 4.17.0-0.8.rc3
+- Rebuild with no changes to fix F37 update grouping
+
 * Thu Aug 25 2022 Andreas Schneider <asn@redhat.com> - 4.17.0-0.7.rc3
 - python3-samba package should not require the samba package
 
