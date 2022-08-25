@@ -135,7 +135,7 @@
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
 %global samba_version 4.17.0
-%global baserelease 6
+%global baserelease 7
 # This should be rc1 or %%nil
 %global pre_release rc3
 
@@ -790,7 +790,6 @@ library.
 ### PYTHON3
 %package -n python3-%{name}
 Summary: Samba Python3 libraries
-Requires: %{name} = %{samba_depver}
 Requires: %{name}-client-libs = %{samba_depver}
 Requires: %{name}-common-libs = %{samba_depver}
 Requires: %{name}-libs = %{samba_depver}
@@ -1993,7 +1992,7 @@ fi
 %{_mandir}/man5/smbpasswd.5*
 %{_mandir}/man7/samba.7*
 
-### COMMON-libs
+### COMMON-LIBS
 %files common-libs
 # common libraries
 %{_libdir}/samba/libcmdline-samba4.so
@@ -4240,6 +4239,9 @@ fi
 %endif
 
 %changelog
+* Thu Aug 25 2022 Andreas Schneider <asn@redhat.com> - 4.17.0-0.7.rc3
+- python3-samba package should not require the samba package
+
 * Tue Aug 23 2022 Pavel Filipenský <pfilipen@redhat.com> - 4.17.0-0.6.rc3
 - resolves: #2118818 - Update to version 4.17.0rc3
 
