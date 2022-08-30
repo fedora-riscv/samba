@@ -135,9 +135,9 @@
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
 %global samba_version 4.17.0
-%global baserelease 11
+%global baserelease 1
 # This should be rc1 or %%nil
-%global pre_release rc5
+%global pre_release %nil
 
 %global samba_release %{baserelease}
 %if "x%{?pre_release}" != "x"
@@ -4290,6 +4290,11 @@ fi
 %endif
 
 %changelog
+* Tue Sep 13 2022 Andreas Schneider <asn@redhat.com> - 4.17.0-1
+- resolves: rhbz#2118818 - Update to version 4.17.0
+- resolves: rhbz#2121138 - Fix CVE-2022-32743
+- resolves: rhbz#2122650 - Fix CVE-2022-1615
+
 * Tue Sep 13 2022 Andreas Schneider <asn@redhat.com> - 4.17.0-0.11.rc5
 - resolves: rhbz#2093656 - Split out libnetapi(-devel) sub-packages
 - resolves: rhbz#2096405 - Add samba-usershare package
