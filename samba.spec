@@ -135,9 +135,9 @@
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
 %global samba_version 4.17.0
-%global baserelease 8
+%global baserelease 9
 # This should be rc1 or %%nil
-%global pre_release rc3
+%global pre_release rc4
 
 %global samba_release %{baserelease}
 %if "x%{?pre_release}" != "x"
@@ -4239,6 +4239,9 @@ fi
 %endif
 
 %changelog
+* Wed Aug 31 2022 Guenther Deschner <gdeschner@redhat.com> - 4.17.0-0.9.rc4
+- resolves: #2118818 - Update to version 4.17.0rc4
+
 * Thu Aug 25 2022 Adam Williamson <awilliam@redhat.com> - 4.17.0-0.8.rc3
 - Rebuild with no changes to fix F37 update grouping
 
