@@ -135,7 +135,7 @@
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
 %global samba_version 4.17.0
-%global baserelease 10
+%global baserelease 11
 # This should be rc1 or %%nil
 %global pre_release rc5
 
@@ -236,6 +236,7 @@ Requires: %{name}-common-libs = %{samba_depver}
 Requires: %{name}-common-tools = %{samba_depver}
 Requires: %{name}-client-libs = %{samba_depver}
 Requires: %{name}-libs = %{samba_depver}
+Requires: libnetapi = %{samba_depver}
 %if %{with libwbclient}
 Requires(post): libwbclient = %{samba_depver}
 Requires: libwbclient = %{samba_depver}
@@ -510,6 +511,7 @@ Requires: samba-common-libs = %{samba_depver}
 Requires: samba-client-libs = %{samba_depver}
 Requires: samba-libs = %{samba_depver}
 Requires: samba-ldb-ldap-modules = %{samba_depver}
+Requires: libnetapi = %{samba_depver}
 %if %{with libwbclient}
 Requires: libwbclient = %{samba_depver}
 %endif
@@ -618,6 +620,7 @@ Requires: %{name}-client-libs = %{samba_depver}
 %if %{with dc}
 Requires: %{name}-dc-libs = %{samba_depver}
 %endif
+Requires: libnetapi = %{samba_depver}
 
 Provides: samba4-devel = %{samba_depver}
 Obsoletes: samba4-devel < %{samba_depver}
@@ -737,6 +740,25 @@ Provides: bundled(libreplace)
 %description libs
 The %{name}-libs package contains the libraries needed by programs that link
 against the SMB, RPC and other protocols provided by the Samba suite.
+
+### LIBNETAPI
+%package -n libnetapi
+Summary: The NETAPI library
+Requires(pre): %{name}-common = %{samba_depver}
+Requires: %{name}-common = %{samba_depver}
+Requires: %{name}-common-libs = %{samba_depver}
+Requires: %{name}-client-libs = %{samba_depver}
+
+%description -n libnetapi
+This contains the NETAPI library from the Samba suite.
+
+%package -n libnetapi-devel
+Summary: Developer tools for the NETAPI library
+Requires: libnetapi = %{samba_depver}
+
+%description -n libnetapi-devel
+The libnetapi-devel package contains the header files and libraries needed to
+develop programs that link against the NETAPI library in the Samba suite.
 
 ### LIBSMBCLIENT
 %if %{with libsmbclient}
@@ -874,6 +896,7 @@ Requires: %{name}-test-libs = %{samba_depver}
 Requires: %{name}-dc-libs = %{samba_depver}
 %endif
 Requires: %{name}-libs = %{samba_depver}
+Requires: libnetapi = %{samba_depver}
 %if %{with libsmbclient}
 Requires: libsmbclient = %{samba_depver}
 %endif
@@ -1845,7 +1868,6 @@ fi
 %{_libdir}/libndr-nbt.so.%{libndr_nbt_so_version}*
 %{_libdir}/libndr-standard.so.%{libndr_standard_so_version}*
 %{_libdir}/libndr.so.%{libndr_so_version}*
-%{_libdir}/libnetapi.so.%{libnetapi_so_version}*
 %{_libdir}/libsamba-credentials.so.%{libsamba_credentials_so_version}*
 %{_libdir}/libsamba-errors.so.%{libsamba_errors_so_version}*
 %{_libdir}/libsamba-hostconfig.so.%{libsamba_hostconfig_so_version}*
@@ -2196,7 +2218,6 @@ fi
 %{_includedir}/samba-4.0/ndr/ndr_krb5pac.h
 %{_includedir}/samba-4.0/ndr/ndr_svcctl.h
 %{_includedir}/samba-4.0/ndr/ndr_nbt.h
-%{_includedir}/samba-4.0/netapi.h
 %{_includedir}/samba-4.0/param.h
 %{_includedir}/samba-4.0/passdb.h
 %{_includedir}/samba-4.0/policy.h
@@ -2237,7 +2258,6 @@ fi
 %{_libdir}/libndr-nbt.so
 %{_libdir}/libndr-standard.so
 %{_libdir}/libndr.so
-%{_libdir}/libnetapi.so
 %{_libdir}/libsamba-credentials.so
 %{_libdir}/libsamba-errors.so
 %{_libdir}/libsamba-hostconfig.so
@@ -2251,7 +2271,6 @@ fi
 %{_libdir}/pkgconfig/ndr_krb5pac.pc
 %{_libdir}/pkgconfig/ndr_nbt.pc
 %{_libdir}/pkgconfig/ndr_standard.pc
-%{_libdir}/pkgconfig/netapi.pc
 %{_libdir}/pkgconfig/samba-credentials.pc
 %{_libdir}/pkgconfig/samba-hostconfig.pc
 %{_libdir}/pkgconfig/samba-util.pc
@@ -2330,6 +2349,16 @@ fi
 %{_libdir}/samba/libREG-FULL-samba4.so
 %{_libdir}/samba/libRPC-SERVER-LOOP-samba4.so
 %{_libdir}/samba/libRPC-WORKER-samba4.so
+
+### LIBNETAPI
+%files -n libnetapi
+%{_libdir}/libnetapi.so.%{libnetapi_so_version}*
+
+### LIBNETAPI-DEVEL
+%files -n libnetapi-devel
+%{_includedir}/samba-4.0/netapi.h
+%{_libdir}/libnetapi.so
+%{_libdir}/pkgconfig/netapi.pc
 
 ### LIBSMBCLIENT
 %if %{with libsmbclient}
@@ -4239,6 +4268,9 @@ fi
 %endif
 
 %changelog
+* Tue Sep 13 2022 Andreas Schneider <asn@redhat.com> - 4.17.0-0.11.rc5
+- resolves: rhbz#2093656 - Split out libnetapi(-devel) sub-packages
+
 * Tue Sep 06 2022 Guenther Deschner <gdeschner@redhat.com> - 4.17.0-0.10.rc5
 - resolves: #2118818 - Update to version 4.17.0rc5
 
