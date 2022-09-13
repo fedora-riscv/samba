@@ -224,9 +224,10 @@ Source11:       smb.conf.vendor
 Source12:       smb.conf.example
 Source13:       pam_winbind.conf
 Source14:       samba.pamd
-Source15:       samba.abignore
+Source15:       usershares.conf.vendor
 
 Source201:      README.downgrade
+Source202:      samba.abignore
 
 Requires(pre): /usr/sbin/groupadd
 
@@ -933,6 +934,17 @@ Provides: bundled(libreplace)
 %description test-libs
 %{name}-test-libs provides libraries required by the testing tools.
 
+### USERSHARES
+%package usershares
+Summary: Provides support for non-root user shares
+Requires: %{name} = %{samba_depver}
+Requires: %{name}-common-tools = %{samba_depver}
+
+%description usershares
+Installing this package will provide a configuration file, group and
+directories to support non-root user shares. You can configure them
+as a user using the `net usershare` command.
+
 ### WINBIND
 %package winbind
 Summary: Samba winbind
@@ -1284,6 +1296,7 @@ install -d -m 0755 %{buildroot}/var/lib/samba/lock
 install -d -m 0755 %{buildroot}/var/lib/samba/private
 install -d -m 0755 %{buildroot}/var/lib/samba/scripts
 install -d -m 0755 %{buildroot}/var/lib/samba/sysvol
+install -d -m 0755 %{buildroot}/var/lib/samba/usershares
 install -d -m 0755 %{buildroot}/var/lib/samba/winbindd_privileged
 install -d -m 0755 %{buildroot}/var/log/samba/old
 install -d -m 0755 %{buildroot}/run/samba
@@ -1311,6 +1324,7 @@ install -m 0644 %{SOURCE10} %{buildroot}%{_sysconfdir}/logrotate.d/samba
 
 install -m 0644 %{SOURCE11} %{buildroot}%{_sysconfdir}/samba/smb.conf
 install -m 0644 %{SOURCE12} %{buildroot}%{_sysconfdir}/samba/smb.conf.example
+install -m 0644 %{SOURCE15} %{buildroot}%{_sysconfdir}/samba/usershares.conf
 
 install -d -m 0755 %{buildroot}%{_sysconfdir}/security
 install -m 0644 %{SOURCE13} %{buildroot}%{_sysconfdir}/security/pam_winbind.conf
@@ -1602,6 +1616,9 @@ fi
 %endif
 
 %ldconfig_scriptlets test
+
+%pre usershares
+getent group usershares >/dev/null || groupadd -r usershares || :
 
 %pre winbind
 /usr/sbin/groupadd -g 88 wbpriv >/dev/null 2>&1 || :
@@ -3303,6 +3320,11 @@ fi
 %{_libdir}/samba/libdsdb-module-samba4.so
 %endif
 
+### USERSHARES
+%files usershares
+%config(noreplace) %{_sysconfdir}/samba/usershares.conf
+%attr(1770,root,usershares) %dir /var/lib/samba/usershares
+
 ### WINBIND
 %files winbind
 %{_libdir}/samba/idmap
@@ -4270,6 +4292,7 @@ fi
 %changelog
 * Tue Sep 13 2022 Andreas Schneider <asn@redhat.com> - 4.17.0-0.11.rc5
 - resolves: rhbz#2093656 - Split out libnetapi(-devel) sub-packages
+- resolves: rhbz#2096405 - Add samba-usershare package
 
 * Tue Sep 06 2022 Guenther Deschner <gdeschner@redhat.com> - 4.17.0-0.10.rc5
 - resolves: #2118818 - Update to version 4.17.0rc5
