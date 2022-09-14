@@ -1377,8 +1377,6 @@ for i in \
     %{_mandir}/man8/samba.8 \
     %{_mandir}/man8/samba_downgrade_db.8 \
     %{_mandir}/man8/samba-gpupdate.8 \
-    %{_libdir}/samba/ldb/ildap.so \
-    %{_libdir}/samba/ldb/ldbsamba_extensions.so \
     %{_unitdir}/samba.service \
     %{python3_sitearch}/samba/dcerpc/dnsserver.*.so \
     %{python3_sitearch}/samba/dnsserver.py \
