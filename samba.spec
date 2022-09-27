@@ -311,6 +311,7 @@ BuildRequires: readline-devel
 BuildRequires: rpcgen
 BuildRequires: rpcsvc-proto-devel
 BuildRequires: sed
+BuildRequires: systemd-rpm-macros
 BuildRequires: libtasn1-devel
 # We need asn1Parser
 BuildRequires: libtasn1-tools
