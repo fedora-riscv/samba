@@ -177,17 +177,13 @@ Name:           samba
 Version:        %{samba_version}
 Release:        %{samba_release}%{?dist}
 
-%if 0%{?rhel}
-Epoch:          0
-%else
+%if 0%{?fedora}
 Epoch:          2
+%else
+Epoch:          0
 %endif
 
-%if 0%{?epoch} > 0
 %global samba_depver %{epoch}:%{version}-%{release}
-%else
-%global samba_depver %{version}-%{release}
-%endif
 
 Summary:        Server and Client software to interoperate with Windows machines
 License:        GPLv3+ and LGPLv3+
@@ -4185,6 +4181,9 @@ fi
 %endif
 
 %changelog
+* Thu Dec 22 2022 Pavel Filipenský <pfilipen@redhat.com> - 4.16.8-1
+- Always add epoch to samba_depver to fix osci.brew-build.rpmdeplint.functional
+
 * Tue Dec 20 2022 Pavel Filipenský <pfilipenn@redhat.com> - 4.16.8-1
 - Move libpac and libauth4 to dc-libs
 - Create a new 'samba-dcerpc' sub-package for DCERPC services
