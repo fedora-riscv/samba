@@ -201,17 +201,13 @@ Name:           samba
 Version:        %{samba_version}
 Release:        %{samba_release}%{?dist}
 
-%if 0%{?rhel}
-Epoch:          0
-%else
+%if 0%{?fedora}
 Epoch:          2
+%else
+Epoch:          0
 %endif
 
-%if 0%{?epoch} > 0
 %global samba_depver %{epoch}:%{version}-%{release}
-%else
-%global samba_depver %{version}-%{release}
-%endif
 
 Summary:        Server and Client software to interoperate with Windows machines
 License:        GPLv3+ and LGPLv3+
@@ -4340,6 +4336,9 @@ fi
 %endif
 
 %changelog
+* Thu Dec 22 2022 Pavel Filipenský <pfilipen@redhat.com> - 4.17.4-2
+- Always add epoch to samba_depver to fix osci.brew-build.rpmdeplint.functional
+
 * Tue Dec 20 2022 Pavel Filipenský <pfilipen@redhat.com> - 4.17.4-1
 - Fix '--without dc' build: delete libauth4-samba4.so
 
