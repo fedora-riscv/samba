@@ -136,7 +136,7 @@
 
 %global baserelease 0
 
-%global samba_version 4.16.6
+%global samba_version 4.16.7
 %global talloc_version 2.3.3
 %global tdb_version 1.4.6
 %global tevent_version 0.12.0
@@ -4157,6 +4157,10 @@ fi
 %endif
 
 %changelog
+* Tue Nov 15 2022 Guenther Deschner <gdeschner@redhat.com> - 4.16.7-0
+- Update to version 4.16.7
+- resolves: #2140960, #2143116 - Security fixes for CVE-2022-42898
+
 * Wed Oct 26 2022 Guenther Deschner <gdeschner@redhat.com> - 4.16.6-0
 - Update to version 4.16.6
 - resolves: #2137776, #2137778 - Security fixes for CVE-2022-3592
