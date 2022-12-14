@@ -219,6 +219,7 @@ Requires: %{name}-common-libs = %{samba_depver}
 Requires: %{name}-common-tools = %{samba_depver}
 Requires: %{name}-client-libs = %{samba_depver}
 Requires: %{name}-libs = %{samba_depver}
+Requires: %{name}-dcerpc = %{samba_depver}
 %if %{with libwbclient}
 Requires(post): libwbclient = %{samba_depver}
 Requires: libwbclient = %{samba_depver}
@@ -504,6 +505,19 @@ Provides: bundled(libreplace)
 %description common-tools
 The samba-common-tools package contains tools for Samba servers and
 SMB/CIFS clients.
+
+### RPC
+%package dcerpc
+Summary: DCE RPC binaries
+Requires: samba-common-libs = %{samba_depver}
+Requires: samba-client-libs = %{samba_depver}
+Requires: samba-libs = %{samba_depver}
+%if %{with libwbclient}
+Requires: libwbclient = %{samba_depver}
+%endif
+
+%description dcerpc
+The samba-dcerpc package contains binaries that serve DCERPC over named pipes.
 
 ### DC
 %if %{with dc} || %{with testsuite}
@@ -877,6 +891,7 @@ Requires: %{name}-winbind-modules = %{samba_depver}
 Requires(post): libwbclient = %{samba_depver}
 Requires: libwbclient = %{samba_depver}
 %endif
+Requires: %{name}-dcerpc = %{samba_depver}
 
 Provides: samba4-winbind = %{samba_depver}
 Obsoletes: samba4-winbind < %{samba_depver}
@@ -1642,15 +1657,6 @@ fi
 
 %dir %{_libexecdir}/samba
 %{_libexecdir}/samba/samba-bgqd
-%{_libexecdir}/samba/samba-dcerpcd
-%{_libexecdir}/samba/rpcd_classic
-%{_libexecdir}/samba/rpcd_epmapper
-%{_libexecdir}/samba/rpcd_fsrvp
-%{_libexecdir}/samba/rpcd_lsad
-%{_libexecdir}/samba/rpcd_mdssvc
-%{_libexecdir}/samba/rpcd_rpcecho
-%{_libexecdir}/samba/rpcd_spoolss
-%{_libexecdir}/samba/rpcd_winreg
 
 %dir %{_datadir}/samba
 %dir %{_datadir}/samba/mdssvc
@@ -1664,7 +1670,6 @@ fi
 %{_mandir}/man1/smbstatus.1*
 %{_mandir}/man8/eventlogadm.8*
 %{_mandir}/man8/samba-bgqd.8*
-%{_mandir}/man8/samba-dcerpcd.8*
 %{_mandir}/man8/smbd.8*
 %{_mandir}/man8/nmbd.8*
 %{_mandir}/man8/vfs_acl_tdb.8*
@@ -1970,6 +1975,20 @@ fi
 %{_mandir}/man8/pdbedit.8*
 %{_mandir}/man8/samba-tool.8*
 %{_mandir}/man8/smbpasswd.8*
+
+### RPC
+%files dcerpc
+%dir %{_libexecdir}/samba
+%{_libexecdir}/samba/samba-dcerpcd
+%{_libexecdir}/samba/rpcd_classic
+%{_libexecdir}/samba/rpcd_epmapper
+%{_libexecdir}/samba/rpcd_fsrvp
+%{_libexecdir}/samba/rpcd_lsad
+%{_libexecdir}/samba/rpcd_mdssvc
+%{_libexecdir}/samba/rpcd_rpcecho
+%{_libexecdir}/samba/rpcd_spoolss
+%{_libexecdir}/samba/rpcd_winreg
+%{_mandir}/man8/samba-dcerpcd.8*
 
 ### DC
 %if %{with dc} || %{with testsuite}
