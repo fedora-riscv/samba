@@ -2093,7 +2093,6 @@ fi
 %{_libdir}/krb5/plugins/kdb/samba.so
 
 %{_libdir}/samba/auth/samba4.so
-%{_libdir}/samba/libpac-samba4.so
 %dir %{_libdir}/samba/gensec
 %{_libdir}/samba/gensec/krb5.so
 %{_libdir}/samba/ldb/acl.so
@@ -2157,7 +2156,9 @@ fi
 
 ### DC-LIBS
 %files dc-libs
+%{_libdir}/samba/libauth4-samba4.so
 %{_libdir}/samba/libdb-glue-samba4.so
+%{_libdir}/samba/libpac-samba4.so
 %{_libdir}/samba/libprocess-model-samba4.so
 %{_libdir}/samba/libservice-samba4.so
 
@@ -2376,7 +2377,6 @@ fi
 %{_libdir}/libdcerpc-samr.so.*
 
 %{_libdir}/samba/libLIBWBCLIENT-OLD-samba4.so
-%{_libdir}/samba/libauth4-samba4.so
 %{_libdir}/samba/libauth-unix-token-samba4.so
 %{_libdir}/samba/libdcerpc-samba4.so
 %{_libdir}/samba/libdnsserver-common-samba4.so
