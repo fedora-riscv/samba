@@ -1400,6 +1400,7 @@ touch %{buildroot}%{_libdir}/krb5/plugins/libkrb5/winbind_krb5_locator.so
 
 %if %{without dc} && %{without testsuite}
 for i in \
+    %{_libdir}/samba/libauth4-samba4.so \
     %{_libdir}/samba/libdfs-server-ad-samba4.so \
     %{_libdir}/samba/libdsdb-garbage-collect-tombstones-samba4.so \
     %{_libdir}/samba/libscavenge-dns-records-samba4.so \
@@ -4335,6 +4336,9 @@ fi
 %endif
 
 %changelog
+* Tue Dec 20 2022 Pavel Filipenský <pfilipen@redhat.com> - 4.17.4-1
+- Fix '--without dc' build: delete libauth4-samba4.so
+
 * Mon Dec 19 2022 Pavel Filipenský <pfilipen@redhat.com> - 4.17.4-1
 - Create a samba-dcerpc sub-package
 - Fix package installation without samba and samba-dc package
