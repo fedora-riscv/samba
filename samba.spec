@@ -134,7 +134,7 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%global baserelease 0
+%global baserelease 1
 
 %global samba_version 4.16.8
 %global talloc_version 2.3.3
@@ -4181,6 +4181,10 @@ fi
 %endif
 
 %changelog
+* Tue Dec 20 2022 Pavel Filipenský <pfilipenn@redhat.com> - 4.16.8-1
+- Move libpac and libauth4 to dc-libs
+- Create a new 'samba-dcerpc' sub-package for DCERPC services
+
 * Fri Dec 16 2022 Guenther Deschner <gdeschner@redhat.com> - 4.16.8-0
 - resolves: #2154303, #2154304 - Security fixes for CVE-2022-37966
 - resolves: #2154320, #2154322 - Security fixes for CVE-2022-37967
