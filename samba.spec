@@ -134,7 +134,7 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%global baserelease 1
+%global baserelease 2
 
 %global samba_version 4.16.8
 %global talloc_version 2.3.3
@@ -563,6 +563,9 @@ BuildArch: noarch
 %description dc-provision
 The samba-dc-provision package provides files to setup a domain controller
 
+#endif with dc || with testsuite
+%endif
+
 ### DC-LIBS
 %package dc-libs
 Summary: Samba AD Domain Controller Libraries
@@ -579,6 +582,7 @@ Provides: bundled(libreplace)
 The %{name}-dc-libs package contains the libraries needed by the DC to
 link against the SMB, RPC and other protocols.
 
+%if %{with dc} || %{with testsuite}
 ### DC-BIND
 %package dc-bind-dlz
 Summary: Bind DLZ module for Samba AD
@@ -756,9 +760,7 @@ Requires: %{name} = %{samba_depver}
 Requires: %{name}-client-libs = %{samba_depver}
 Requires: %{name}-common-libs = %{samba_depver}
 Requires: %{name}-libs = %{samba_depver}
-%if %{with dc}
 Requires: %{name}-dc-libs = %{samba_depver}
-%endif
 Requires: python3-talloc
 Requires: python3-tevent
 Requires: python3-tdb
@@ -1299,7 +1301,6 @@ touch %{buildroot}%{_libdir}/krb5/plugins/libkrb5/winbind_krb5_locator.so
 
 %if %{without dc} && %{without testsuite}
 for i in \
-    %{_libdir}/samba/libauth4-samba4.so \
     %{_libdir}/samba/libdfs-server-ad-samba4.so \
     %{_libdir}/samba/libdsdb-garbage-collect-tombstones-samba4.so \
     %{_libdir}/samba/libscavenge-dns-records-samba4.so \
@@ -2069,9 +2070,13 @@ fi
 %license source4/setup/ad-schema/licence.txt
 %{_datadir}/samba/setup
 
+#endif with dc || with testsuite
+%endif
 ### DC-LIBS
 %files dc-libs
 %{_libdir}/samba/libauth4-samba4.so
+
+%if %{with dc} || %{with testsuite}
 %{_libdir}/samba/libdb-glue-samba4.so
 %{_libdir}/samba/libpac-samba4.so
 %{_libdir}/samba/libprocess-model-samba4.so
@@ -4181,8 +4186,9 @@ fi
 %endif
 
 %changelog
-* Thu Dec 22 2022 Pavel Filipenský <pfilipen@redhat.com> - 4.16.8-1
+* Thu Dec 22 2022 Pavel Filipenský <pfilipen@redhat.com> - 4.16.8-2
 - Always add epoch to samba_depver to fix osci.brew-build.rpmdeplint.functional
+- Create package dc-libs also for 'non-dc build'
 
 * Tue Dec 20 2022 Pavel Filipenský <pfilipenn@redhat.com> - 4.16.8-1
 - Move libpac and libauth4 to dc-libs
