@@ -306,8 +306,10 @@ BuildRequires: perl-generators
 BuildRequires: perl(Archive::Tar)
 BuildRequires: perl(Test::More)
 BuildRequires: popt-devel
+BuildRequires: python3-cryptography
 BuildRequires: python3-devel
 BuildRequires: python3-dns
+BuildRequires: python3-requests
 BuildRequires: python3-setuptools
 BuildRequires: quota-devel
 BuildRequires: readline-devel
@@ -390,7 +392,6 @@ BuildRequires: python3-gpg
 BuildRequires: python3-markdown
 BuildRequires: python3-pyasn1 >= 0.4.8
 BuildRequires: python3-setproctitle
-BuildRequires: python3-cryptography
 
 %if %{without includelibs}
 BuildRequires: tdb-tools
@@ -839,11 +840,13 @@ Requires: %{name}-client-libs = %{samba_depver}
 Requires: %{name}-common-libs = %{samba_depver}
 Requires: %{name}-libs = %{samba_depver}
 Requires: %{name}-dc-libs = %{samba_depver}
-Requires: python3-talloc
-Requires: python3-tevent
-Requires: python3-tdb
-Requires: python3-ldb
+Requires: python3-cryptography
 Requires: python3-dns
+Requires: python3-ldb
+Requires: python3-requests
+Requires: python3-talloc
+Requires: python3-tdb
+Requires: python3-tevent
 %if %{with libsmbclient}
 Requires: libsmbclient = %{samba_depver}
 %endif
