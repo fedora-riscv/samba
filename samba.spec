@@ -351,14 +351,6 @@ BuildRequires: librados-devel
 BuildRequires: python3-etcd
 %endif
 
-%if %{with dc} || %{with testsuite}
-BuildRequires: python3-pyasn1 >= 0.4.8
-
-BuildRequires: bind
-BuildRequires: krb5-server >= %{required_mit_krb5}
-#endif with dc
-%endif
-
 # pidl requirements
 BuildRequires: perl(ExtUtils::MakeMaker)
 BuildRequires: perl(FindBin)
@@ -396,6 +388,7 @@ BuildRequires: python3-iso8601
 %endif
 BuildRequires: python3-gpg
 BuildRequires: python3-markdown
+BuildRequires: python3-pyasn1 >= 0.4.8
 BuildRequires: python3-setproctitle
 BuildRequires: python3-cryptography
 
