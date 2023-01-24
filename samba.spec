@@ -383,7 +383,7 @@ BuildRequires: lmdb-devel
 %if %{with dc} || %{with testsuite}
 BuildRequires: bind
 BuildRequires: krb5-server >= %{required_mit_krb5}
-%if 0%{?fedora} || 0%{rhel} >= 9
+%if 0%{?fedora} || 0%{?rhel} >= 9
 BuildRequires: python3-dateutil
 %else
 BuildRequires: python3-iso8601
