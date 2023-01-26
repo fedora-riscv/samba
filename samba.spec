@@ -134,8 +134,8 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%global samba_version 4.17.4
-%global baserelease 2
+%global samba_version 4.17.5
+%global baserelease 0
 # This should be rc1 or %%nil
 %global pre_release %nil
 
@@ -4341,6 +4341,9 @@ fi
 %endif
 
 %changelog
+* Thu Jan 26 2023 Guenther Deschner <gdeschner@redhat.com> - 4.17.5-0
+- Update to version 4.17.5
+
 * Thu Dec 22 2022 Pavel Filipenský <pfilipen@redhat.com> - 4.17.4-2
 - Always add epoch to samba_depver to fix osci.brew-build.rpmdeplint.functional
 - Create package dc-libs also for 'non-dc build'
