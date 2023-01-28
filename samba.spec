@@ -19,6 +19,11 @@
 # ctdb is enabled by default, you can disable it with: --without clustering
 %bcond_without clustering
 
+# Disable winexe on riscv64 temporary due to mingw toolchains issue.
+%ifarch riscv64
+%global _without_winexe 1
+%endif
+
 # Define _make_verbose if it doesn't exist (RHEL8)
 %{!?_make_verbose:%define _make_verbose V=1 VERBOSE=1}
 
@@ -199,7 +204,7 @@
 
 Name:           samba
 Version:        %{samba_version}
-Release:        %{samba_release}%{?dist}
+Release:        %{samba_release}.rv64%{?dist}
 
 %if 0%{?fedora}
 Epoch:          2
@@ -4341,6 +4346,9 @@ fi
 %endif
 
 %changelog
+* Thu Jan 28 2023 Liu Yang <Yang.Liu.sn@gmail.com> - 4.17.5-0.rv64
+- Disable winexe for riscv64.
+
 * Thu Jan 26 2023 Guenther Deschner <gdeschner@redhat.com> - 4.17.5-0
 - Update to version 4.17.5
 
