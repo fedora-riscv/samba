@@ -18,3 +18,7 @@ runpath:
 
 abidiff:
     suppression_file: samba.abignore
+
+debuginfo:
+    ignore:
+        - /usr/lib*/libdcerpc-samr.so.*
