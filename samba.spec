@@ -135,7 +135,7 @@
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
 %global samba_version 4.18.0
-%global baserelease 3
+%global baserelease 4
 # This should be rc1 or %%nil
 %global pre_release rc2
 
@@ -511,7 +511,7 @@ SMB/CIFS clients.
 
 ### COMMON-TOOLS
 %package common-tools
-Summary: Tools for Samba servers and clients
+Summary: Tools for Samba clients
 Requires: samba-common-libs = %{samba_depver}
 Requires: samba-client-libs = %{samba_depver}
 Requires: samba-libs = %{samba_depver}
@@ -521,22 +521,28 @@ Requires: libnetapi = %{samba_depver}
 Requires: libwbclient = %{samba_depver}
 %endif
 
+Provides: bundled(libreplace)
+
+%description common-tools
+The samba-common-tools package contains tools for SMB/CIFS clients.
+
+### SAMBA-TOOLS
+%package tools
+Summary: Tools for Samba servers
 # samba-tool needs python3-samba
 Requires: python3-%{name} = %{samba_depver}
 # samba-tool needs tdbbackup
 Requires: tdb-tools
-%if %{with dc}
-# samba-tool needs python3-samba-dc on a full build
+# samba-tool needs python3-samba-dc also on non-dc build
 Requires: python3-%{name}-dc = %{samba_depver}
+%if %{with dc}
 # samba-tool needs mdb_copy for domain backup or upgrade provision
 Requires: lmdb
 %endif
 
-Provides: bundled(libreplace)
-
-%description common-tools
-The samba-common-tools package contains tools for Samba servers and
-SMB/CIFS clients.
+%description tools
+The samba-tools package contains tools for Samba servers
+and for GPO management on domain members.
 
 ### RPC
 %package dcerpc
@@ -877,7 +883,6 @@ Requires: %{name}-libs = %{samba_depver}
 The python3-%{name}-test package contains the Python libraries used by the test suite of Samba.
 If you want to run full set of Samba tests, you need to install this package.
 
-%if %{with dc} || %{with testsuite}
 %package -n python3-samba-dc
 Summary: Samba Python libraries for Samba AD
 Requires: %{name}-client-libs = %{samba_depver}
@@ -887,7 +892,6 @@ Requires: python3-%{name} = %{samba_depver}
 %description -n python3-samba-dc
 The python3-%{name}-dc package contains the Python libraries needed by programs
 to manage Samba AD.
-%endif
 
 ### PIDL
 %package pidl
@@ -980,6 +984,7 @@ Requires(post): %{name}-client-libs = %{samba_depver}
 Requires: %{name}-libs = %{samba_depver}
 Requires(post): %{name}-libs = %{samba_depver}
 Requires: %{name}-winbind-modules = %{samba_depver}
+Recommends: %{name}-tools = %{samba_depver}
 
 %if %{with libwbclient}
 Requires(post): libwbclient = %{samba_depver}
@@ -1407,54 +1412,10 @@ touch %{buildroot}%{_libdir}/krb5/plugins/libkrb5/winbind_krb5_locator.so
 
 %if %{without dc} && %{without testsuite}
 for i in \
-    %{_libdir}/samba/libdfs-server-ad-samba4.so \
-    %{_libdir}/samba/libdsdb-garbage-collect-tombstones-samba4.so \
-    %{_libdir}/samba/libscavenge-dns-records-samba4.so \
     %{_mandir}/man8/samba.8 \
     %{_mandir}/man8/samba_downgrade_db.8 \
     %{_mandir}/man8/samba-gpupdate.8 \
     %{_unitdir}/samba.service \
-    %{python3_sitearch}/samba/dcerpc/dnsserver.*.so \
-    %{python3_sitearch}/samba/dnsserver.py \
-    %{python3_sitearch}/samba/domain_update.py \
-    %{python3_sitearch}/samba/forest_update.py \
-    %{python3_sitearch}/samba/kcc/__init__.py \
-    %{python3_sitearch}/samba/kcc/debug.py \
-    %{python3_sitearch}/samba/kcc/graph.py \
-    %{python3_sitearch}/samba/kcc/graph_utils.py \
-    %{python3_sitearch}/samba/kcc/kcc_utils.py \
-    %{python3_sitearch}/samba/kcc/ldif_import_export.py \
-    %{python3_sitearch}/samba/kcc/__pycache__/__init__.*.pyc \
-    %{python3_sitearch}/samba/kcc/__pycache__/debug.*.pyc \
-    %{python3_sitearch}/samba/kcc/__pycache__/graph.*.pyc \
-    %{python3_sitearch}/samba/kcc/__pycache__/graph_utils.*.pyc \
-    %{python3_sitearch}/samba/kcc/__pycache__/kcc_utils.*.pyc \
-    %{python3_sitearch}/samba/kcc/__pycache__/ldif_import_export.*.pyc \
-    %{python3_sitearch}/samba/ms_forest_updates_markdown.py \
-    %{python3_sitearch}/samba/ms_schema_markdown.py \
-    %{python3_sitearch}/samba/provision/__init__.py \
-    %{python3_sitearch}/samba/provision/backend.py \
-    %{python3_sitearch}/samba/provision/common.py \
-    %{python3_sitearch}/samba/provision/kerberos_implementation.py \
-    %{python3_sitearch}/samba/provision/kerberos.py \
-    %{python3_sitearch}/samba/provision/sambadns.py \
-    %{python3_sitearch}/samba/provision/__pycache__/__init__.*.pyc \
-    %{python3_sitearch}/samba/provision/__pycache__/backend.*.pyc \
-    %{python3_sitearch}/samba/provision/__pycache__/common.*.pyc \
-    %{python3_sitearch}/samba/provision/__pycache__/kerberos_implementation.*.pyc \
-    %{python3_sitearch}/samba/provision/__pycache__/kerberos.*.pyc \
-    %{python3_sitearch}/samba/provision/__pycache__/sambadns.*.pyc \
-    %{python3_sitearch}/samba/__pycache__/domain_update.*.pyc \
-    %{python3_sitearch}/samba/__pycache__/forest_update.*.pyc \
-    %{python3_sitearch}/samba/__pycache__/ms_forest_updates_markdown.*.pyc \
-    %{python3_sitearch}/samba/__pycache__/ms_schema_markdown.*.pyc \
-    %{python3_sitearch}/samba/__pycache__/remove_dc.*.pyc \
-    %{python3_sitearch}/samba/__pycache__/schema.*.pyc \
-    %{python3_sitearch}/samba/__pycache__/uptodateness.*.pyc \
-    %{python3_sitearch}/samba/remove_dc.py \
-    %{python3_sitearch}/samba/samdb.py \
-    %{python3_sitearch}/samba/schema.py \
-    %{python3_sitearch}/samba/uptodateness.py \
     %{_sbindir}/samba-gpupdate \
     ; do
     rm -f %{buildroot}$i
@@ -2069,11 +2030,11 @@ fi
 %{_libdir}/samba/pdb/smbpasswd.so
 %{_libdir}/samba/pdb/tdbsam.so
 
+### COMMON-TOOLS
 %files common-tools
 %{_bindir}/net
 %{_bindir}/pdbedit
 %{_bindir}/profiles
-%{_bindir}/samba-tool
 %{_bindir}/smbcontrol
 %{_bindir}/smbpasswd
 %{_bindir}/testparm
@@ -2082,8 +2043,12 @@ fi
 %{_mandir}/man1/testparm.1*
 %{_mandir}/man8/net.8*
 %{_mandir}/man8/pdbedit.8*
-%{_mandir}/man8/samba-tool.8*
 %{_mandir}/man8/smbpasswd.8*
+
+### TOOLS
+%files tools
+%{_bindir}/samba-tool
+%{_mandir}/man8/samba-tool.8*
 
 ### RPC
 %files dcerpc
@@ -2805,7 +2770,6 @@ fi
 %{_libdir}/libsamba-policy.*.so
 %{_libdir}/pkgconfig/samba-policy.*.pc
 
-%if %{with dc} || %{with testsuite}
 %files -n python3-%{name}-dc
 %{python3_sitearch}/samba/samdb.py
 %{python3_sitearch}/samba/schema.py
@@ -2821,7 +2785,9 @@ fi
 %{python3_sitearch}/samba/__pycache__/uptodateness.*.pyc
 
 %{python3_sitearch}/samba/dcerpc/dnsserver.*.so
+%if %{with dc} || %{with testsuite}
 %{python3_sitearch}/samba/dckeytab.*.so
+%endif
 %{python3_sitearch}/samba/domain_update.py
 %{python3_sitearch}/samba/forest_update.py
 %{python3_sitearch}/samba/ms_forest_updates_markdown.py
@@ -2862,7 +2828,6 @@ fi
 
 %{python3_sitearch}/samba/remove_dc.py
 %{python3_sitearch}/samba/uptodateness.py
-%endif
 
 %files -n python3-%{name}-test
 %dir %{python3_sitearch}/samba/tests
@@ -4368,6 +4333,9 @@ fi
 %endif
 
 %changelog
+* Tue Feb 14 2023 Pavel Filipenský <pfilipen@redhat.com> - 4.18.0rc2-4
+- resolves: rhbz#2166124 - Create package samba-tools, move there samba-tool binary
+
 * Thu Feb 02 2023 Guenther Deschner <gdeschner@redhat.com> - 4.18.0rc2-3
 - resolves: #2166416 - Update to version 4.18.0rc2
 
