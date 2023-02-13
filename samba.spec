@@ -4333,6 +4333,9 @@ fi
 %endif
 
 %changelog
+* Mon Feb 13 2023 Pavel Filipenský <pfilipen@redhat.com> - 4.18.0rc2-5
+- Create package samba-tools, move there samba-tool binary
+
 * Thu Feb 02 2023 Guenther Deschner <gdeschner@redhat.com> - 4.18.0rc2-3
 - resolves: #2166416 - Update to version 4.18.0rc2
 
