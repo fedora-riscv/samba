@@ -135,9 +135,9 @@
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
 %global samba_version 4.18.0
-%global baserelease 5
+%global baserelease 6
 # This should be rc1 or %%nil
-%global pre_release rc2
+%global pre_release rc3
 
 %global samba_release %{baserelease}
 %if "x%{?pre_release}" != "x"
@@ -170,8 +170,8 @@
 
 %global talloc_version 2.4.0
 %global tdb_version 1.4.8
-%global tevent_version 0.14.0
-%global ldb_version 2.7.0
+%global tevent_version 0.14.1
+%global ldb_version 2.7.1
 
 %global required_mit_krb5 1.20.1
 
@@ -4333,6 +4333,9 @@ fi
 %endif
 
 %changelog
+* Wed Feb 15 2023 Guenther Deschner <gdeschner@redhat.com> - 4.18.0rc3-6
+- resolves: #2166416 - Update to version 4.18.0rc3
+
 * Mon Feb 13 2023 Pavel Filipenský <pfilipen@redhat.com> - 4.18.0rc2-5
 - Create package samba-tools, move there samba-tool binary
 
