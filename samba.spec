@@ -531,13 +531,12 @@ The samba-common-tools package contains tools for SMB/CIFS clients.
 Summary: Tools for Samba servers
 # samba-tool needs python3-samba
 Requires: python3-%{name} = %{samba_depver}
-# samba-tool needs tdbbackup
-Requires: tdb-tools
 # samba-tool needs python3-samba-dc also on non-dc build
 Requires: python3-%{name}-dc = %{samba_depver}
 %if %{with dc}
-# samba-tool needs mdb_copy for domain backup or upgrade provision
+# samba-tool needs mdb_copy and tdbackup for domain backup or upgrade provision
 Requires: lmdb
+Requires: tdb-tools
 %endif
 
 %description tools
