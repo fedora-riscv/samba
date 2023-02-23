@@ -1075,7 +1075,7 @@ necessary to communicate to the Winbind Daemon
 %if %{with winexe}
 %package winexe
 Summary: Samba Winexe Windows Binary
-License: GPLv3
+License: GPL-3.0-only
 Requires: %{name}-client-libs = %{samba_depver}
 Requires: %{name}-common-libs = %{samba_depver}
 
@@ -4333,6 +4333,9 @@ fi
 %endif
 
 %changelog
+* Thu Feb 23 2023 Pavel Filipenský <pfilipen@redhat.com> - 4.18.0-0.6.rc3
+- SPDX migration
+
 * Wed Feb 15 2023 Guenther Deschner <gdeschner@redhat.com> - 4.18.0rc3-6
 - resolves: #2166416 - Update to version 4.18.0rc3
 
