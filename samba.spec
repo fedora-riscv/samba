@@ -270,6 +270,7 @@ Provides: bundled(libreplace)
 
 BuildRequires: make
 BuildRequires: gcc
+BuildRequires: glibc-gconv-extra
 BuildRequires: avahi-devel
 BuildRequires: bison
 BuildRequires: cups-devel
@@ -448,6 +449,8 @@ Requires: %{name}-common-libs = %{samba_depver}
 Requires: libwbclient = %{samba_depver}
 %endif
 Requires: krb5-libs >= %{required_mit_krb5}
+# This is needed for charset conversion
+Requires: glibc-gconv-extra
 
 %description client-libs
 The samba-client-libs package contains internal libraries needed by the
@@ -4333,6 +4336,9 @@ fi
 %endif
 
 %changelog
+* Tue Feb 28 2023 Andreas Schneider <asn@redhat.com> - 4.18.0-0.7.rc3
+- resolves: #2173619 - Add missing Requires for glibc-gconv-extra
+
 * Thu Feb 23 2023 Pavel Filipenský <pfilipen@redhat.com> - 4.18.0-0.6.rc3
 - SPDX migration
 
