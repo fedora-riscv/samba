@@ -1262,6 +1262,13 @@ export python_LDFLAGS="$(echo ${LDFLAGS} | sed -e 's/-Wl,-z,defs//g')"
 export python_LDFLAGS="$(echo %{__global_ldflags} | sed -e 's/-Wl,-z,defs//g')"
 %endif
 
+# Add support for mock ccache plugin
+CCACHE="$(command -v ccache)"
+if [ -n "${CCACHE}" ]; then
+    ${CCACHE} -s
+    export CC="${CCACHE} gcc"
+fi
+
 %configure \
         --enable-fhs \
         --with-piddir=/run \
