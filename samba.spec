@@ -989,7 +989,7 @@ Requires(post): %{name}-client-libs = %{samba_depver}
 Requires: %{name}-libs = %{samba_depver}
 Requires(post): %{name}-libs = %{samba_depver}
 Requires: %{name}-winbind-modules = %{samba_depver}
-Recommends: %{name}-tools = %{samba_depver}
+Suggests: %{name}-tools = %{samba_depver}
 
 %if %{with libwbclient}
 Requires(post): libwbclient = %{samba_depver}
