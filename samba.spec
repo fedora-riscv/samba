@@ -56,8 +56,8 @@
 %if 0%{?fedora}
 
 # ppc64le excluded pending resolution of https://gcc.gnu.org/bugzilla/show_bug.cgi?id=104172
-#%%ifarch aarch64 ppc64le s390x x86_64
-%ifarch aarch64 s390x x86_64
+#%%ifarch aarch64 ppc64le s390x x86_64 riscv64
+%ifarch aarch64 s390x x86_64 riscv64
 %bcond_without vfs_cephfs
 %bcond_without ceph_mutex
 %else
@@ -80,7 +80,7 @@
 
 %if 0%{?fedora}
 
-%ifarch aarch64 ppc64le s390x x86_64
+%ifarch aarch64 ppc64le s390x x86_64 riscv64
 %bcond_without vfs_glusterfs
 %else
 %bcond_with vfs_glusterfs
@@ -109,7 +109,7 @@
 # Build vfs_io_uring module by default on 64bit Fedora
 %if 0%{?fedora} || 0%{?rhel} >= 8
 
-%ifarch aarch64 ppc64le s390x x86_64
+%ifarch aarch64 ppc64le s390x x86_64 riscv64
 %bcond_without vfs_io_uring
 %else
 %bcond_with vfs_io_uring
@@ -202,7 +202,7 @@
 
 Name:           samba
 Version:        %{samba_version}
-Release:        %{samba_release}%{?dist}
+Release:        %{samba_release}.rv64%{?dist}
 
 %if 0%{?fedora}
 Epoch:          2
@@ -4381,6 +4381,9 @@ fi
 %endif
 
 %changelog
+* Fri May 12 2023 Liu Yang <Yang.Liu.sn@gmail.com> - 4.18.2-0.rv64
+- Enable more fetures for riscv64.
+
 * Wed Apr 19 2023 Guenther Deschner <gdeschner@redhat.com> - 4.18.2-0
 - resolves: #2187991 - Update to version 4.18.2
 
