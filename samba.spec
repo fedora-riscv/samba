@@ -4381,6 +4381,9 @@ fi
 %endif
 
 %changelog
+* Thu Jun 15 2023 Andreas Schneider <asn@redhat.com> - 4.18.3-1
+- resolves: #2203539 - Also cover mit_kdc.log by logrotate
+
 * Thu Jun 01 2023 Guenther Deschner <gdeschner@redhat.com> - 4.18.3-0
 - resolves: #2211453 - Update to version 4.18.3
 
