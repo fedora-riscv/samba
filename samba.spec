@@ -137,8 +137,8 @@
 
 %define samba_requires_eq()  %(LC_ALL="C" echo '%*' | xargs -r rpm -q --qf 'Requires: %%{name} = %%{epoch}:%%{version}\\n' | sed -e 's/ (none):/ /' -e 's/ 0:/ /' | grep -v "is not")
 
-%global samba_version 4.18.2
-%global baserelease 0
+%global samba_version 4.19.2
+%global baserelease 1
 # This should be rc1 or %%nil
 %global pre_release %nil
 
@@ -171,10 +171,10 @@
 %global libsmbclient_so_version 0
 %global libwbclient_so_version 0
 
-%global talloc_version 2.4.0
-%global tdb_version 1.4.8
-%global tevent_version 0.14.1
-%global ldb_version 2.7.2
+%global talloc_version 2.4.1
+%global tdb_version 1.4.9
+%global tevent_version 0.15.0
+%global ldb_version 2.8.0
 
 %global required_mit_krb5 1.20.1
 
@@ -829,6 +829,7 @@ suite.
 %package -n libwbclient
 Summary: The winbind client library
 Requires: %{name}-client-libs = %{samba_depver}
+Conflicts: sssd-libwbclient
 
 %description -n libwbclient
 The libwbclient package contains the winbind client library from the Samba
@@ -837,6 +838,7 @@ suite.
 %package -n libwbclient-devel
 Summary: Developer tools for the winbind library
 Requires: libwbclient = %{samba_depver}
+Conflicts: sssd-libwbclient-devel
 
 Provides: samba-winbind-devel = %{samba_depver}
 Obsoletes: samba-winbind-devel < %{samba_depver}
@@ -896,6 +898,8 @@ Summary: Samba Python libraries for Samba AD
 Requires: %{name}-client-libs = %{samba_depver}
 Requires: %{name}-dc-libs = %{samba_depver}
 Requires: python3-%{name} = %{samba_depver}
+# for ms_forest_updates_markdown.py and ms_schema_markdown.py
+Requires: python3-markdown
 
 %description -n python3-samba-dc
 The python3-%{name}-dc package contains the Python libraries needed by programs
@@ -1090,7 +1094,7 @@ Requires: %{name}-common-libs = %{samba_depver}
 Provides: bundled(libreplace)
 
 %description winexe
-Winexe is a Remote Windows®-command executor
+Winexe is a Remote Windows-command executor
 %endif
 
 ### CTDB
@@ -1359,17 +1363,6 @@ install -d -m 0755 %{buildroot}/%{_libdir}/samba
 install -d -m 0755 %{buildroot}/%{_libdir}/samba/ldb
 install -d -m 0755 %{buildroot}/%{_libdir}/pkgconfig
 
-# Move libwbclient.so* into private directory, it cannot be just libdir/samba
-# because samba uses rpath with this directory.
-install -d -m 0755 %{buildroot}/%{_libdir}/samba/wbclient
-mv %{buildroot}/%{_libdir}/libwbclient.so* %{buildroot}/%{_libdir}/samba/wbclient
-if [ ! -f %{buildroot}/%{_libdir}/samba/wbclient/libwbclient.so.%{libwbc_alternatives_version} ]
-then
-    echo "Expected libwbclient version not found, please check if version has changed."
-    exit -1
-fi
-
-
 touch %{buildroot}%{_libexecdir}/samba/cups_backend_smb
 
 # Install other stuff
@@ -1576,52 +1569,13 @@ fi
 %endif
 
 %if %{with libwbclient}
-%posttrans -n libwbclient
-# It has to be posttrans here to make sure all files of a previous version
-# without alternatives support are removed
-%{_sbindir}/update-alternatives \
-        --install \
-        %{_libdir}/libwbclient.so.%{libwbc_alternatives_version} \
-        libwbclient.so.%{libwbc_alternatives_version}%{libwbc_alternatives_suffix} \
-        %{_libdir}/samba/wbclient/libwbclient.so.%{libwbc_alternatives_version} \
-        10
+%pre -n libwbclient
+if [ $1 -gt 1 ] ; then
+    rm -rf %{_libdir}/samba/wbclient/
+    rm -f /etc/alternatives/libwbclient.so*
+    rm -f /var/lib/alternatives/libwbclient.so*
+fi
 %{?ldconfig}
-
-%preun -n libwbclient
-if [ $1 -eq 0 ]; then
-    %{_sbindir}/update-alternatives \
-            --remove \
-            libwbclient.so.%{libwbc_alternatives_version}%{libwbc_alternatives_suffix} \
-            %{_libdir}/samba/wbclient/libwbclient.so.%{libwbc_alternatives_version}
-fi
-/sbin/ldconfig
-
-%posttrans -n libwbclient-devel
-%{_sbindir}/update-alternatives \
-        --install %{_libdir}/libwbclient.so \
-        libwbclient.so%{libwbc_alternatives_suffix} \
-        %{_libdir}/samba/wbclient/libwbclient.so \
-        10
-
-%preun -n libwbclient-devel
-# alternatives checks if the file which should be removed is a link or not, but
-# not if it points to the /etc/alternatives directory or to some other place.
-# When downgrading to a version where alternatives is not used and
-# libwbclient.so is a link and not a file it will be removed. The following
-# check removes the alternatives files manually if that is the case.
-if [ $1 -eq 0 ]; then
-    if [ "`readlink %{_libdir}/libwbclient.so`" == "libwbclient.so.%{libwbc_alternatives_version}" ]; then
-        /bin/rm -f \
-            /etc/alternatives/libwbclient.so%{libwbc_alternatives_suffix} \
-            /var/lib/alternatives/libwbclient.so%{libwbc_alternatives_suffix} 2> /dev/null
-    else
-        %{_sbindir}/update-alternatives \
-            --remove \
-            libwbclient.so%{libwbc_alternatives_suffix} \
-            %{_libdir}/samba/wbclient/libwbclient.so
-    fi
-fi
-
 #endif {with libwbclient}
 %endif
 
@@ -1846,7 +1800,6 @@ fi
 %{_mandir}/man1/smbclient.1*
 %{_mandir}/man1/smbcquotas.1*
 %{_mandir}/man1/smbget.1*
-%{_mandir}/man5/smbgetrc.5*
 %{_mandir}/man1/smbtar.1*
 %{_mandir}/man1/smbtree.1*
 %{_mandir}/man7/traffic_learner.7.*
@@ -2053,10 +2006,12 @@ fi
 %{_bindir}/net
 %{_bindir}/pdbedit
 %{_bindir}/profiles
+%{_bindir}/samba-log-parser
 %{_bindir}/smbcontrol
 %{_bindir}/smbpasswd
 %{_bindir}/testparm
 %{_mandir}/man1/profiles.1*
+%{_mandir}/man1/samba-log-parser.1*
 %{_mandir}/man1/smbcontrol.1*
 %{_mandir}/man1/testparm.1*
 %{_mandir}/man8/net.8*
@@ -2077,7 +2032,9 @@ fi
 %{_libexecdir}/samba/rpcd_fsrvp
 %{_libexecdir}/samba/rpcd_lsad
 %{_libexecdir}/samba/rpcd_mdssvc
+%if %{with testsuite}
 %{_libexecdir}/samba/rpcd_rpcecho
+%endif
 %{_libexecdir}/samba/rpcd_spoolss
 %{_libexecdir}/samba/rpcd_winreg
 %{_mandir}/man8/samba-dcerpcd.8*
@@ -2200,6 +2157,8 @@ fi
 %endif
 
 %{_libdir}/libdcerpc-server.so.*
+%{_libdir}/samba/libad-claims-samba4.so
+%{_libdir}/samba/libauthn-policy-util-samba4.so
 %{_libdir}/samba/libdsdb-module-samba4.so
 %{_libdir}/samba/libdsdb-garbage-collect-tombstones-samba4.so
 %{_libdir}/samba/libscavenge-dns-records-samba4.so
@@ -2426,12 +2385,12 @@ fi
 ### LIBWBCLIENT
 %if %{with libwbclient}
 %files -n libwbclient
-%{_libdir}/samba/wbclient/libwbclient.so.%{libwbclient_so_version}*
+%{_libdir}/libwbclient.so.%{libwbclient_so_version}*
 
 ### LIBWBCLIENT-DEVEL
 %files -n libwbclient-devel
 %{_includedir}/samba-4.0/wbclient.h
-%{_libdir}/samba/wbclient/libwbclient.so
+%{_libdir}/libwbclient.so
 %{_libdir}/pkgconfig/wbclient.pc
 #endif {with libwbclient}
 %endif
@@ -2495,6 +2454,7 @@ fi
 %{python3_sitearch}/samba/__pycache__/descriptor.*.pyc
 %{python3_sitearch}/samba/__pycache__/dnsresolver.*.pyc
 %{python3_sitearch}/samba/__pycache__/drs_utils.*.pyc
+%{python3_sitearch}/samba/__pycache__/functional_level.*.pyc
 %{python3_sitearch}/samba/__pycache__/getopt.*.pyc
 %{python3_sitearch}/samba/__pycache__/graph.*.pyc
 %{python3_sitearch}/samba/__pycache__/hostconfig.*.pyc
@@ -2506,6 +2466,7 @@ fi
 %{python3_sitearch}/samba/__pycache__/ms_schema.*.pyc
 %{python3_sitearch}/samba/__pycache__/ndr.*.pyc
 %{python3_sitearch}/samba/__pycache__/ntacls.*.pyc
+%{python3_sitearch}/samba/__pycache__/policies.*.pyc
 %{python3_sitearch}/samba/__pycache__/safe_tarfile.*.pyc
 %{python3_sitearch}/samba/__pycache__/sd_utils.*.pyc
 %{python3_sitearch}/samba/__pycache__/sites.*.pyc
@@ -2575,6 +2536,7 @@ fi
 %{python3_sitearch}/samba/drs_utils.py
 %{python3_sitearch}/samba/dsdb.*.so
 %{python3_sitearch}/samba/dsdb_dns.*.so
+%{python3_sitearch}/samba/functional_level.py
 %{python3_sitearch}/samba/gensec.*.so
 %{python3_sitearch}/samba/getopt.py
 %{python3_sitearch}/samba/graph.py
@@ -2597,6 +2559,8 @@ fi
 %{python3_sitearch}/samba/emulate/traffic_packets.py
 %dir %{python3_sitearch}/samba/gp
 %dir %{python3_sitearch}/samba/gp/__pycache__
+%{python3_sitearch}/samba/gp/__init__.py
+%{python3_sitearch}/samba/gp/__pycache__/__init__.*.pyc
 %{python3_sitearch}/samba/gp/__pycache__/gpclass.*.pyc
 %{python3_sitearch}/samba/gp/__pycache__/gp_centrify_crontab_ext.*.pyc
 %{python3_sitearch}/samba/gp/__pycache__/gp_centrify_sudoers_ext.*.pyc
@@ -2675,12 +2639,12 @@ fi
 %{python3_sitearch}/samba/netcmd/__pycache__/dbcheck.*.pyc
 %{python3_sitearch}/samba/netcmd/__pycache__/delegation.*.pyc
 %{python3_sitearch}/samba/netcmd/__pycache__/dns.*.pyc
-%{python3_sitearch}/samba/netcmd/__pycache__/domain.*.pyc
-%{python3_sitearch}/samba/netcmd/__pycache__/domain_backup.*.pyc
 %{python3_sitearch}/samba/netcmd/__pycache__/drs.*.pyc
 %{python3_sitearch}/samba/netcmd/__pycache__/dsacl.*.pyc
+%{python3_sitearch}/samba/netcmd/__pycache__/encoders.*.pyc
 %{python3_sitearch}/samba/netcmd/__pycache__/forest.*.pyc
 %{python3_sitearch}/samba/netcmd/__pycache__/fsmo.*.pyc
+%{python3_sitearch}/samba/netcmd/__pycache__/gpcommon.*.pyc
 %{python3_sitearch}/samba/netcmd/__pycache__/gpo.*.pyc
 %{python3_sitearch}/samba/netcmd/__pycache__/group.*.pyc
 %{python3_sitearch}/samba/netcmd/__pycache__/ldapcmp.*.pyc
@@ -2696,19 +2660,102 @@ fi
 %{python3_sitearch}/samba/netcmd/__pycache__/spn.*.pyc
 %{python3_sitearch}/samba/netcmd/__pycache__/testparm.*.pyc
 %{python3_sitearch}/samba/netcmd/__pycache__/user.*.pyc
+%{python3_sitearch}/samba/netcmd/__pycache__/validators.*.pyc
 %{python3_sitearch}/samba/netcmd/__pycache__/visualize.*.pyc
 %{python3_sitearch}/samba/netcmd/common.py
 %{python3_sitearch}/samba/netcmd/computer.py
 %{python3_sitearch}/samba/netcmd/contact.py
 %{python3_sitearch}/samba/netcmd/dbcheck.py
 %{python3_sitearch}/samba/netcmd/delegation.py
+%dir %{python3_sitearch}/samba/netcmd/domain
+%{python3_sitearch}/samba/netcmd/domain/__init__.py
+%dir %{python3_sitearch}/samba/netcmd/domain/__pycache__
+%{python3_sitearch}/samba/netcmd/domain/__pycache__/__init__.*.pyc
+%{python3_sitearch}/samba/netcmd/domain/__pycache__/backup.*.pyc
+%{python3_sitearch}/samba/netcmd/domain/__pycache__/classicupgrade.*.pyc
+%{python3_sitearch}/samba/netcmd/domain/__pycache__/common.*.pyc
+%{python3_sitearch}/samba/netcmd/domain/__pycache__/dcpromo.*.pyc
+%{python3_sitearch}/samba/netcmd/domain/__pycache__/demote.*.pyc
+%{python3_sitearch}/samba/netcmd/domain/__pycache__/functional_prep.*.pyc
+%{python3_sitearch}/samba/netcmd/domain/__pycache__/info.*.pyc
+%{python3_sitearch}/samba/netcmd/domain/__pycache__/join.*.pyc
+%{python3_sitearch}/samba/netcmd/domain/__pycache__/keytab.*.pyc
+%{python3_sitearch}/samba/netcmd/domain/__pycache__/leave.*.pyc
+%{python3_sitearch}/samba/netcmd/domain/__pycache__/level.*.pyc
+%{python3_sitearch}/samba/netcmd/domain/__pycache__/passwordsettings.*.pyc
+%{python3_sitearch}/samba/netcmd/domain/__pycache__/provision.*.pyc
+%{python3_sitearch}/samba/netcmd/domain/__pycache__/samba3upgrade.*.pyc
+%{python3_sitearch}/samba/netcmd/domain/__pycache__/schemaupgrade.*.pyc
+%{python3_sitearch}/samba/netcmd/domain/__pycache__/tombstones.*.pyc
+%{python3_sitearch}/samba/netcmd/domain/__pycache__/trust.*.pyc
+%dir %{python3_sitearch}/samba/netcmd/domain/auth
+%{python3_sitearch}/samba/netcmd/domain/auth/__init__.py
+%dir %{python3_sitearch}/samba/netcmd/domain/auth/__pycache__
+%{python3_sitearch}/samba/netcmd/domain/auth/__pycache__/__init__.*.pyc
+%{python3_sitearch}/samba/netcmd/domain/auth/__pycache__/policy.*.pyc
+%{python3_sitearch}/samba/netcmd/domain/auth/__pycache__/silo.*.pyc
+%{python3_sitearch}/samba/netcmd/domain/auth/__pycache__/silo_member.*.pyc
+%{python3_sitearch}/samba/netcmd/domain/auth/policy.py
+%{python3_sitearch}/samba/netcmd/domain/auth/silo.py
+%{python3_sitearch}/samba/netcmd/domain/auth/silo_member.py
+%{python3_sitearch}/samba/netcmd/domain/backup.py
+%dir %{python3_sitearch}/samba/netcmd/domain/claim
+%{python3_sitearch}/samba/netcmd/domain/claim/__init__.py
+%dir %{python3_sitearch}/samba/netcmd/domain/claim/__pycache__
+%{python3_sitearch}/samba/netcmd/domain/claim/__pycache__/__init__.*.pyc
+%{python3_sitearch}/samba/netcmd/domain/claim/__pycache__/claim_type.*.pyc
+%{python3_sitearch}/samba/netcmd/domain/claim/__pycache__/value_type.*.pyc
+%{python3_sitearch}/samba/netcmd/domain/claim/claim_type.py
+%{python3_sitearch}/samba/netcmd/domain/claim/value_type.py
+%{python3_sitearch}/samba/netcmd/domain/classicupgrade.py
+%{python3_sitearch}/samba/netcmd/domain/common.py
+%{python3_sitearch}/samba/netcmd/domain/dcpromo.py
+%{python3_sitearch}/samba/netcmd/domain/demote.py
+%{python3_sitearch}/samba/netcmd/domain/functional_prep.py
+%{python3_sitearch}/samba/netcmd/domain/info.py
+%{python3_sitearch}/samba/netcmd/domain/join.py
+%{python3_sitearch}/samba/netcmd/domain/keytab.py
+%{python3_sitearch}/samba/netcmd/domain/leave.py
+%{python3_sitearch}/samba/netcmd/domain/level.py
+%dir %{python3_sitearch}/samba/netcmd/domain/models
+%{python3_sitearch}/samba/netcmd/domain/models/__init__.py
+%dir %{python3_sitearch}/samba/netcmd/domain/models/__pycache__
+%{python3_sitearch}/samba/netcmd/domain/models/__pycache__/__init__.*.pyc
+%{python3_sitearch}/samba/netcmd/domain/models/__pycache__/auth_policy.*.pyc
+%{python3_sitearch}/samba/netcmd/domain/models/__pycache__/auth_silo.*.pyc
+%{python3_sitearch}/samba/netcmd/domain/models/__pycache__/claim_type.*.pyc
+%{python3_sitearch}/samba/netcmd/domain/models/__pycache__/exceptions.*.pyc
+%{python3_sitearch}/samba/netcmd/domain/models/__pycache__/fields.*.pyc
+%{python3_sitearch}/samba/netcmd/domain/models/__pycache__/model.*.pyc
+%{python3_sitearch}/samba/netcmd/domain/models/__pycache__/schema.*.pyc
+%{python3_sitearch}/samba/netcmd/domain/models/__pycache__/site.*.pyc
+%{python3_sitearch}/samba/netcmd/domain/models/__pycache__/subnet.*.pyc
+%{python3_sitearch}/samba/netcmd/domain/models/__pycache__/user.*.pyc
+%{python3_sitearch}/samba/netcmd/domain/models/__pycache__/value_type.*.pyc
+%{python3_sitearch}/samba/netcmd/domain/models/auth_policy.py
+%{python3_sitearch}/samba/netcmd/domain/models/auth_silo.py
+%{python3_sitearch}/samba/netcmd/domain/models/claim_type.py
+%{python3_sitearch}/samba/netcmd/domain/models/exceptions.py
+%{python3_sitearch}/samba/netcmd/domain/models/fields.py
+%{python3_sitearch}/samba/netcmd/domain/models/model.py
+%{python3_sitearch}/samba/netcmd/domain/models/schema.py
+%{python3_sitearch}/samba/netcmd/domain/models/site.py
+%{python3_sitearch}/samba/netcmd/domain/models/subnet.py
+%{python3_sitearch}/samba/netcmd/domain/models/user.py
+%{python3_sitearch}/samba/netcmd/domain/models/value_type.py
+%{python3_sitearch}/samba/netcmd/domain/passwordsettings.py
+%{python3_sitearch}/samba/netcmd/domain/provision.py
+%{python3_sitearch}/samba/netcmd/domain/samba3upgrade.py
+%{python3_sitearch}/samba/netcmd/domain/schemaupgrade.py
+%{python3_sitearch}/samba/netcmd/domain/tombstones.py
+%{python3_sitearch}/samba/netcmd/domain/trust.py
 %{python3_sitearch}/samba/netcmd/dns.py
-%{python3_sitearch}/samba/netcmd/domain.py
-%{python3_sitearch}/samba/netcmd/domain_backup.py
 %{python3_sitearch}/samba/netcmd/drs.py
 %{python3_sitearch}/samba/netcmd/dsacl.py
+%{python3_sitearch}/samba/netcmd/encoders.py
 %{python3_sitearch}/samba/netcmd/forest.py
 %{python3_sitearch}/samba/netcmd/fsmo.py
+%{python3_sitearch}/samba/netcmd/gpcommon.py
 %{python3_sitearch}/samba/netcmd/gpo.py
 %{python3_sitearch}/samba/netcmd/group.py
 %{python3_sitearch}/samba/netcmd/ldapcmp.py
@@ -2724,9 +2771,11 @@ fi
 %{python3_sitearch}/samba/netcmd/spn.py
 %{python3_sitearch}/samba/netcmd/testparm.py
 %{python3_sitearch}/samba/netcmd/user.py
+%{python3_sitearch}/samba/netcmd/validators.py
 %{python3_sitearch}/samba/netcmd/visualize.py
 %{python3_sitearch}/samba/ntacls.py
 %{python3_sitearch}/samba/param.*.so
+%{python3_sitearch}/samba/policies.py
 %{python3_sitearch}/samba/policy.*.so
 %{python3_sitearch}/samba/registry.*.so
 %{python3_sitearch}/samba/reparse_symlink.*.so
@@ -2903,6 +2952,7 @@ fi
 %{python3_sitearch}/samba/tests/__pycache__/ldap_referrals.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/ldap_spn.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/ldap_upn_sam_account.*.pyc
+%{python3_sitearch}/samba/tests/__pycache__/ldap_whoami.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/loadparm.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/logfiles.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/libsmb.*.pyc
@@ -2950,6 +3000,7 @@ fi
 %{python3_sitearch}/samba/tests/__pycache__/s3_net_join.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/safe_tarfile.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/samba_upgradedns_lmdb.*.pyc
+%{python3_sitearch}/samba/tests/__pycache__/samba_startup_fl_change.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/samba3sam.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/samdb.*.pyc
 %{python3_sitearch}/samba/tests/__pycache__/samdb_api.*.pyc
@@ -3132,8 +3183,11 @@ fi
 %{python3_sitearch}/samba/tests/krb5/__pycache__/alias_tests.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/as_canonicalization_tests.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/as_req_tests.*.pyc
+%{python3_sitearch}/samba/tests/krb5/__pycache__/authn_policy_tests.*.pyc
+%{python3_sitearch}/samba/tests/krb5/__pycache__/claims_in_pac.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/claims_tests.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/compatability_tests.*.pyc
+%{python3_sitearch}/samba/tests/krb5/__pycache__/device_tests.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/etype_tests.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/fast_tests.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/group_tests.*.pyc
@@ -3146,6 +3200,7 @@ fi
 %{python3_sitearch}/samba/tests/krb5/__pycache__/ms_kile_client_principal_lookup_tests.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/nt_hash_tests.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/pac_align_tests.*.pyc
+%{python3_sitearch}/samba/tests/krb5/__pycache__/pkinit_tests.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/protected_users_tests.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/raw_testcase.*.pyc
 %{python3_sitearch}/samba/tests/krb5/__pycache__/rfc4120_constants.*.pyc
@@ -3165,8 +3220,11 @@ fi
 %{python3_sitearch}/samba/tests/krb5/alias_tests.py
 %{python3_sitearch}/samba/tests/krb5/as_canonicalization_tests.py
 %{python3_sitearch}/samba/tests/krb5/as_req_tests.py
+%{python3_sitearch}/samba/tests/krb5/authn_policy_tests.py
+%{python3_sitearch}/samba/tests/krb5/claims_in_pac.py
 %{python3_sitearch}/samba/tests/krb5/claims_tests.py
 %{python3_sitearch}/samba/tests/krb5/compatability_tests.py
+%{python3_sitearch}/samba/tests/krb5/device_tests.py
 %{python3_sitearch}/samba/tests/krb5/etype_tests.py
 %{python3_sitearch}/samba/tests/krb5/fast_tests.py
 %{python3_sitearch}/samba/tests/krb5/group_tests.py
@@ -3179,6 +3237,7 @@ fi
 %{python3_sitearch}/samba/tests/krb5/ms_kile_client_principal_lookup_tests.py
 %{python3_sitearch}/samba/tests/krb5/nt_hash_tests.py
 %{python3_sitearch}/samba/tests/krb5/pac_align_tests.py
+%{python3_sitearch}/samba/tests/krb5/pkinit_tests.py
 %{python3_sitearch}/samba/tests/krb5/protected_users_tests.py
 %{python3_sitearch}/samba/tests/krb5/raw_testcase.py
 %{python3_sitearch}/samba/tests/krb5/rfc4120_constants.py
@@ -3200,6 +3259,7 @@ fi
 %{python3_sitearch}/samba/tests/ldap_spn.py
 %{python3_sitearch}/samba/tests/ldap_referrals.py
 %{python3_sitearch}/samba/tests/ldap_upn_sam_account.py
+%{python3_sitearch}/samba/tests/ldap_whoami.py
 %{python3_sitearch}/samba/tests/libsmb.py
 %{python3_sitearch}/samba/tests/libsmb-basic.py
 %{python3_sitearch}/samba/tests/loadparm.py
@@ -3247,6 +3307,7 @@ fi
 %{python3_sitearch}/samba/tests/s3_net_join.py
 %{python3_sitearch}/samba/tests/safe_tarfile.py
 %{python3_sitearch}/samba/tests/samba3sam.py
+%{python3_sitearch}/samba/tests/samba_startup_fl_change.py
 %{python3_sitearch}/samba/tests/samba_upgradedns_lmdb.py
 %dir %{python3_sitearch}/samba/tests/samba_tool
 %{python3_sitearch}/samba/tests/samba_tool/__init__.py
@@ -3257,6 +3318,11 @@ fi
 %{python3_sitearch}/samba/tests/samba_tool/__pycache__/contact.*.pyc
 %{python3_sitearch}/samba/tests/samba_tool/__pycache__/demote.*.pyc
 %{python3_sitearch}/samba/tests/samba_tool/__pycache__/dnscmd.*.pyc
+%{python3_sitearch}/samba/tests/samba_tool/__pycache__/domain_auth_base.*.pyc
+%{python3_sitearch}/samba/tests/samba_tool/__pycache__/domain_auth_policy.*.pyc
+%{python3_sitearch}/samba/tests/samba_tool/__pycache__/domain_auth_silo.*.pyc
+%{python3_sitearch}/samba/tests/samba_tool/__pycache__/domain_claim.*.pyc
+%{python3_sitearch}/samba/tests/samba_tool/__pycache__/domain_models.*.pyc
 %{python3_sitearch}/samba/tests/samba_tool/__pycache__/drs_clone_dc_data_lmdb_size.*.pyc
 %{python3_sitearch}/samba/tests/samba_tool/__pycache__/dsacl.*.pyc
 %{python3_sitearch}/samba/tests/samba_tool/__pycache__/forest.*.pyc
@@ -3294,6 +3360,11 @@ fi
 %{python3_sitearch}/samba/tests/samba_tool/contact.py
 %{python3_sitearch}/samba/tests/samba_tool/demote.py
 %{python3_sitearch}/samba/tests/samba_tool/dnscmd.py
+%{python3_sitearch}/samba/tests/samba_tool/domain_auth_base.py
+%{python3_sitearch}/samba/tests/samba_tool/domain_auth_policy.py
+%{python3_sitearch}/samba/tests/samba_tool/domain_auth_silo.py
+%{python3_sitearch}/samba/tests/samba_tool/domain_claim.py
+%{python3_sitearch}/samba/tests/samba_tool/domain_models.py
 %{python3_sitearch}/samba/tests/samba_tool/drs_clone_dc_data_lmdb_size.py
 %{python3_sitearch}/samba/tests/samba_tool/dsacl.py
 %{python3_sitearch}/samba/tests/samba_tool/forest.py
@@ -4381,6 +4452,76 @@ fi
 %endif
 
 %changelog
+* Mon Oct 16 2023 Guenther Deschner <gdeschner@redhat.com> - 4.19.2-1
+- resolves: #2244496 - Update to version 4.19.2
+
+* Tue Oct 10 2023 Guenther Deschner <gdeschner@redhat.com> - 4.19.1-1
+- resolves: #2243073 - Update to version 4.19.1
+- resolves: #2241881, #2243228: Security fix for CVE-2023-3961
+- resolves: #2241882, #2243231: Security fix for CVE-2023-4091
+- resolves: #2241883, #2243230: Security fix for CVE-2023-4154
+- resolves: #2241884, #2243229: Security fix for CVE-2023-42669
+- resolves: #2241885, #2243232: Security fix for CVE-2023-42670
+
+* Mon Sep 04 2023 Guenther Deschner <gdeschner@redhat.com> - 4.19.0-1
+- resolves: #2237259 - Update to version 4.19.0
+
+* Mon Aug 28 2023 Guenther Deschner <gdeschner@redhat.com> - 4.19.0-0.5.rc4
+- resolves: #2232744 - Update to version 4.19.0rc4
+
+* Fri Aug 18 2023 Guenther Deschner <gdeschner@redhat.com> - 4.19.0-0.4.rc3
+- resolves: #2232744 - Update to version 4.19.0rc3
+
+* Wed Aug 16 2023 Yaakov Selkowitz <yselkowi@redhat.com> - 2:4.19.0-0.3.rc2
+- Move ad-claims and authn-policy-util to dc-libs
+
+* Tue Aug 15 2023 Adam Williamson <awilliam@redhat.com> - 4.19.0-0.2.rc2
+- python3-samba-dc requires python3-markdown now
+
+* Tue Aug 08 2023 Guenther Deschner <gdeschner@redhat.com> - 4.19.0-0.1.rc2
+- resolves: #2227246 - Update to version 4.19.0rc2
+
+* Mon Aug 07 2023 Guenther Deschner <gdeschner@redhat.com> - 4.19.0-0.0.rc1
+- resolves: #2227246 - Update to version 4.19.0rc1
+
+* Thu Jul 20 2023 Guenther Deschner <gdeschner@redhat.com> - 4.18.5-0
+- resolves: #2224040 - Update to version 4.18.5
+- resolves: #2222791, #2224254 - Security fix for CVE-2022-2127
+- resolves: #2222792, #2224255 - Security fix for CVE-2023-3347
+- resolves: #2222793, #2224253 - Security fix for CVE-2023-34966
+- resolves: #2222794, #2224252 - Security fix for CVE-2023-34967
+- resolves: #2222795, #2224250 - Security fix for CVE-2023-34968
+
+* Sat Jul 15 2023 Guenther Deschner <gdeschner@redhat.com> - 4.18.4-3
+- resolves: #2223091 - Fix netlogon LogonGetCapabilities level 2 error handling
+
+* Tue Jul 11 2023 František Zatloukal <fzatlouk@redhat.com> - 2:4.18.4-2
+- Rebuilt for ICU 73.2
+
+* Wed Jul 05 2023 Python Maint <python-maint@redhat.com> - 2:4.18.4-1
+- Rebuilt for Python 3.12
+
+* Wed Jul 05 2023 Guenther Deschner <gdeschner@redhat.com> - 4.18.4-0
+- resolves: #2219799 - Update to version 4.18.4
+
+* Mon Jun 26 2023 Python Maint <python-maint@redhat.com> - 2:4.18.3-5
+- Rebuilt for Python 3.12
+
+* Mon Jun 26 2023 Adam Williamson <awilliam@redhat.com> - 4.18.3-4
+- Only run libwbclient %pre on upgrade, not fresh install
+
+* Fri Jun 23 2023 Andreas Schneider <asn@redhat.com> - 4.18.3-3
+- resolves: rhbz#2211577 - Fix libwbclient package upgrades
+
+* Thu Jun 15 2023 Python Maint <python-maint@redhat.com> - 2:4.18.3-2
+- Rebuilt for Python 3.12
+
+* Thu Jun 15 2023 Andreas Schneider <asn@redhat.com> - 4.18.3-1
+- resolves: #2203539 - Also cover mit_kdc.log by logrotate
+
+* Thu Jun 01 2023 Guenther Deschner <gdeschner@redhat.com> - 4.18.3-0
+- resolves: #2211453 - Update to version 4.18.3
+
 * Fri May 12 2023 Liu Yang <Yang.Liu.sn@gmail.com> - 4.18.2-0.rv64
 - Enable more fetures for riscv64.
 
@@ -4416,6 +4557,9 @@ fi
 
 * Tue Feb 14 2023 Pavel Filipenský <pfilipen@redhat.com> - 4.18.0rc2-4
 - resolves: rhbz#2166124 - Create package samba-tools, move there samba-tool binary
+
+* Mon Feb 13 2023 Pavel Filipenský <pfilipen@redhat.com> - 4.18.0rc2-5
+- Create package samba-tools, move there samba-tool binary
 
 * Thu Feb 02 2023 Guenther Deschner <gdeschner@redhat.com> - 4.18.0rc2-3
 - resolves: #2166416 - Update to version 4.18.0rc2
